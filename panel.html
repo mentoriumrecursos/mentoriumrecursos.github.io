@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mentorium - Panel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',sans-serif;background:#0E1117;color:#fff;min-height:100vh}
+#login{text-align:center;padding:80px 20px}
+#login .logo{color:#C5A55A;font-size:32px;font-weight:800;margin-bottom:8px}
+#login small{color:#888;display:block;margin-bottom:30px}
+#login input{background:#1a1f2e;border:1px solid #333;color:#fff;padding:14px 20px;border-radius:8px;font-size:15px;width:260px;margin:8px 0;font-family:'Poppins',sans-serif;text-align:center}
+#login input:focus{border-color:#C5A55A;outline:none}
+#login button{background:#C5A55A;color:#0E1117;border:none;padding:14px 40px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'Poppins',sans-serif}
+#login .error{color:#ff4444;font-size:13px;margin-top:10px;display:none}
+#panel{display:none;padding:20px;max-width:700px;margin:0 auto}
+#panel .top{text-align:center;margin:20px 0}
+#panel .top span{color:#C5A55A;font-size:28px;font-weight:800}
+#panel .top small{display:block;color:#888;font-size:12px;margin-top:4px}
+h2{color:#C5A55A;font-size:17px;margin:25px 0 10px;padding-bottom:6px;border-bottom:1px solid #252b3b}
+.t{display:block;background:#1a1f2e;padding:14px 18px;margin:6px 0;border-radius:10px;text-decoration:none;border-left:4px solid #C5A55A}
+.t .n{color:#fff;font-size:14px;font-weight:700}
+.t .d{color:#888;font-size:11px;margin-top:3px}
+.tg{display:inline-block;background:#C5A55A;color:#0E1117;font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;margin-left:6px}
+</style>
+</head>
+<body>
+<div id="login">
+<div class="logo">MENTORIUM</div>
+<small>Panel Recursos - Acceso Equipo</small>
+<input type="password" id="pass" placeholder="Contrasena" onkeypress="if(event.key==='Enter')ck()">
+<br><button onclick="ck()">Entrar</button>
+<div class="error" id="err">Incorrecta</div>
+</div>
+<div id="panel">
+<div class="top"><span>MENTORIUM</span><small>Recursos para enviar a leads</small></div>
+<h2>CALCULADORAS</h2>
+<a class="t" href="calculadora-margenes.html" target="_blank"><div class="n">Calculadora Margenes Reales <span class="tg">TOP</span></div><div class="d">Cuanto le queda DE VERDAD despues de costes</div></a>
+<a class="t" href="calculadora-roas-real.html" target="_blank"><div class="n">Calculadora ROAS Real</div><div class="d">Si los ads son rentables o no</div></a>
+<a class="t" href="calculadora-profit-first.html" target="_blank"><div class="n">Profit First</div><div class="d">Beneficio antes de gastar</div></a>
+<a class="t" href="calculadora-break-even-diario.html" target="_blank"><div class="n">Break Even Diario</div><div class="d">Cuanto vender al dia para cubrir costes</div></a>
+<h2>AUDITORES</h2>
+<a class="t" href="auditor-checkout.html" target="_blank"><div class="n">Auditor Checkout <span class="tg">TOP</span></div><div class="d">15 puntos que revisar del checkout</div></a>
+<a class="t" href="auditoria-express.html" target="_blank"><div class="n">Auditoria Express</div><div class="d">Nota del 1 al 10 de la tienda</div></a>
+<a class="t" href="auditor-meta-ads.html" target="_blank"><div class="n">Auditor Meta Ads</div><div class="d">Checklist campanas ads</div></a>
+<a class="t" href="landing-audit.html" target="_blank"><div class="n">Auditor Landing</div><div class="d">Landing de alta conversion</div></a>
+<h2>GENERADORES</h2>
+<a class="t" href="validador-producto.html" target="_blank"><div class="n">Validador Producto <span class="tg">TOP</span></div><div class="d">Si un producto tiene potencial</div></a>
+<a class="t" href="comparador-proveedores.html" target="_blank"><div class="n">Comparador Proveedores</div><div class="d">Precio, envio, calidad</div></a>
+<a class="t" href="generador-copy-anuncio.html" target="_blank"><div class="n">Generador Copy Anuncios</div><div class="d">Textos para Meta Ads</div></a>
+<h2>SIMULADORES</h2>
+<a class="t" href="simulador-escalado.html" target="_blank"><div class="n">Simulador Escalado</div><div class="d">Si meto mas en ads cuanto vendo</div></a>
+<a class="t" href="simulador-funnel-organico.html" target="_blank"><div class="n">Funnel Organico</div><div class="d">De seguidores a ventas</div></a>
+</div>
+<script>function ck(){if(document.getElementById('pass').value==='mentorium2026'){document.getElementById('login').style.display='none';document.getElementById('panel').style.display='block'}else{document.getElementById('err').style.display='block'}}</script>
+</body>
+</html>
