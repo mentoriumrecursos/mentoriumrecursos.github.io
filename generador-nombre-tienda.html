@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Nombre de Tienda — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#00C853}
+  .field select option{background:#111;color:#fff}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .chip{padding:6px 14px;background:#1a1a1e;border:1px solid #2a2a2e;border-radius:8px;font-size:12px;font-weight:600;color:#888;cursor:pointer;transition:all 0.2s}
+  .chip:hover,.chip.active{background:rgba(0,200,83,0.12);border-color:#00C853;color:#00C853}
+  .btn{width:100%;padding:16px;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px;transition:background 0.2s}
+  .btn:hover{background:#00b348}
+  .btn:disabled{background:#1c1c20;color:#555;cursor:not-allowed}
+  .results{margin-top:20px}
+  .results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .results-header h2{font-size:16px;font-weight:800}
+  .results-count{font-size:12px;color:#00C853;font-weight:700}
+  .name-card{background:#111113;border:1px solid #1c1c20;border-radius:14px;padding:18px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;transition:border-color 0.2s}
+  .name-card:hover{border-color:#2a2a2e}
+  .name-info{flex:1}
+  .name-text{font-size:17px;font-weight:800;color:#fff;margin-bottom:4px}
+  .name-domain{font-size:12px;color:#555;font-weight:500}
+  .name-domain .avail{color:#00C853;font-weight:700}
+  .name-domain .taken{color:#ff4444;font-weight:700}
+  .name-domain .maybe{color:#C8AA28;font-weight:700}
+  .name-style{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#444;margin-bottom:6px}
+  .name-actions{display:flex;gap:8px;align-items:center}
+  .copy-btn{padding:8px 14px;background:transparent;border:1px solid #333;border-radius:8px;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s}
+  .copy-btn:hover{border-color:#00C853;color:#00C853}
+  .copy-btn.copied{background:#00C853;border-color:#00C853;color:#0a0a0a}
+  .fav-btn{width:32px;height:32px;background:transparent;border:1px solid #333;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+  .fav-btn:hover,.fav-btn.faved{border-color:#00C853;background:rgba(0,200,83,0.1)}
+  .favs-section{margin-top:24px}
+  .favs-section h3{font-size:14px;font-weight:800;color:#00C853;margin-bottom:12px}
+  .tip-box{background:#0d1a0f;border:1px solid #1a3a20;border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#5a9a65;line-height:1.6}
+  .tip-box strong{color:#fff}
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Nombre de Tienda</h1>
+    <p>Encuentra el nombre perfecto para tu marca. 20 sugerencias con simulacion de disponibilidad .com</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu nicho</div>
+    <div class="field">
+      <label>Nicho o sector</label>
+      <input type="text" id="nicho" placeholder="Ej: fitness, decoracion, mascotas, moda urbana...">
+    </div>
+    <div class="field">
+      <label>Palabras clave (separadas por coma)</label>
+      <input type="text" id="keywords" placeholder="Ej: natural, premium, urban, eco, home...">
+      <div class="hint">Palabras que quieres que inspiren el nombre</div>
+    </div>
+    <div class="field">
+      <label>Estilo de nombre</label>
+      <div class="chips" id="styleChips">
+        <div class="chip active" data-val="moderno" onclick="selectStyle(this)">Moderno</div>
+        <div class="chip" data-val="minimalista" onclick="selectStyle(this)">Minimalista</div>
+        <div class="chip" data-val="premium" onclick="selectStyle(this)">Premium / Lujo</div>
+        <div class="chip" data-val="divertido" onclick="selectStyle(this)">Divertido</div>
+        <div class="chip" data-val="tecnico" onclick="selectStyle(this)">Tecnico</div>
+        <div class="chip" data-val="organico" onclick="selectStyle(this)">Organico / Natural</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Longitud preferida</label>
+      <select id="longitud">
+        <option value="corto">Corto (1 palabra)</option>
+        <option value="medio" selected>Medio (1-2 palabras)</option>
+        <option value="compuesto">Compuesto (palabra inventada)</option>
+      </select>
+    </div>
+    <button class="btn" id="genBtn" onclick="generar()">Generar 20 nombres</button>
+  </div>
+
+  <div class="results" id="results" style="display:none">
+    <div class="results-header">
+      <h2>Nombres generados</h2>
+      <span class="results-count" id="resCount">20 nombres</span>
+    </div>
+    <div id="namesList"></div>
+    <div class="tip-box">
+      <strong>Consejo:</strong> Antes de registrar, verifica la disponibilidad real del dominio en tu registrador.
+      Esta herramienta simula probabilidades basadas en patrones comunes — no consulta registros en tiempo real.
+    </div>
+  </div>
+
+  <div class="favs-section" id="favsSection" style="display:none">
+    <h3>Tus favoritos</h3>
+    <div id="favsList"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+<script>
+var selectedStyle = 'moderno';
+var favorites = [];
+
+function selectStyle(el){
+  document.querySelectorAll('#styleChips .chip').forEach(function(c){c.classList.remove('active')});
+  el.classList.add('active');
+  selectedStyle = el.dataset.val;
+}
+
+var prefixes = {
+  moderno: ['Nova','Flux','Vibe','Nex','Pulse','Drift','Hype','Kore','Zeni','Luma','Aero','Pixel','Echo','Ryze','Blaze','Apex','Volt','Dash','Fuse','Bolt'],
+  minimalista: ['Mono','Pure','Bare','Kin','Muji','Nua','Sol','Una','Zen','Ora','Ava','Lio','Rua','Koa','Noa','Isa','Yua','Emi','Rio','Kai'],
+  premium: ['Aurum','Luxe','Regal','Velvet','Crown','Onyx','Maison','Atelier','Noble','Ivory','Sterling','Crest','Opulent','Elite','Prestige','Sovereign','Haven','Classe','Eclat','Refined'],
+  divertido: ['Pop','Boom','Woo','Yay','Ziggy','Bloop','Snappy','Fizz','Jolly','Quirk','Doodle','Peppy','Zappy','Funky','Groovy','Mojo','Spark','Jazzy','Zippy','Dandy'],
+  tecnico: ['Byte','Core','Nexus','Logic','Sync','Proto','Algo','Data','Node','Grid','Stack','Matrix','Vector','Cyber','Nano','Qubit','Hexa','Digi','Meta','Crypt'],
+  organico: ['Terra','Bloom','Root','Sage','Leaf','Arbor','Flora','Verde','Willow','Meadow','Seed','Blossom','Grove','Moss','Fern','Cedar','Oasis','Ivy','Basil','Olive']
+};
+
+var suffixes = {
+  corto: ['','','','','','','','','','','','','','','','','','','',''],
+  medio: ['Lab','Co','Hub','Box','Shop','Store','Casa','Punto','Club','Base','Space','Market','Zone','Spot','Place','Works','Craft','Made','Studio','House'],
+  compuesto: ['ify','ly','io','ica','era','ium','ist','ory','ova','ara','ello','ino','ica','ella','ito','ado','ura','enzo','ista','ante']
+};
+
+function generateName(nicho, kws, style, longitud, index){
+  var pList = prefixes[style] || prefixes.moderno;
+  var sList = suffixes[longitud] || suffixes.medio;
+  var nichoWords = nicho.trim().toLowerCase().split(/\s+/);
+  var kwList = kws ? kws.split(',').map(function(k){return k.trim()}).filter(Boolean) : [];
+  var allWords = nichoWords.concat(kwList);
+
+  var seed = index * 7 + nicho.length * 3 + style.length * 11;
+  function pseudoRand(s){ s = ((s * 1103515245 + 12345) & 0x7fffffff); return s; }
+  seed = pseudoRand(seed + index * 31);
+
+  var strategies = [
+    function(){
+      var p = pList[Math.abs(seed) % pList.length];
+      seed = pseudoRand(seed);
+      var s = sList[Math.abs(seed) % sList.length];
+      return p + s;
+    },
+    function(){
+      var w = allWords[Math.abs(seed) % allWords.length] || 'store';
+      seed = pseudoRand(seed);
+      var p = pList[Math.abs(seed) % pList.length];
+      return p + w.charAt(0).toUpperCase() + w.slice(1);
+    },
+    function(){
+      var w = allWords[Math.abs(seed) % allWords.length] || 'shop';
+      seed = pseudoRand(seed);
+      var suf = sList[Math.abs(seed) % sList.length];
+      return w.charAt(0).toUpperCase() + w.slice(1) + suf;
+    },
+    function(){
+      var p = pList[Math.abs(seed) % pList.length];
+      seed = pseudoRand(seed);
+      var w = allWords[Math.abs(seed) % allWords.length] || '';
+      if(w){
+        return p + ' ' + w.charAt(0).toUpperCase() + w.slice(1);
+      }
+      var s = sList[Math.abs(seed) % sList.length];
+      return p + s;
+    },
+    function(){
+      var p1 = pList[Math.abs(seed) % pList.length];
+      seed = pseudoRand(seed);
+      var p2 = pList[Math.abs(seed) % pList.length];
+      if(p1 === p2){seed = pseudoRand(seed); p2 = pList[Math.abs(seed) % pList.length];}
+      return p1 + p2.toLowerCase();
+    }
+  ];
+
+  var stratIdx = Math.abs(pseudoRand(seed + index)) % strategies.length;
+  var name = strategies[stratIdx]();
+  return name.replace(/\s+/g,' ').trim();
+}
+
+function simulateAvailability(name, index){
+  var clean = name.replace(/\s+/g,'').toLowerCase();
+  var len = clean.length;
+  var hash = 0;
+  for(var i=0;i<clean.length;i++){hash=((hash<<5)-hash)+clean.charCodeAt(i);hash|=0;}
+
+  if(len <= 4) return 'taken';
+  if(len >= 10) return 'available';
+  if(len >= 7) return (Math.abs(hash) % 3 === 0) ? 'taken' : 'available';
+  return (Math.abs(hash) % 2 === 0) ? 'maybe' : 'available';
+}
+
+function generar(){
+  var nicho = document.getElementById('nicho').value.trim();
+  if(!nicho){
+    document.getElementById('nicho').style.borderColor='#ff4444';
+    setTimeout(function(){document.getElementById('nicho').style.borderColor='#1c1c20'},1500);
+    return;
+  }
+  var kws = document.getElementById('keywords').value;
+  var longitud = document.getElementById('longitud').value;
+  var names = [];
+  var seen = {};
+  var attempts = 0;
+
+  while(names.length < 20 && attempts < 100){
+    var name = generateName(nicho, kws, selectedStyle, longitud, attempts);
+    var key = name.toLowerCase().replace(/\s/g,'');
+    if(!seen[key] && name.length > 2){
+      seen[key] = true;
+      var avail = simulateAvailability(name, attempts);
+      names.push({name:name, domain:name.replace(/\s+/g,'').toLowerCase()+'.com', availability:avail});
+    }
+    attempts++;
+  }
+
+  var html = '';
+  names.forEach(function(n,i){
+    var availClass = n.availability === 'available' ? 'avail' : (n.availability === 'taken' ? 'taken' : 'maybe');
+    var availText = n.availability === 'available' ? 'Probablemente disponible' : (n.availability === 'taken' ? 'Probablemente ocupado' : 'Verificar disponibilidad');
+    html += '<div class="name-card" id="nc_'+i+'">';
+    html += '<div class="name-info">';
+    html += '<div class="name-style">'+selectedStyle.toUpperCase()+'</div>';
+    html += '<div class="name-text">'+n.name+'</div>';
+    html += '<div class="name-domain">'+n.domain+' — <span class="'+availClass+'">'+availText+'</span></div>';
+    html += '</div>';
+    html += '<div class="name-actions">';
+    html += '<button class="fav-btn" onclick="toggleFav('+i+',\''+n.name.replace(/'/g,"\\'")+'\')" id="fav_'+i+'">&#9734;</button>';
+    html += '<button class="copy-btn" onclick="copyName(this,\''+n.name.replace(/'/g,"\\'")+'\')" id="cp_'+i+'">Copiar</button>';
+    html += '</div></div>';
+  });
+
+  document.getElementById('namesList').innerHTML = html;
+  document.getElementById('resCount').textContent = names.length + ' nombres';
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+function copyName(btn, name){
+  navigator.clipboard.writeText(name).catch(function(){});
+  btn.textContent = 'Copiado';
+  btn.classList.add('copied');
+  setTimeout(function(){btn.textContent='Copiar';btn.classList.remove('copied')},1500);
+}
+
+function toggleFav(idx, name){
+  var btn = document.getElementById('fav_'+idx);
+  var pos = favorites.indexOf(name);
+  if(pos === -1){
+    favorites.push(name);
+    btn.innerHTML = '&#9733;';
+    btn.classList.add('faved');
+  } else {
+    favorites.splice(pos,1);
+    btn.innerHTML = '&#9734;';
+    btn.classList.remove('faved');
+  }
+  renderFavs();
+}
+
+function renderFavs(){
+  if(favorites.length === 0){
+    document.getElementById('favsSection').style.display='none';
+    return;
+  }
+  document.getElementById('favsSection').style.display='block';
+  var html = '';
+  favorites.forEach(function(f){
+    html += '<div class="name-card"><div class="name-info"><div class="name-text">'+f+'</div>';
+    html += '<div class="name-domain">'+f.replace(/\s+/g,'').toLowerCase()+'.com</div>';
+    html += '</div><div class="name-actions">';
+    html += '<button class="copy-btn" onclick="copyName(this,\''+f.replace(/'/g,"\\'")+'\')">Copiar</button>';
+    html += '</div></div>';
+  });
+  document.getElementById('favsList').innerHTML = html;
+}
+</script>
+</body>
+</html>

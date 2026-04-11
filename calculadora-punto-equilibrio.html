@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Punto de Equilibrio — ¿Cuánto necesitas facturar para no perder? — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#faf9f7,#f0ede8);color:#1a1a1a;min-height:100vh}
+  .container{max-width:460px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .badge{display:inline-block;background:#1a1a1a;color:#fff;font-size:10px;font-weight:800;padding:6px 16px;border-radius:100px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:8px}
+  .header p{font-size:13px;color:#888;line-height:1.5}
+  .card{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
+  .card-title{font-size:11px;font-weight:800;color:#C45830;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field label .val{color:#C45830;font-weight:800}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#e8e4de;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#C45830;border-radius:50%;cursor:pointer;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.15)}
+  .row .num{width:80px;background:#faf9f7;border:1px solid #e8e4de;border-radius:8px;color:#1a1a1a;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#C45830}
+  .row .u{color:#aaa;font-size:13px;font-weight:600;width:16px}
+  .result{background:#fff;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.06);text-align:center;margin-top:20px}
+  .result .big{font-size:48px;font-weight:900;color:#C45830}
+  .result .label{font-size:13px;color:#888;margin-top:6px;margin-bottom:20px}
+  .result .breakdown{text-align:left;background:#faf9f7;padding:16px;border-radius:10px}
+  .result .line{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;border-bottom:1px solid #f0ede8}
+  .result .line:last-child{border-bottom:none}
+  .result .line .l{color:#888}
+  .result .line .v{font-weight:800}
+  .result .line .v.neg{color:#C45830}
+  .result .line .v.pos{color:#2D8C4E}
+  .gauge{margin:20px 0;height:16px;background:#e8e4de;border-radius:8px;overflow:hidden;position:relative}
+  .gauge-fill{height:100%;border-radius:8px;transition:width 0.5s}
+  .gauge-mark{position:absolute;top:-20px;font-size:10px;font-weight:800;color:#1a1a1a;transform:translateX(-50%)}
+  .gauge-labels{display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-top:4px}
+  .insight{background:#fff;border-radius:12px;padding:16px;margin-top:16px;box-shadow:0 2px 8px rgba(0,0,0,0.04);font-size:13px;color:#666;line-height:1.6}
+  .insight strong{color:#1a1a1a}
+  .insight .accent{color:#C45830;font-weight:700}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#ccc}
+  .footer span{color:#C45830;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">Calculadora</div>
+    <h1>¿Cuánto necesitas facturar para no perder?</h1>
+    <p>Tu punto de equilibrio mensual. El número que deberías tener en la pared.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Gastos fijos mensuales</div>
+    <div class="field">
+      <label>Shopify + apps <span class="val" id="lbl_shopify">150€</span></label>
+      <div class="row"><input type="range" min="30" max="500" step="10" value="150" id="sl_shopify" oninput="s('shopify')"><input type="number" class="num" id="in_shopify" value="150" oninput="s('shopify',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Herramientas (Klaviyo, etc.) <span class="val" id="lbl_tools">100€</span></label>
+      <div class="row"><input type="range" min="0" max="500" step="10" value="100" id="sl_tools" oninput="s('tools')"><input type="number" class="num" id="in_tools" value="100" oninput="s('tools',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Dominio + hosting + otros <span class="val" id="lbl_other">50€</span></label>
+      <div class="row"><input type="range" min="0" max="200" step="10" value="50" id="sl_other" oninput="s('other')"><input type="number" class="num" id="in_other" value="50" oninput="s('other',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Salario / coste de tu tiempo <span class="val" id="lbl_salary">0€</span></label>
+      <div class="row"><input type="range" min="0" max="5000" step="100" value="0" id="sl_salary" oninput="s('salary')"><input type="number" class="num" id="in_salary" value="0" oninput="s('salary',1)"><span class="u">€</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Costes variables</div>
+    <div class="field">
+      <label>Margen bruto por venta <span class="val" id="lbl_margin">40%</span></label>
+      <div class="row"><input type="range" min="10" max="70" value="40" id="sl_margin" oninput="s('margin')"><input type="number" class="num" id="in_margin" value="40" oninput="s('margin',1)"><span class="u">%</span></div>
+    </div>
+    <div class="field">
+      <label>Ticket medio <span class="val" id="lbl_aov">45€</span></label>
+      <div class="row"><input type="range" min="10" max="200" value="45" id="sl_aov" oninput="s('aov')"><input type="number" class="num" id="in_aov" value="45" oninput="s('aov',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Gasto en ads mensual <span class="val" id="lbl_ads">2000€</span></label>
+      <div class="row"><input type="range" min="0" max="20000" step="100" value="2000" id="sl_ads" oninput="s('ads')"><input type="number" class="num" id="in_ads" value="2000" oninput="s('ads',1)"><span class="u">€</span></div>
+    </div>
+  </div>
+
+  <div class="result" id="result"></div>
+  <div class="insight" id="insight"></div>
+
+  <div class="footer">Herramienta gratuita de <span>MENTORIUM</span></div>
+</div>
+<script>
+function s(k,fi){var sl=document.getElementById('sl_'+k),inp=document.getElementById('in_'+k);if(fi)sl.value=inp.value;else inp.value=sl.value;calc();}
+function fmt(n){return Math.round(n).toLocaleString('es-ES')+'€'}
+function calc(){
+  var shopify=parseFloat(document.getElementById('in_shopify').value)||0;
+  var tools=parseFloat(document.getElementById('in_tools').value)||0;
+  var other=parseFloat(document.getElementById('in_other').value)||0;
+  var salary=parseFloat(document.getElementById('in_salary').value)||0;
+  var margin=parseFloat(document.getElementById('in_margin').value)||0;
+  var aov=parseFloat(document.getElementById('in_aov').value)||0;
+  var ads=parseFloat(document.getElementById('in_ads').value)||0;
+
+  document.getElementById('lbl_shopify').textContent=shopify+'€';
+  document.getElementById('lbl_tools').textContent=tools+'€';
+  document.getElementById('lbl_other').textContent=other+'€';
+  document.getElementById('lbl_salary').textContent=salary+'€';
+  document.getElementById('lbl_margin').textContent=margin+'%';
+  document.getElementById('lbl_aov').textContent=aov+'€';
+  document.getElementById('lbl_ads').textContent=ads+'€';
+
+  var fijos=shopify+tools+other+salary;
+  var total_fijos=fijos+ads;
+
+  // Break-even: fijos / margin_pct
+  var be_revenue=margin>0?total_fijos/(margin/100):0;
+  var be_orders=aov>0?Math.ceil(be_revenue/aov):0;
+  var be_daily=Math.ceil(be_orders/30);
+  var margin_per_order=aov*margin/100;
+
+  var html='<div class="big">'+fmt(be_revenue)+'</div>';
+  html+='<div class="label">Necesitas facturar esto al mes para no perder ni un euro</div>';
+
+  // Gauge
+  var gauge_pct=Math.min(be_revenue/30000*100,100);
+  html+='<div class="gauge"><div class="gauge-fill" style="width:'+gauge_pct+'%;background:'+(be_revenue>20000?'#C45830':be_revenue>10000?'#C8AA28':'#2D8C4E')+'"></div></div>';
+  html+='<div class="gauge-labels"><span>0€</span><span>10K€</span><span>20K€</span><span>30K€</span></div>';
+
+  html+='<div class="breakdown">';
+  html+='<div class="line"><span class="l">Gastos fijos</span><span class="v neg">'+fmt(fijos)+'</span></div>';
+  html+='<div class="line"><span class="l">Gasto en ads</span><span class="v neg">'+fmt(ads)+'</span></div>';
+  html+='<div class="line"><span class="l">Total costes fijos</span><span class="v neg">'+fmt(total_fijos)+'</span></div>';
+  html+='<div class="line"><span class="l">Margen bruto</span><span class="v">'+margin+'%</span></div>';
+  html+='<div class="line"><span class="l">Margen por pedido</span><span class="v">'+margin_per_order.toFixed(0)+'€</span></div>';
+  html+='<div class="line"><span class="l">Pedidos necesarios</span><span class="v">'+be_orders+'/mes</span></div>';
+  html+='<div class="line"><span class="l">Pedidos por día</span><span class="v">'+be_daily+'/día</span></div>';
+  html+='</div>';
+
+  document.getElementById('result').innerHTML=html;
+
+  var ins='';
+  if(be_daily<=2){
+    ins='<strong style="color:#2D8C4E">Break-even alcanzable.</strong> Con '+be_daily+' pedidos al día cubres todos tus costes. Con una conversión del 2% necesitas '+Math.ceil(be_daily/0.02)+' visitantes diarios.';
+  }else if(be_daily<=5){
+    ins='<strong>Break-even moderado.</strong> '+be_daily+' pedidos/día es factible pero requiere tráfico consistente. ';
+    if(ads>fijos) ins+='<span class="accent">Tu gasto en ads ('+fmt(ads)+') es mayor que tus fijos ('+fmt(fijos)+'). Si bajas ads y mejoras conversión orgánica, el break-even baja.</span>';
+  }else{
+    ins='<strong style="color:#C45830">Break-even alto.</strong> Necesitas '+be_daily+' pedidos diarios. ';
+    ins+='<span class="accent">Revisa: ¿puedes subir precio para aumentar margen? ¿Puedes bajar fijos eliminando apps innecesarias? ¿Tus ads están siendo rentables?</span>';
+  }
+  document.getElementById('insight').innerHTML=ins;
+}
+calc();
+</script>
+</body>
+</html>

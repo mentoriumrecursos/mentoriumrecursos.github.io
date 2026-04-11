@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Copy para Anuncios — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#00C853}
+  .field select option{background:#111;color:#fff}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .chip{padding:6px 14px;background:#1a1a1e;border:1px solid #2a2a2e;border-radius:8px;font-size:12px;font-weight:600;color:#888;cursor:pointer;transition:all 0.2s}
+  .chip:hover,.chip.active{background:rgba(0,200,83,0.12);border-color:#00C853;color:#00C853}
+  .btn{width:100%;padding:16px;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px;transition:background 0.2s}
+  .btn:hover{background:#00b348}
+  .ad-card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:0;margin-bottom:14px;overflow:hidden}
+  .ad-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1c1c20}
+  .ad-type{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#00C853}
+  .ad-num{font-size:11px;font-weight:700;color:#333}
+  .ad-copy-all{padding:6px 14px;background:transparent;border:1px solid #333;border-radius:6px;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s}
+  .ad-copy-all:hover{border-color:#00C853;color:#00C853}
+  .ad-copy-all.copied{background:#00C853;border-color:#00C853;color:#0a0a0a}
+  .ad-section{padding:14px 20px;border-bottom:1px solid #0e0e10}
+  .ad-section:last-child{border-bottom:none}
+  .ad-section-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#444;margin-bottom:6px}
+  .ad-section-text{font-size:14px;font-weight:600;color:#ddd;line-height:1.6}
+  .ad-section-text.hook-text{font-size:16px;font-weight:800;color:#fff}
+  .ad-score{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#0c0c0e}
+  .ad-score-bar{flex:1;height:4px;background:#1c1c20;border-radius:100px;overflow:hidden}
+  .ad-score-fill{height:100%;border-radius:100px}
+  .ad-score-label{font-size:11px;font-weight:700;min-width:80px;text-align:right}
+  .results-header{display:flex;justify-content:space-between;align-items:center;margin:20px 0 16px}
+  .results-header h2{font-size:16px;font-weight:800}
+  .platform-tabs{display:flex;gap:8px;margin-bottom:16px}
+  .platform-tab{padding:8px 16px;background:#1a1a1e;border:1px solid #2a2a2e;border-radius:8px;font-size:12px;font-weight:700;color:#666;cursor:pointer;transition:all 0.2s}
+  .platform-tab:hover{border-color:#333}
+  .platform-tab.active{background:rgba(0,200,83,0.1);border-color:#00C853;color:#00C853}
+  .hidden{display:none}
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Copy para Anuncios</h1>
+    <p>5 variaciones de copy con estructura Hook + Body + CTA. Listas para testear.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu producto</div>
+    <div class="field">
+      <label>Producto o servicio</label>
+      <input type="text" id="producto" placeholder="Ej: Serum vitamina C, zapatillas minimalistas, curso de cocina...">
+    </div>
+    <div class="field">
+      <label>Beneficio principal</label>
+      <input type="text" id="beneficio" placeholder="Ej: Piel sin manchas en 30 dias, caminar como descalzo...">
+      <div class="hint">Que consigue el cliente al usar tu producto</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu audiencia</div>
+    <div class="field">
+      <label>Publico objetivo</label>
+      <input type="text" id="audiencia" placeholder="Ej: Mujeres 30-45 preocupadas por el envejecimiento...">
+    </div>
+    <div class="field">
+      <label>Dolor o problema principal</label>
+      <textarea id="dolor" rows="2" placeholder="Ej: Ha probado cremas caras que no funcionan y esta frustrada..."></textarea>
+    </div>
+    <div class="field">
+      <label>Oferta o incentivo</label>
+      <input type="text" id="oferta" placeholder="Ej: 20% descuento, envio gratis, 2x1, prueba 30 dias...">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Formato</div>
+    <div class="field">
+      <label>Plataforma</label>
+      <div class="chips" id="platformChips">
+        <div class="chip active" data-val="meta" onclick="selectPlatform(this)">Meta Ads</div>
+        <div class="chip" data-val="google" onclick="selectPlatform(this)">Google Ads</div>
+        <div class="chip" data-val="tiktok" onclick="selectPlatform(this)">TikTok Ads</div>
+        <div class="chip" data-val="email" onclick="selectPlatform(this)">Email</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Tono</label>
+      <select id="tono">
+        <option value="directo">Directo y urgente</option>
+        <option value="emocional">Emocional y narrativo</option>
+        <option value="educativo">Educativo y de autoridad</option>
+        <option value="social">Prueba social y testimonial</option>
+      </select>
+    </div>
+    <button class="btn" onclick="generate()">Generar 5 variaciones</button>
+  </div>
+
+  <div id="results" class="hidden">
+    <div class="results-header">
+      <h2>Variaciones generadas</h2>
+    </div>
+    <div id="adsList"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+<script>
+var selectedPlatform = 'meta';
+
+function selectPlatform(el){
+  document.querySelectorAll('#platformChips .chip').forEach(function(c){c.classList.remove('active')});
+  el.classList.add('active');
+  selectedPlatform = el.dataset.val;
+}
+
+var hookTemplates = {
+  directo: [
+    'Deja de {dolorAccion}. {producto} lo resuelve en {tiempo}.',
+    'Si {dolorCondicion}, esto te interesa.',
+    '{beneficio} sin {objecion}. Asi de simple.',
+    'Lo que nadie te dice sobre {dolorTema}: {revelacion}.',
+    '{numero}+ personas ya {logro}. Tu cuando?'
+  ],
+  emocional: [
+    'Recuerdas cuando {situacionPasada}? No tiene por que seguir asi.',
+    'Imagina {escenarioIdeal}. Ahora imagina que es posible en {tiempo}.',
+    '{persona} estaba igual que tu. Hoy {resultado}.',
+    'El dia que deje de {dolorAccion}, todo cambio.',
+    'No es tu culpa. Nadie te enseno que {revelacion}.'
+  ],
+  educativo: [
+    'El {error} que comete el {porcentaje}% de la gente con {tema}.',
+    '{dato} — y aun asi, la mayoria sigue {errorComun}.',
+    'La ciencia detras de {beneficio}: por que {producto} funciona.',
+    '{mito} es mentira. La realidad sobre {tema} es mas simple.',
+    'En {estudio}, {hallazgo}. Esto cambia todo lo que sabias sobre {tema}.'
+  ],
+  social: [
+    '"{testimonio}" — {nombre}, cliente desde {fecha}.',
+    '+{numero} resenas de 5 estrellas. Algo estamos haciendo bien.',
+    'Cuando {famoso} recomienda {producto}, algo tiene.',
+    'Lo mas vendido de {mes}. {numero} unidades y contando.',
+    '{nombre} lo probo por curiosidad. Ahora no puede vivir sin {producto}.'
+  ]
+};
+
+var bodyTemplates = {
+  directo: [
+    '{producto} esta disenado para {audiencia} que {dolor}.\n\nEn vez de {solucionMala}, {producto} {mecanismo}.\n\nResultado: {beneficio}.',
+    'El problema no eres tu. Es {causaReal}.\n\n{producto} ataca directamente {problema} con {diferenciador}.\n\n{beneficio} desde el primer uso.',
+    'Mira, {audiencia}: {dolor} tiene solucion.\n\n{producto} funciona porque {razon}. Sin complicaciones. Sin esperar meses.\n\nLo mejor? {beneficioExtra}.'
+  ],
+  emocional: [
+    'Se lo que es {dolorEmocional}. Esa sensacion de {sentimiento} cada vez que {situacion}.\n\nPero hay una forma diferente. {producto} fue creado para personas como tu que {deseo}.\n\nDe verdad mereces {beneficio}.',
+    'Durante anos, {audiencia} ha aceptado {statusQuo} como normal.\n\nPero no lo es. Tu mereces {beneficio}. Y ahora, con {producto}, esta al alcance de tu mano.\n\nCada dia que esperas es un dia menos disfrutando de {resultado}.',
+    'Todo empezo cuando una persona como tu dijo "basta".\n\nBasta de {dolor}. Basta de {frustracion}.\n\n{producto} nacio de esa frustracion. Y hoy, {numero}+ personas han recuperado {beneficio}.'
+  ],
+  educativo: [
+    'La mayoria de {audiencia} intenta resolver {problema} con {solucionMala}.\n\nEl error: {explicacion}.\n\n{producto} funciona diferente. Usa {tecnologia} para {mecanismo}.\n\nResultado: {beneficio} de forma {adjetivo}.',
+    'Dato: {estadistica}.\n\nPor que? Porque {causa}.\n\n{producto} aborda esto de raiz. En lugar de {enfoqueMalo}, {enfoqueNuevo}.\n\nLa diferencia se nota en {tiempo}.',
+    'Despues de {investigacion}, descubrimos que {hallazgo}.\n\nEso cambio todo. Creamos {producto} basandonos en {principio}.\n\nEl resultado: {audiencia} consigue {beneficio} un {porcentaje}% mas rapido.'
+  ],
+  social: [
+    '"{testimonio1}"\n\n"{testimonio2}"\n\n"{testimonio3}"\n\nNo somos nosotros quienes lo decimos. Son {numero}+ clientes satisfechos.',
+    'Cuando lanzamos {producto}, no esperabamos esta respuesta.\n\n{numero} unidades en {tiempo}. Resenas de 4.9/5. Y mensajes como:\n\n"{testimonio}"\n\nAhora entendemos por que.',
+    'Lo que dicen de {producto}:\n\n{nombre1}: "{miniTestimonio1}"\n{nombre2}: "{miniTestimonio2}"\n{nombre3}: "{miniTestimonio3}"\n\nLa prueba esta en los resultados.'
+  ]
+};
+
+var ctaTemplates = {
+  directo: [
+    'Entra ahora y consigue {oferta}. Link en bio.',
+    '{oferta} solo hasta {limite}. No te quedes fuera.',
+    'Haz clic, prueba {producto} con {garantia} y ve la diferencia tu mismo.',
+    'Ultimas unidades con {oferta}. Cuando se acaben, se acaban.',
+    'Compra hoy. {oferta}. Sin riesgo.'
+  ],
+  emocional: [
+    'Date lo que mereces. {oferta} por tiempo limitado.',
+    'El primer paso hacia {beneficio} esta a un clic. {oferta}.',
+    'Tu futuro yo te lo agradecera. Empieza hoy con {oferta}.',
+    'No esperes mas para sentirte {emocion}. {oferta} te espera.',
+    'Hazte el regalo. {producto} con {oferta}.'
+  ],
+  educativo: [
+    'Compruebalo tu mismo. {oferta} para que lo pruebes sin riesgo.',
+    'La evidencia es clara. Ahora te toca a ti. {oferta}.',
+    'Haz la prueba inteligente: {producto} con {oferta}.',
+    'Pasa de la teoria a los resultados. {oferta} disponible ahora.',
+    'La decision informada: {producto} con {garantia}. {oferta}.'
+  ],
+  social: [
+    'Unete a los +{numero} que ya lo usan. {oferta}.',
+    'Si funciona para ellos, funciona para ti. {oferta}.',
+    'Descubre por que {numero}+ personas eligen {producto}. {oferta}.',
+    'La comunidad no miente. Prueba {producto} con {oferta}.',
+    'Haz como {nombre}: empieza con {oferta}.'
+  ]
+};
+
+function fillTemplate(tpl, vars){
+  var result = tpl;
+  Object.keys(vars).forEach(function(key){
+    var re = new RegExp('\\{'+key+'\\}','g');
+    result = result.replace(re, vars[key]);
+  });
+  result = result.replace(/\{[a-zA-Z]+\}/g, '...');
+  return result;
+}
+
+function generate(){
+  var producto = document.getElementById('producto').value.trim();
+  var beneficio = document.getElementById('beneficio').value.trim();
+  var audiencia = document.getElementById('audiencia').value.trim();
+  var dolor = document.getElementById('dolor').value.trim();
+  var oferta = document.getElementById('oferta').value.trim();
+  var tono = document.getElementById('tono').value;
+
+  if(!producto){
+    document.getElementById('producto').style.borderColor='#ff4444';
+    setTimeout(function(){document.getElementById('producto').style.borderColor='#1c1c20'},1500);
+    return;
+  }
+
+  var vars = {
+    producto: producto,
+    beneficio: beneficio || 'resultados visibles',
+    audiencia: audiencia || 'personas como tu',
+    dolor: dolor || 'el problema que enfrentas',
+    oferta: oferta || 'oferta especial',
+    dolorAccion: dolor ? dolor.split(' ').slice(0,4).join(' ') : 'perder tiempo',
+    dolorCondicion: dolor ? dolor.toLowerCase().substring(0,50) : 'esto te suena',
+    objecion: 'complicaciones',
+    dolorTema: producto.split(' ')[0],
+    revelacion: beneficio || 'hay una forma mejor',
+    numero: Math.floor(Math.random()*5000+1000).toString(),
+    logro: beneficio ? beneficio.toLowerCase() : 'conseguido resultados',
+    situacionPasada: dolor ? dolor.toLowerCase().substring(0,40) : 'no encontrabas solucion',
+    escenarioIdeal: beneficio ? beneficio.toLowerCase() : 'tener lo que quieres',
+    tiempo: '30 dias',
+    persona: 'Maria',
+    resultado: beneficio || 'otra vida',
+    error: 'error',
+    porcentaje: '80',
+    tema: producto.split(' ')[0],
+    dato: 'El 73% de las personas nunca resuelve este problema',
+    errorComun: 'haciendo lo mismo',
+    mito: 'Lo que te dijeron',
+    estudio: 'un estudio reciente',
+    hallazgo: 'este factor es clave',
+    testimonio: beneficio ? 'Desde que uso '+producto+', '+beneficio.toLowerCase() : 'Increible producto, funciona de verdad',
+    nombre: 'Ana M.',
+    fecha: 'hace 6 meses',
+    famoso: 'expertos del sector',
+    mes: 'este mes',
+    solucionMala: 'opciones genericas',
+    mecanismo: 'ataca el problema de raiz',
+    causaReal: 'las soluciones genericas',
+    problema: 'el problema real',
+    diferenciador: 'un enfoque unico',
+    beneficioExtra: 'sin efectos secundarios',
+    razon: 'esta disenado especificamente para esto',
+    dolorEmocional: dolor || 'sentirse frustrado',
+    sentimiento: 'frustracion',
+    situacion: 'lo intentas y no funciona',
+    deseo: 'merece algo mejor',
+    statusQuo: 'opciones mediocres',
+    frustracion: 'soluciones que no funcionan',
+    explicacion: 'no atacan la causa real',
+    tecnologia: 'un enfoque diferente',
+    adjetivo: 'natural y sostenible',
+    estadistica: 'Solo el 20% consigue resultados reales',
+    causa: 'usan el enfoque equivocado',
+    enfoqueMalo: 'parches temporales',
+    enfoqueNuevo: 'aborda la raiz del problema',
+    investigacion: 'meses de investigacion',
+    principio: 'lo que realmente funciona',
+    testimonio1: 'Increible. '+beneficio,
+    testimonio2: 'Ojala lo hubiera descubierto antes',
+    testimonio3: 'Lo recomiendo a todo el mundo',
+    nombre1: 'Laura P.',
+    nombre2: 'Carlos R.',
+    nombre3: 'Marta S.',
+    miniTestimonio1: 'Funciona de verdad',
+    miniTestimonio2: 'Mejor compra del ano',
+    miniTestimonio3: 'Resultados en 2 semanas',
+    limite: 'fin de semana',
+    garantia: 'garantia de 30 dias',
+    emocion: 'increible'
+  };
+
+  var hooks = hookTemplates[tono] || hookTemplates.directo;
+  var bodies = bodyTemplates[tono] || bodyTemplates.directo;
+  var ctas = ctaTemplates[tono] || ctaTemplates.directo;
+
+  var html = '';
+  for(var i = 0; i < 5; i++){
+    var hook = fillTemplate(hooks[i % hooks.length], vars);
+    var body = fillTemplate(bodies[i % bodies.length], vars);
+    var cta = fillTemplate(ctas[i % ctas.length], vars);
+
+    var lengths = {meta:300,google:150,tiktok:200,email:500};
+    var maxLen = lengths[selectedPlatform] || 300;
+    var totalLen = hook.length + body.length + cta.length;
+    var fitScore = totalLen <= maxLen ? 95 : totalLen <= maxLen * 1.3 ? 75 : 55;
+    var scoreColor = fitScore >= 90 ? '#00C853' : fitScore >= 70 ? '#C8AA28' : '#ff6b6b';
+    var scoreLabel = fitScore >= 90 ? 'Optimo para '+selectedPlatform : fitScore >= 70 ? 'Algo largo — recortar' : 'Demasiado largo';
+
+    var fullCopy = hook + '\n\n' + body + '\n\n' + cta;
+    var escapedCopy = fullCopy.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+
+    html += '<div class="ad-card">';
+    html += '<div class="ad-header"><div><div class="ad-type">Variacion '+tono+'</div><div class="ad-num">#'+(i+1)+' de 5</div></div>';
+    html += '<button class="ad-copy-all" onclick="copyAd(this,\''+escapedCopy+'\')">Copiar todo</button></div>';
+    html += '<div class="ad-section"><div class="ad-section-label">Hook</div><div class="ad-section-text hook-text">'+hook+'</div></div>';
+    html += '<div class="ad-section"><div class="ad-section-label">Body</div><div class="ad-section-text">'+body.replace(/\n/g,'<br>')+'</div></div>';
+    html += '<div class="ad-section"><div class="ad-section-label">CTA</div><div class="ad-section-text" style="color:#00C853">'+cta+'</div></div>';
+    html += '<div class="ad-score"><div class="ad-score-bar"><div class="ad-score-fill" style="width:'+fitScore+'%;background:'+scoreColor+'"></div></div>';
+    html += '<div class="ad-score-label" style="color:'+scoreColor+'">'+scoreLabel+'</div></div>';
+    html += '</div>';
+  }
+
+  document.getElementById('adsList').innerHTML = html;
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+function copyAd(btn, text){
+  var decoded = text.replace(/\\n/g, '\n').replace(/\\'/g, "'");
+  navigator.clipboard.writeText(decoded).catch(function(){});
+  btn.textContent = 'Copiado';
+  btn.classList.add('copied');
+  setTimeout(function(){btn.textContent='Copiar todo';btn.classList.remove('copied')},1500);
+}
+</script>
+</body>
+</html>

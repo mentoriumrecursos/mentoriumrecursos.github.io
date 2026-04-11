@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Precio Psicológico — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:540px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .input-wrap{position:relative}
+  .input-wrap .prefix,.input-wrap .suffix{position:absolute;top:50%;transform:translateY(-50%);font-size:14px;font-weight:700;color:#444;pointer-events:none}
+  .input-wrap .prefix{left:14px}
+  .input-wrap .suffix{right:14px}
+  input[type=number]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:16px;font-weight:700;padding:14px 50px 14px 14px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input[type=number]:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  input[type=number].has-prefix{padding-left:36px}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+
+  select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px;font-family:inherit;outline:none;cursor:pointer;transition:border-color 0.3s;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+  select:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  select option{background:#111;color:#fff}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .price-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px}
+  .price-card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:20px 14px;text-align:center;transition:all 0.4s;position:relative;overflow:hidden}
+  .price-card:hover{transform:translateY(-4px);border-color:#00C853;box-shadow:0 12px 40px rgba(0,200,83,0.1)}
+  .price-card.recommended{border-color:#00C853;background:linear-gradient(135deg,#0a1a0f,#111113)}
+  .price-card.recommended::before{content:'RECOMENDADO';position:absolute;top:0;left:0;right:0;background:#00C853;color:#0a0a0a;font-size:8px;font-weight:900;letter-spacing:2px;padding:4px 0}
+  .price-card.recommended .pc-price{margin-top:8px}
+  .pc-strategy{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#555;margin-bottom:12px}
+  .pc-price{font-size:34px;font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:4px}
+  .pc-price.green{color:#00C853}
+  .pc-cents{font-size:16px;font-weight:700;color:#666;vertical-align:super}
+  .pc-original{font-size:13px;color:#444;text-decoration:line-through;margin-bottom:12px;height:18px}
+  .pc-tag{display:inline-block;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;margin-bottom:12px}
+  .pc-tag.charm{background:rgba(0,200,83,0.1);color:#00C853}
+  .pc-tag.prestige{background:rgba(41,121,255,0.1);color:#2979FF}
+  .pc-tag.anchor{background:rgba(255,152,0,0.1);color:#FF9800}
+  .pc-why{font-size:11px;color:#666;line-height:1.6;text-align:left;margin-top:12px;padding-top:12px;border-top:1px solid #1c1c20}
+
+  .anchor-section{margin-top:16px}
+  .anchor-visual{background:#0c0c0e;border:1px solid #1c1c20;border-radius:16px;padding:24px;text-align:center}
+  .anchor-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+  .anchor-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px}
+  .anchor-price{padding:16px 20px;border-radius:12px;text-align:center;transition:all 0.3s}
+  .anchor-price.decoy{background:#111113;border:1px solid #1c1c20;opacity:0.6}
+  .anchor-price.target{background:linear-gradient(135deg,#0a1a0f,#111113);border:2px solid #00C853;transform:scale(1.1)}
+  .anchor-price.premium{background:#111113;border:1px solid #1c1c20;opacity:0.7}
+  .anchor-price .ap-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:6px}
+  .anchor-price .ap-value{font-size:24px;font-weight:900;letter-spacing:-1px}
+  .anchor-price.target .ap-value{color:#00C853}
+  .anchor-arrow{color:#333;font-size:20px}
+  .anchor-explain{font-size:12px;color:#666;line-height:1.6;margin-top:4px}
+
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .metric{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:18px 16px;text-align:center;transition:all 0.3s}
+  .metric:hover{border-color:#00C853;transform:translateY(-2px)}
+  .metric .m-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  .metric .m-value{font-size:22px;font-weight:900;letter-spacing:-1px;line-height:1}
+  .metric .m-value.green{color:#00C853}
+  .metric .m-sub{font-size:10px;color:#444;margin-top:6px;font-weight:600}
+
+  .tactics{margin-top:16px}
+  .tactic{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #141416}
+  .tactic:last-child{border:none}
+  .tactic-num{width:28px;height:28px;background:#00C853;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#0a0a0a;flex-shrink:0}
+  .tactic-info .t-title{font-size:14px;font-weight:700;color:#ccc;margin-bottom:4px}
+  .tactic-info .t-desc{font-size:12px;color:#555;line-height:1.5}
+
+  .insight{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:1px solid #1a3a25;border-radius:14px;padding:18px;margin-top:16px}
+  .insight .tag{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#00C853;margin-bottom:8px}
+  .insight p{font-size:13px;color:#999;line-height:1.7;font-weight:500}
+  .insight strong{color:#fff}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora de Precio Psicológico</h1>
+    <p>Introduce tu precio base y tu segmento. Obtén 3 puntos de precio con estrategias de anclaje psicológico probadas.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu producto</div>
+    <div class="field">
+      <label>Precio base actual</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" id="basePrice" class="has-prefix" value="49" step="0.01" placeholder="49.00">
+      </div>
+      <div class="hint">El precio al que vendes ahora o quieres vender</div>
+    </div>
+    <div class="field">
+      <label>Coste del producto</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" id="productCost" class="has-prefix" value="15" step="0.01" placeholder="15.00">
+      </div>
+      <div class="hint">Lo que te cuesta fabricar o comprar al proveedor</div>
+    </div>
+    <div class="field">
+      <label>Segmento de mercado</label>
+      <select id="segment">
+        <option value="budget">Precio bajo / competitivo</option>
+        <option value="mid" selected>Gama media</option>
+        <option value="premium">Premium / alta gama</option>
+        <option value="luxury">Lujo / exclusivo</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tipo de producto</label>
+      <select id="productType">
+        <option value="physical" selected>Producto físico</option>
+        <option value="digital">Producto digital</option>
+        <option value="service">Servicio / suscripción</option>
+        <option value="bundle">Pack / bundle</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Precio medio de la competencia</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" id="competitorPrice" class="has-prefix" value="45" step="0.01" placeholder="45.00">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="calculate()">GENERAR PRECIOS PSICOLÓGICOS</button>
+
+  <div class="results" id="results">
+    <div class="price-cards" id="priceCards"></div>
+
+    <div class="anchor-section">
+      <div class="anchor-visual" id="anchorVisual"></div>
+    </div>
+
+    <div class="metric-grid" id="metricGrid"></div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Tácticas de implementación</div>
+      <div class="tactics" id="tactics"></div>
+    </div>
+
+    <div class="insight" id="insightBox">
+      <div class="tag">Estrategia de pricing</div>
+      <p id="insightText"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+function calculate(){
+  const base = parseFloat(document.getElementById('basePrice').value)||0;
+  const cost = parseFloat(document.getElementById('productCost').value)||0;
+  const segment = document.getElementById('segment').value;
+  const productType = document.getElementById('productType').value;
+  const competitor = parseFloat(document.getElementById('competitorPrice').value)||0;
+
+  if(base <= 0){alert('Introduce un precio base válido');return}
+
+  // Generate 3 price points based on segment
+  let charmPrice, prestigePrice, anchorPrice;
+  let charmStrategy, prestigeStrategy, anchorStrategy;
+  let charmWhy, prestigeWhy, anchorWhy;
+  let recommended;
+
+  if(segment === 'budget'){
+    // Charm pricing: .99 or .95
+    charmPrice = Math.floor(base) - 0.01;
+    if(charmPrice < base * 0.9) charmPrice = Math.floor(base * 0.95) + 0.99;
+    prestigePrice = Math.round(base);
+    anchorPrice = Math.round(base * 1.4);
+
+    charmStrategy = 'Charm Pricing';
+    prestigeStrategy = 'Precio redondo';
+    anchorStrategy = 'Ancla alta';
+    charmWhy = 'Terminar en .99 hace que el cerebro procese el dígito izquierdo. 29,99 se percibe como "veintialgo", no 30.';
+    prestigeWhy = 'Precio redondo para comparación directa con competencia. Transmite transparencia.';
+    anchorWhy = 'Versión premium que hace que tu precio real parezca una ganga por contraste.';
+    recommended = 0;
+  } else if(segment === 'mid'){
+    charmPrice = Math.floor(base) - 0.01;
+    if(base > 10 && base < 100){
+      const tens = Math.floor(base / 10) * 10;
+      charmPrice = tens + 9.99;
+      if(charmPrice > base * 1.05) charmPrice = tens - 0.01;
+    }
+    prestigePrice = Math.round(base / 5) * 5;
+    if(prestigePrice < base) prestigePrice += 5;
+    anchorPrice = Math.round(base * 1.6 / 5) * 5;
+
+    charmStrategy = 'Charm Pricing';
+    prestigeStrategy = 'Precio de confianza';
+    anchorStrategy = 'Decoy + ancla';
+    charmWhy = 'El efecto del dígito izquierdo maximiza la percepción de ahorro sin sacrificar margen.';
+    prestigeWhy = 'Múltiplo de 5 transmite profesionalidad y facilita la decisión. Menos fricción mental.';
+    anchorWhy = 'Precio señuelo que ancla la percepción. Tu precio real parece la opción inteligente.';
+    recommended = 1;
+  } else if(segment === 'premium'){
+    charmPrice = Math.round(base / 5) * 5 - 1;
+    prestigePrice = Math.round(base / 10) * 10;
+    if(prestigePrice <= base) prestigePrice += 10;
+    anchorPrice = Math.round(base * 1.8 / 10) * 10;
+
+    charmStrategy = 'Just-below';
+    prestigeStrategy = 'Precio Premium';
+    anchorStrategy = 'Ancla exclusiva';
+    charmWhy = 'Justo por debajo del umbral psicológico. 99 en vez de 100 mantiene la percepción en el rango inferior.';
+    prestigeWhy = 'Número redondo que transmite calidad y exclusividad. En premium, los decimales restan valor percibido.';
+    anchorWhy = 'Versión de lujo que reposiciona tu producto premium como "accesible dentro de su categoría".';
+    recommended = 1;
+  } else {
+    charmPrice = Math.round(base / 10) * 10;
+    prestigePrice = Math.round(base * 1.2 / 50) * 50;
+    if(prestigePrice <= base) prestigePrice += 50;
+    anchorPrice = Math.round(base * 2 / 100) * 100;
+
+    charmStrategy = 'Precio limpio';
+    prestigeStrategy = 'Precio de prestigio';
+    anchorStrategy = 'Aspiracional';
+    charmWhy = 'En lujo, los precios redondos son esenciales. Los decimales degradan la percepción de exclusividad.';
+    prestigeWhy = 'Múltiplo de 50 comunica calidad premium. El cliente de lujo no busca "ofertas", busca estatus.';
+    anchorWhy = 'El precio más alto ancla el valor de marca. Incluso si no se vende, eleva todo tu catálogo.';
+    recommended = 1;
+  }
+
+  const prices = [
+    {price:charmPrice, strategy:charmStrategy, tag:'charm', why:charmWhy},
+    {price:prestigePrice, strategy:prestigeStrategy, tag:'prestige', why:prestigeWhy},
+    {price:anchorPrice, strategy:anchorStrategy, tag:'anchor', why:anchorWhy}
+  ];
+
+  // Render price cards
+  let cardsHTML = '';
+  prices.forEach((p, i) => {
+    const isRec = i === recommended;
+    const margin = p.price - cost;
+    const marginPct = p.price > 0 ? (margin / p.price * 100) : 0;
+    const vs = competitor > 0 ? ((p.price - competitor) / competitor * 100) : 0;
+    const priceInt = Math.floor(p.price);
+    const priceDec = Math.round((p.price - priceInt) * 100);
+
+    cardsHTML += '<div class="price-card '+(isRec?'recommended':'')+'">';
+    cardsHTML += '<div class="pc-strategy">'+p.strategy+'</div>';
+    cardsHTML += '<div class="pc-price '+(isRec?'green':'')+'">'+priceInt+'<span class="pc-cents">,'+String(priceDec).padStart(2,'0')+'</span></div>';
+    cardsHTML += '<div class="pc-original">'+(base !== p.price ? base.toFixed(2)+' \u20AC' : '')+'</div>';
+    cardsHTML += '<div class="pc-tag '+p.tag+'">'+p.strategy.toUpperCase()+'</div>';
+    cardsHTML += '<div class="pc-why">'+p.why+'</div>';
+    cardsHTML += '</div>';
+  });
+  document.getElementById('priceCards').innerHTML = cardsHTML;
+
+  // Anchor visualization
+  const recPrice = prices[recommended].price;
+  const decoyPrice = Math.round((recPrice + prices[2].price) / 2);
+  document.getElementById('anchorVisual').innerHTML =
+    '<div class="anchor-title">Estrategia de anclaje</div>'+
+    '<div class="anchor-row">'+
+      '<div class="anchor-price premium"><div class="ap-label">Ancla alta</div><div class="ap-value">'+prices[2].price.toFixed(0)+' \u20AC</div></div>'+
+      '<div class="anchor-arrow">&rarr;</div>'+
+      '<div class="anchor-price decoy"><div class="ap-label">Señuelo</div><div class="ap-value">'+decoyPrice+' \u20AC</div></div>'+
+      '<div class="anchor-arrow">&rarr;</div>'+
+      '<div class="anchor-price target"><div class="ap-label">Tu precio</div><div class="ap-value">'+recPrice.toFixed(0)+' \u20AC</div></div>'+
+    '</div>'+
+    '<div class="anchor-explain">El cliente ve el precio alto primero, el señuelo hace que tu precio parezca la opción inteligente. <strong>Efecto de compromiso asimétrico.</strong></div>';
+
+  // Metrics
+  const recMargin = recPrice - cost;
+  const recMarginPct = recPrice > 0 ? (recMargin / recPrice * 100) : 0;
+  const vsCompetitor = competitor > 0 ? ((recPrice - competitor) / competitor * 100) : 0;
+  const uplift = base > 0 ? ((recPrice - base) / base * 100) : 0;
+
+  document.getElementById('metricGrid').innerHTML =
+    '<div class="metric"><div class="m-label">Margen por unidad</div><div class="m-value green">'+recMargin.toFixed(2)+' \u20AC</div><div class="m-sub">'+recMarginPct.toFixed(1)+'% de margen</div></div>'+
+    '<div class="metric"><div class="m-label">vs Competencia</div><div class="m-value '+(vsCompetitor >= 0 ? 'green' : '')+'">'+(vsCompetitor >= 0 ? '+' : '')+vsCompetitor.toFixed(1)+'%</div><div class="m-sub">'+(vsCompetitor > 0 ? 'Por encima' : 'Por debajo')+'</div></div>';
+
+  // Tactics
+  const tacticsData = [];
+  if(segment === 'budget' || segment === 'mid'){
+    tacticsData.push({title:'Usa precios terminados en 9', desc:'El efecto "left-digit" hace que 29,99 se perciba como 20 y pico. Funciona mejor en ecommerce que en servicios.'});
+    tacticsData.push({title:'Muestra el precio tachado', desc:'Ancla visual: precio original tachado + precio actual. El cerebro calcula el ahorro automáticamente.'});
+    tacticsData.push({title:'Divide en pagos', desc:'En vez de "99 \u20AC", muestra "3 pagos de 33 \u20AC". Reduce la fricción del precio absoluto.'});
+  }
+  if(segment === 'premium' || segment === 'luxury'){
+    tacticsData.push({title:'Elimina el símbolo de moneda', desc:'Estudios de Cornell: quitar el "\u20AC" reduce la asociación mental con "gastar dinero". Escribe "49" en vez de "49 \u20AC".'});
+    tacticsData.push({title:'Usa precios redondos', desc:'En premium, los decimales comunican "oferta". Los números redondos comunican calidad y confianza.'});
+    tacticsData.push({title:'Posiciona junto al premium', desc:'Si tu producto está al lado del más caro de la categoría, se percibe como "premium accesible".'});
+  }
+  tacticsData.push({title:'Ofrece 3 opciones (no 2, no 4)', desc:'La regla del 3: básico, estándar (tu target), premium. El 60% elegirá el del medio. Es el efecto de compromiso.'});
+  tacticsData.push({title:'Ancla antes de mostrar el precio', desc:'Menciona el valor real o el coste de no actuar ANTES de revelar el precio. Cambia el marco de referencia.'});
+
+  let tacticsHTML = '';
+  tacticsData.forEach((t,i) => {
+    tacticsHTML += '<div class="tactic"><div class="tactic-num">'+(i+1)+'</div><div class="tactic-info"><div class="t-title">'+t.title+'</div><div class="t-desc">'+t.desc+'</div></div></div>';
+  });
+  document.getElementById('tactics').innerHTML = tacticsHTML;
+
+  // Insight
+  const segmentNames = {budget:'precio bajo',mid:'gama media',premium:'premium',luxury:'lujo'};
+  document.getElementById('insightText').innerHTML =
+    'Para tu segmento <strong>'+segmentNames[segment]+'</strong>, el precio recomendado es <strong>'+recPrice.toFixed(2)+' \u20AC</strong> con un margen del <strong>'+recMarginPct.toFixed(1)+'%</strong> por unidad. '+
+    (uplift > 0 ? 'Esto supone un <strong>+'+uplift.toFixed(1)+'% de incremento</strong> sobre tu precio actual, justificado por el posicionamiento psicológico. ' : '')+
+    'Usa la estrategia de 3 opciones con el precio ancla de <strong>'+prices[2].price.toFixed(0)+' \u20AC</strong> para que tu precio objetivo parezca la elección obvia.';
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

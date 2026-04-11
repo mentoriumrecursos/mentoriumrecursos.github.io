@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditor de Confianza de Tienda — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:540px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+
+  .score-circle{width:160px;height:160px;margin:0 auto 20px;position:relative}
+  .score-circle svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .score-circle .track{fill:none;stroke:#1c1c20;stroke-width:10}
+  .score-circle .fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease,stroke 0.3s}
+  .score-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .score-number{font-size:48px;font-weight:900;letter-spacing:-2px;line-height:1}
+  .score-label{font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+  .score-grade{text-align:center;font-size:15px;font-weight:800;margin-bottom:20px}
+
+  .checklist-section{margin-bottom:20px}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .section-header h3{font-size:13px;font-weight:700;color:#aaa}
+  .section-header .section-score{font-size:12px;font-weight:800;padding:3px 10px;border-radius:6px}
+
+  .check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all 0.15s;background:#0c0c0e;border:1px solid #1c1c20}
+  .check-item:hover{border-color:#2a2a30}
+  .check-item.checked{border-color:#1a3a25;background:#0a1a0f}
+  .check-item.checked .checkbox{background:#00C853;border-color:#00C853}
+  .check-item.checked .checkbox::after{content:"";display:block;width:6px;height:10px;border:solid #0a0a0a;border-width:0 2px 2px 0;transform:rotate(45deg);margin:1px 0 0 3px}
+  .checkbox{width:22px;height:22px;border:2px solid #333;border-radius:6px;flex-shrink:0;transition:all 0.15s;margin-top:1px}
+  .check-content{flex:1}
+  .check-label{font-size:13px;font-weight:600;color:#ccc;line-height:1.3}
+  .check-weight{font-size:10px;font-weight:700;color:#444;margin-left:6px}
+  .check-desc{font-size:11px;color:#555;margin-top:3px;line-height:1.4}
+
+  .fix-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:14px;margin-bottom:8px;display:none}
+  .fix-card.show{display:block}
+  .fix-card .fix-priority{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;margin-bottom:6px}
+  .fix-card .fix-priority.critical{background:#1a0a08;color:#E53935;border:1px solid #3a1510}
+  .fix-card .fix-priority.high{background:#1a1700;color:#FFB300;border:1px solid #3a3010}
+  .fix-card .fix-priority.medium{background:#0a141a;color:#42A5F5;border:1px solid #1a2a3a}
+  .fix-card .fix-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px}
+  .fix-card .fix-desc{font-size:12px;color:#777;line-height:1.5}
+  .fix-card .fix-impact{font-size:11px;color:#00C853;margin-top:6px;font-weight:600}
+
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+  .summary-box{background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:14px;text-align:center}
+  .summary-box .sb-val{font-size:22px;font-weight:900;margin-bottom:2px}
+  .summary-box .sb-label{font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:1px}
+
+  .insight-box{border-radius:12px;padding:16px;margin-top:16px;font-size:13px;line-height:1.6}
+  .insight-box.ok{background:#0a1a0f;border:1px solid #1a3a25;color:#81C784}
+  .insight-box.mid{background:#1a1700;border:1px solid #3a3010;color:#FFD54F}
+  .insight-box.bad{background:#1a0a08;border:1px solid #3a1510;color:#E57373}
+  .insight-box strong{color:#fff}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Auditor de Confianza de Tienda</h1>
+    <p>Marca cada elemento que tiene tu tienda. Recibe una puntuacion de confianza y las correcciones exactas.</p>
+  </div>
+
+  <div class="card" id="scoreCard">
+    <div class="card-title">Puntuacion de confianza</div>
+    <div class="score-circle">
+      <svg viewBox="0 0 120 120">
+        <circle class="track" cx="60" cy="60" r="52"/>
+        <circle class="fill" id="scoreFill" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+      </svg>
+      <div class="score-text">
+        <div class="score-number" id="scoreNum">0</div>
+        <div class="score-label">de 100</div>
+      </div>
+    </div>
+    <div class="score-grade" id="scoreGrade">Completa la auditoria</div>
+    <div class="summary-grid">
+      <div class="summary-box"><div class="sb-val" id="sb_checked" style="color:#00C853">0</div><div class="sb-label">Cumplidos</div></div>
+      <div class="summary-box"><div class="sb-val" id="sb_missing" style="color:#E53935">0</div><div class="sb-label">Pendientes</div></div>
+      <div class="summary-box"><div class="sb-val" id="sb_impact" style="color:#FFB300">0%</div><div class="sb-label">Impacto potencial</div></div>
+    </div>
+  </div>
+
+  <div id="checklistContainer"></div>
+
+  <div class="card" id="fixesCard" style="display:none">
+    <div class="card-title">Correcciones prioritarias</div>
+    <div id="fixesContainer"></div>
+  </div>
+
+  <div id="insightBox"></div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+const sections=[
+  {name:'Seguridad y Pagos',items:[
+    {id:'ssl',label:'Certificado SSL activo (HTTPS)',weight:12,desc:'La URL muestra candado y empieza por https://',fix:'Activa SSL desde tu proveedor de hosting o Shopify (ya incluido). Sin esto, Google penaliza y los navegadores muestran "No seguro".',priority:'critical',impact:'+15% conversion estimado'},
+    {id:'payments',label:'Badges de pago visibles',weight:8,desc:'Visa, Mastercard, PayPal, Apple Pay visibles en footer y checkout',fix:'Anade iconos de metodos de pago en el footer y justo encima del boton de compra. Usa los SVG oficiales de cada marca.',priority:'high',impact:'+8% confianza en checkout'},
+    {id:'secure_checkout',label:'Checkout seguro indicado',weight:6,desc:'Texto o icono "Pago 100% seguro" cerca del boton de compra',fix:'Anade un mini banner debajo del boton de compra: icono de candado + "Pago 100% seguro y encriptado". Shopify: usa un app como Trust Badge.',priority:'high',impact:'+5% tasa de finalizacion'},
+    {id:'privacy',label:'Politica de privacidad',weight:5,desc:'Pagina accesible con politica de privacidad y cookies',fix:'Crea una pagina /politica-privacidad con los datos basicos: que datos recoges, como los usas, derechos del usuario. Usa un generador RGPD.',priority:'medium',impact:'Cumplimiento legal + confianza'}
+  ]},
+  {name:'Prueba Social',items:[
+    {id:'reviews',label:'Resenas de producto con fotos',weight:10,desc:'Al menos 5 resenas con foto por producto estrella',fix:'Instala una app de resenas (Judge.me, Loox). Envia emails post-compra pidiendo resena con foto a cambio de un 10% en la siguiente compra.',priority:'critical',impact:'+12-15% conversion'},
+    {id:'testimonials',label:'Testimonios en pagina principal',weight:7,desc:'Seccion visible de testimonios de clientes reales',fix:'Anade una seccion "Lo que dicen nuestros clientes" en la home con 3-5 testimonios reales, nombre, foto y resultado.',priority:'high',impact:'+10% confianza inicial'},
+    {id:'social_followers',label:'Redes sociales con seguidores',weight:5,desc:'Links a RRSS activas con al menos 500 seguidores',fix:'Enlaza tus redes activas en footer. Si tienes pocas, pon solo las mas fuertes. Nunca pongas redes vacias o inactivas.',priority:'medium',impact:'Credibilidad de marca'},
+    {id:'press',label:'Logos de prensa / mencionado en',weight:4,desc:'"Visto en..." con logos de medios o colaboraciones',fix:'Si tienes alguna mencion en blogs, YouTube o prensa, crea una barra "Mencionado en" con logos. Genera confianza instantanea.',priority:'medium',impact:'+7% percepcion de autoridad'},
+    {id:'sold_count',label:'Contador de ventas o "X personas viendo"',weight:3,desc:'Indicador de popularidad en fichas de producto',fix:'Usa una app de social proof que muestre notificaciones de compras recientes o "23 personas estan viendo esto ahora".',priority:'medium',impact:'+5% urgencia y conversion'}
+  ]},
+  {name:'Transparencia',items:[
+    {id:'about',label:'Pagina "Sobre nosotros" con cara',weight:8,desc:'Historia real, foto del equipo o fundador, mision',fix:'Crea /sobre-nosotros con: foto real del equipo, historia de por que creaste la tienda, valores y mision. Las personas compran a personas.',priority:'critical',impact:'+12% confianza'},
+    {id:'contact',label:'Pagina de contacto completa',weight:7,desc:'Email, telefono, formulario, y/o chat en vivo',fix:'Pagina /contacto con: email real (no gmail), telefono, formulario, horario de atencion. Anade chat en vivo con Tidio o similar.',priority:'high',impact:'+10% reduccion de abandono'},
+    {id:'faq',label:'Seccion de preguntas frecuentes',weight:5,desc:'FAQ con al menos 8-10 preguntas comunes resueltas',fix:'Crea una pagina FAQ con las 10 preguntas que mas recibes: envio, devoluciones, tallas, plazos, materiales. Reduce tickets y aumenta confianza.',priority:'high',impact:'-20% tickets de soporte'},
+    {id:'returns',label:'Politica de devoluciones clara',weight:8,desc:'Pagina visible con condiciones, plazos y proceso',fix:'Crea /devoluciones con: plazo claro (14-30 dias), condiciones, quien paga envio, proceso paso a paso. Ponla visible en footer y ficha de producto.',priority:'critical',impact:'+15% reduccion de objeciones'},
+    {id:'shipping',label:'Informacion de envio detallada',weight:6,desc:'Plazos, costes, zonas y seguimiento explicados',fix:'Pagina /envios con: plazos por zona, costes o umbrales para envio gratis, tracking disponible. Anade banner "Envio gratis a partir de X" si aplica.',priority:'high',impact:'+8% finalizacion de compra'}
+  ]},
+  {name:'Experiencia Profesional',items:[
+    {id:'domain',label:'Dominio propio (no .myshopify)',weight:6,desc:'URL personalizada sin subdominio de la plataforma',fix:'Compra un dominio .com o .es y conectalo a tu tienda. Un .myshopify.com grita "amateur" y mata la confianza.',priority:'critical',impact:'Percepcion profesional basica'},
+    {id:'logo',label:'Logo profesional',weight:5,desc:'Logo propio, no generico, visible en header y favicon',fix:'Invierte 30-50 euros en un logo en Fiverr o usa Canva Pro. Asegurate de tener favicon personalizado en la pestana del navegador.',priority:'high',impact:'Primera impresion de marca'},
+    {id:'mobile',label:'Diseno responsive perfecto',weight:7,desc:'La tienda se ve y navega perfectamente en movil',fix:'Revisa CADA pagina en movil. El 75%+ de tu trafico es mobile. Botones grandes, texto legible, imagenes que cargan. Usa PageSpeed Insights.',priority:'critical',impact:'+20% conversion mobile'},
+    {id:'speed',label:'Velocidad de carga < 3 segundos',weight:6,desc:'La pagina principal carga en menos de 3s en movil',fix:'Comprime imagenes (TinyPNG), elimina apps innecesarias, usa un tema ligero. Cada segundo extra = -7% conversion.',priority:'high',impact:'+7% conversion por segundo ahorrado'},
+    {id:'photos',label:'Fotos de producto profesionales',weight:5,desc:'Al menos 4 fotos por producto, fondo blanco + lifestyle',fix:'Minimo 4 fotos: fondo blanco (frontal, lateral, detalle) + 1 lifestyle. Si es ropa: modelo real. Invierte en esto antes que en ads.',priority:'high',impact:'+30% percepcion de calidad'}
+  ]}
+];
+
+const container=document.getElementById('checklistContainer');
+const allItems=[];
+
+sections.forEach(sec=>{
+  const card=document.createElement('div');
+  card.className='card';
+  let html=`<div class="section-header"><h3>${sec.name}</h3><div class="section-score" id="ss_${sec.name.replace(/\s/g,'_')}" style="background:#1c1c20;color:#555">0/${sec.items.length}</div></div>`;
+  sec.items.forEach(item=>{
+    allItems.push(item);
+    html+=`
+      <div class="check-item" id="ci_${item.id}" onclick="toggleCheck('${item.id}')">
+        <div class="checkbox" id="cb_${item.id}"></div>
+        <div class="check-content">
+          <div class="check-label">${item.label}<span class="check-weight">${item.weight} pts</span></div>
+          <div class="check-desc">${item.desc}</div>
+        </div>
+      </div>`;
+  });
+  card.innerHTML=html;
+  container.appendChild(card);
+});
+
+const checked=new Set();
+function toggleCheck(id){
+  if(checked.has(id)) checked.delete(id); else checked.add(id);
+  document.getElementById('ci_'+id).classList.toggle('checked');
+  recalc();
+}
+
+function recalc(){
+  const totalWeight=allItems.reduce((s,i)=>s+i.weight,0);
+  const earnedWeight=allItems.filter(i=>checked.has(i.id)).reduce((s,i)=>s+i.weight,0);
+  const score=Math.round(earnedWeight/totalWeight*100);
+  const numChecked=checked.size;
+  const numMissing=allItems.length-numChecked;
+  const missingWeight=totalWeight-earnedWeight;
+  const impactPct=Math.round(missingWeight/totalWeight*100);
+
+  // Score circle
+  const circumference=326.73;
+  const offset=circumference-(score/100)*circumference;
+  const fill=document.getElementById('scoreFill');
+  fill.style.strokeDashoffset=offset;
+  fill.style.stroke=score>=75?'#00C853':score>=50?'#FFB300':'#E53935';
+  document.getElementById('scoreNum').textContent=score;
+  document.getElementById('scoreNum').style.color=score>=75?'#00C853':score>=50?'#FFB300':'#E53935';
+
+  const grades=[
+    [90,'Tienda de alta confianza','#00C853'],
+    [75,'Buena base, detalles por pulir','#00C853'],
+    [50,'Confianza media — necesita mejoras','#FFB300'],
+    [25,'Confianza baja — perdiendo ventas','#E53935'],
+    [0,'Confianza critica — urgente','#E53935']
+  ];
+  const g=grades.find(x=>score>=x[0]);
+  document.getElementById('scoreGrade').textContent=g[1];
+  document.getElementById('scoreGrade').style.color=g[2];
+
+  document.getElementById('sb_checked').textContent=numChecked;
+  document.getElementById('sb_missing').textContent=numMissing;
+  document.getElementById('sb_impact').textContent=impactPct+'%';
+
+  // Section scores
+  sections.forEach(sec=>{
+    const done=sec.items.filter(i=>checked.has(i.id)).length;
+    const el=document.getElementById('ss_'+sec.name.replace(/\s/g,'_'));
+    el.textContent=`${done}/${sec.items.length}`;
+    if(done===sec.items.length){el.style.background='#0a1a0f';el.style.color='#00C853'}
+    else if(done>=sec.items.length/2){el.style.background='#1a1700';el.style.color='#FFB300'}
+    else{el.style.background='#1a0a08';el.style.color='#E53935'}
+  });
+
+  // Fixes
+  const fixesCard=document.getElementById('fixesCard');
+  const fixesContainer=document.getElementById('fixesContainer');
+  const missing=allItems.filter(i=>!checked.has(i.id)).sort((a,b)=>b.weight-a.weight);
+  if(missing.length>0){
+    fixesCard.style.display='';
+    fixesContainer.innerHTML=missing.map(item=>`
+      <div class="fix-card show">
+        <div class="fix-priority ${item.priority}">${item.priority==='critical'?'CRITICO':item.priority==='high'?'ALTO':'MEDIO'}</div>
+        <div class="fix-title">${item.label}</div>
+        <div class="fix-desc">${item.fix}</div>
+        <div class="fix-impact">Impacto estimado: ${item.impact}</div>
+      </div>
+    `).join('');
+  } else {
+    fixesCard.style.display='none';
+  }
+
+  // Insight
+  let iClass,iText;
+  if(score>=80){
+    iClass='ok';
+    iText=`<strong>Tu tienda transmite confianza.</strong> Puntuacion ${score}/100. Tienes los elementos clave cubiertos. ${numMissing>0?`Quedan ${numMissing} detalles menores que podrian mejorar aun mas tu conversion.`:'Todos los elementos cubiertos. Enfocate en optimizar conversion y trafico.'}`;
+  } else if(score>=50){
+    iClass='mid';
+    iText=`<strong>Confianza mejorable.</strong> Puntuacion ${score}/100. Tienes base pero faltan ${numMissing} elementos que representan un ${impactPct}% de potencial de mejora. <strong>Prioriza los items marcados como CRITICO</strong> — son los que mas impactan en conversion.`;
+  } else {
+    iClass='bad';
+    iText=`<strong>Alerta: tu tienda no genera confianza.</strong> Puntuacion ${score}/100. Faltan ${numMissing} elementos fundamentales. Antes de invertir en trafico, <strong>arregla los ${missing.filter(m=>m.priority==='critical').length} elementos criticos</strong>. Enviar trafico a una tienda sin confianza = tirar dinero.`;
+  }
+  document.getElementById('insightBox').innerHTML=`<div class="insight-box ${iClass}">${iText}</div>`;
+}
+
+recalc();
+</script>
+</body>
+</html>

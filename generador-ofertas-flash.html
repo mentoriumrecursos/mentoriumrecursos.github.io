@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Ofertas Flash — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+
+  input[type=text],input[type=number],textarea,select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:14px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input:focus,textarea:focus,select:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  textarea{resize:vertical;min-height:70px;line-height:1.5}
+  select{cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+  select option{background:#111113;color:#fff}
+  input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+  .urgency-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .urgency-opt{background:#0c0c0e;border:2px solid #1c1c20;border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all 0.3s}
+  .urgency-opt:hover{border-color:#333}
+  .urgency-opt.active{border-color:#00C853;background:rgba(0,200,83,0.05)}
+  .urgency-opt .urg-time{font-size:20px;font-weight:900;margin-bottom:4px}
+  .urgency-opt .urg-label{font-size:11px;font-weight:600;color:#666}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .flash-preview{background:linear-gradient(135deg,#1a0000,#111113);border:2px solid #3a1515;border-radius:18px;padding:30px 24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden}
+  .flash-preview::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(255,0,0,0.03),transparent,rgba(255,100,0,0.03),transparent);animation:rotate 8s linear infinite}
+  @keyframes rotate{to{transform:rotate(360deg)}}
+  .flash-badge{display:inline-block;background:#E53935;color:#fff;font-size:11px;font-weight:800;letter-spacing:2px;padding:6px 16px;border-radius:6px;margin-bottom:16px;position:relative}
+  .flash-product{font-size:24px;font-weight:900;letter-spacing:-0.5px;margin-bottom:12px;position:relative}
+  .flash-prices{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px;position:relative}
+  .flash-old{font-size:20px;font-weight:700;color:#666;text-decoration:line-through}
+  .flash-new{font-size:42px;font-weight:900;color:#00C853;letter-spacing:-2px}
+  .flash-save{background:rgba(0,200,83,0.1);color:#00C853;font-size:13px;font-weight:800;padding:6px 14px;border-radius:8px;display:inline-block;margin-bottom:16px;position:relative}
+  .flash-timer{font-size:14px;color:#E53935;font-weight:700;position:relative}
+
+  .copy-section{margin-bottom:12px}
+  .copy-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#666;margin-bottom:8px}
+  .copy-block{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;font-size:13px;line-height:1.7;color:#ccc;position:relative;cursor:pointer;transition:border-color 0.3s}
+  .copy-block:hover{border-color:#00C853}
+  .copy-block::after{content:'Copiar';position:absolute;top:12px;right:12px;font-size:10px;font-weight:800;color:#00C853;background:rgba(0,200,83,0.1);padding:4px 10px;border-radius:6px;letter-spacing:1px}
+  .copy-block.copied::after{content:'Copiado';background:rgba(0,200,83,0.2)}
+
+  .margin-alert{padding:16px;border-radius:12px;font-size:13px;font-weight:600;line-height:1.6;margin-bottom:16px}
+  .margin-alert.danger{background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);color:#ff6b6b}
+  .margin-alert.warning{background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);color:#F5A623}
+  .margin-alert.safe{background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:#00C853}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Ofertas Flash</h1>
+    <p>Crea ofertas urgentes con copy listo para publicar. Calcula el impacto real en tu margen antes de lanzar.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Producto</div>
+    <div class="field">
+      <label>Nombre del producto</label>
+      <input type="text" id="product-name" placeholder="Ej: Sérum Vitamina C Premium">
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Precio original (&euro;)</label>
+        <input type="number" id="original-price" placeholder="49.90" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label>Coste del producto (&euro;)</label>
+        <input type="number" id="product-cost" placeholder="12.50" min="0" step="0.01">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Descuento</div>
+    <div class="grid-3">
+      <div class="field">
+        <label>Descuento (%)</label>
+        <input type="number" id="discount-pct" placeholder="25" min="1" max="90" value="25">
+      </div>
+      <div class="field">
+        <label>Unidades disponibles</label>
+        <input type="number" id="units-available" placeholder="50" min="1" value="50">
+      </div>
+      <div class="field">
+        <label>Ventas diarias norm.</label>
+        <input type="number" id="daily-sales" placeholder="5" min="0" value="5">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Duración de la oferta</div>
+    <div class="urgency-options" id="urgency-options">
+      <div class="urgency-opt" data-hours="4" onclick="selectUrgency(this)">
+        <div class="urg-time">4h</div>
+        <div class="urg-label">Ultra flash</div>
+      </div>
+      <div class="urgency-opt active" data-hours="24" onclick="selectUrgency(this)">
+        <div class="urg-time">24h</div>
+        <div class="urg-label">Un día</div>
+      </div>
+      <div class="urgency-opt" data-hours="48" onclick="selectUrgency(this)">
+        <div class="urg-time">48h</div>
+        <div class="urg-label">Fin de semana</div>
+      </div>
+      <div class="urgency-opt" data-hours="72" onclick="selectUrgency(this)">
+        <div class="urg-time">72h</div>
+        <div class="urg-label">Tres días</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generate()">GENERAR OFERTA FLASH</button>
+
+  <div class="results" id="results">
+    <div class="flash-preview" id="flash-preview"></div>
+    <div class="margin-alert" id="margin-alert"></div>
+
+    <div class="card">
+      <div class="card-title">Copy para publicar</div>
+
+      <div class="copy-section">
+        <div class="copy-label">Titular principal</div>
+        <div class="copy-block" id="copy-headline" onclick="copyText(this)"></div>
+      </div>
+
+      <div class="copy-section">
+        <div class="copy-label">Descripción / Caption</div>
+        <div class="copy-block" id="copy-caption" onclick="copyText(this)"></div>
+      </div>
+
+      <div class="copy-section">
+        <div class="copy-label">Stories (3 slides)</div>
+        <div class="copy-block" id="copy-stories" onclick="copyText(this)"></div>
+      </div>
+
+      <div class="copy-section">
+        <div class="copy-label">Email / WhatsApp</div>
+        <div class="copy-block" id="copy-email" onclick="copyText(this)"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Impacto financiero</div>
+      <div id="financial-impact"></div>
+    </div>
+
+    <div class="footer">
+      <div class="brand">MENTORIUM</div>
+      <div class="handle">@javier.sanchezecom</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedHours = 24;
+
+function selectUrgency(el){
+  document.querySelectorAll('.urgency-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  selectedHours = parseInt(el.dataset.hours);
+}
+
+function copyText(el){
+  navigator.clipboard.writeText(el.innerText).then(()=>{
+    el.classList.add('copied');
+    setTimeout(()=>el.classList.remove('copied'),1500);
+  });
+}
+
+function generate(){
+  const name = document.getElementById('product-name').value.trim();
+  const price = parseFloat(document.getElementById('original-price').value);
+  const cost = parseFloat(document.getElementById('product-cost').value);
+  const disc = parseFloat(document.getElementById('discount-pct').value);
+  const units = parseInt(document.getElementById('units-available').value);
+  const dailySales = parseInt(document.getElementById('daily-sales').value) || 5;
+
+  if(!name || !price || !cost || !disc){
+    alert('Completa todos los campos antes de generar.');
+    return;
+  }
+
+  const flashPrice = price * (1 - disc/100);
+  const saving = price - flashPrice;
+  const marginBefore = ((price - cost) / price * 100);
+  const marginAfter = ((flashPrice - cost) / flashPrice * 100);
+  const profitBefore = price - cost;
+  const profitAfter = flashPrice - cost;
+
+  // Duration label
+  const durLabel = selectedHours <= 4 ? 'las próximas '+selectedHours+' horas' :
+                   selectedHours === 24 ? 'solo hoy' :
+                   selectedHours === 48 ? 'este fin de semana' : 'los próximos 3 días';
+
+  const durShort = selectedHours <= 4 ? selectedHours+'H' :
+                   selectedHours === 24 ? '24H' :
+                   selectedHours === 48 ? '48H' : '72H';
+
+  // Estimated units sold during flash
+  const multiplier = disc >= 40 ? 3 : disc >= 25 ? 2 : 1.5;
+  const estSold = Math.min(Math.round(dailySales * (selectedHours/24) * multiplier), units);
+  const estRevenue = estSold * flashPrice;
+  const estProfit = estSold * profitAfter;
+  const normalRevenue = dailySales * (selectedHours/24) * price;
+  const normalProfit = dailySales * (selectedHours/24) * profitBefore;
+
+  // Preview
+  document.getElementById('flash-preview').innerHTML = `
+    <div class="flash-badge">OFERTA FLASH \u2014 ${durShort}</div>
+    <div class="flash-product">${name}</div>
+    <div class="flash-prices">
+      <span class="flash-old">${price.toFixed(2)}\u20ac</span>
+      <span class="flash-new">${flashPrice.toFixed(2)}\u20ac</span>
+    </div>
+    <div class="flash-save">Ahorras ${saving.toFixed(2)}\u20ac (-${disc}%)</div>
+    <div class="flash-timer">\u23F1 Termina en ${durLabel}</div>
+  `;
+
+  // Margin alert
+  const alertEl = document.getElementById('margin-alert');
+  if(marginAfter < 10){
+    alertEl.className = 'margin-alert danger';
+    alertEl.innerHTML = `\u26A0\uFE0F <strong>Margen peligroso:</strong> Con este descuento tu margen baja al ${marginAfter.toFixed(1)}%. Ganas solo ${profitAfter.toFixed(2)}\u20ac por unidad. Considera reducir el descuento o limitar unidades.`;
+  } else if(marginAfter < 25){
+    alertEl.className = 'margin-alert warning';
+    alertEl.innerHTML = `\u26A0 <strong>Margen ajustado:</strong> Tu margen baja del ${marginBefore.toFixed(1)}% al ${marginAfter.toFixed(1)}%. Rentable solo si vendes suficiente volumen.`;
+  } else {
+    alertEl.className = 'margin-alert safe';
+    alertEl.innerHTML = `<strong>Margen saludable:</strong> Mantienes un ${marginAfter.toFixed(1)}% de margen. La oferta es agresiva pero rentable.`;
+  }
+
+  // Copy
+  document.getElementById('copy-headline').textContent =
+    `\uD83D\uDD25 FLASH SALE ${durShort} \u2014 ${name} a ${flashPrice.toFixed(2)}\u20ac (antes ${price.toFixed(2)}\u20ac)`;
+
+  document.getElementById('copy-caption').textContent =
+    `${disc}% de descuento en ${name}.\n\nPrecio normal: ${price.toFixed(2)}\u20ac\nHoy: ${flashPrice.toFixed(2)}\u20ac\n\nSolo ${units} unidades. Cuando se acaben, vuelve al precio original.\n\nSin código. Sin trucos. Precio ya aplicado en la web.\n\n${durLabel.charAt(0).toUpperCase()+durLabel.slice(1)}. Después desaparece.`;
+
+  document.getElementById('copy-stories').textContent =
+    `SLIDE 1:\n"${name} al -${disc}%"\n${flashPrice.toFixed(2)}\u20ac (tachar ${price.toFixed(2)}\u20ac)\n\nSLIDE 2:\n"Solo ${units} unidades"\n"Cuando se acaban, se acabó"\n\nSLIDE 3:\nCTA: "Link en bio"\nTimer: ${durLabel}`;
+
+  document.getElementById('copy-email').textContent =
+    `Asunto: ${name} al -${disc}% \u2014 solo ${durLabel}\n\nOye,\n\nTenemos ${units} unidades de ${name} al -${disc}%.\n\nPrecio normal: ${price.toFixed(2)}\u20ac\nAhora: ${flashPrice.toFixed(2)}\u20ac\n\nNo hay código, el precio ya está aplicado.\n\nCuando se agoten las ${units} unidades o pasen las ${selectedHours}h, vuelve al precio de siempre.\n\n[VER OFERTA]\n\nSin presión. Pero si lo quieres, es ahora.`;
+
+  // Financial impact
+  document.getElementById('financial-impact').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Margen antes</div>
+        <div style="font-size:22px;font-weight:900">${marginBefore.toFixed(1)}%</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">${profitBefore.toFixed(2)}\u20ac/ud</div>
+      </div>
+      <div style="background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Margen después</div>
+        <div style="font-size:22px;font-weight:900;color:${marginAfter<15?'#E53935':marginAfter<25?'#F5A623':'#00C853'}">${marginAfter.toFixed(1)}%</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">${profitAfter.toFixed(2)}\u20ac/ud</div>
+      </div>
+      <div style="background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Ventas estimadas</div>
+        <div style="font-size:22px;font-weight:900">${estSold} uds</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">x${multiplier} vs normal</div>
+      </div>
+      <div style="background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Beneficio flash</div>
+        <div style="font-size:22px;font-weight:900;color:${estProfit>normalProfit?'#00C853':'#E53935'}">${estProfit.toFixed(0)}\u20ac</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">vs ${normalProfit.toFixed(0)}\u20ac normal</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

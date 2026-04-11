@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Secuencia de Email — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field .hint{font-size:11px;color:#444;margin-top:5px;line-height:1.4}
+
+  input[type=text],textarea,select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:14px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input:focus,textarea:focus,select:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  textarea{resize:vertical;min-height:70px;line-height:1.5}
+  select{cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+  select option{background:#111113;color:#fff}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  .type-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .type-opt{background:#0c0c0e;border:2px solid #1c1c20;border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all 0.3s}
+  .type-opt:hover{border-color:#333}
+  .type-opt.active{border-color:#00C853;background:rgba(0,200,83,0.05)}
+  .type-opt .opt-icon{font-size:24px;margin-bottom:6px}
+  .type-opt .opt-name{font-size:13px;font-weight:700;margin-bottom:3px}
+  .type-opt .opt-desc{font-size:10px;color:#555;line-height:1.3}
+
+  .tone-options{display:flex;gap:8px;flex-wrap:wrap}
+  .tone-opt{background:#0c0c0e;border:2px solid #1c1c20;border-radius:8px;padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s}
+  .tone-opt:hover{border-color:#333}
+  .tone-opt.active{border-color:#00C853;color:#00C853;background:rgba(0,200,83,0.05)}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .sequence-overview{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px;margin-bottom:8px}
+  .seq-step{flex-shrink:0;width:90px;text-align:center;padding:14px 10px;background:#0c0c0e;border:2px solid #1c1c20;border-radius:12px;cursor:pointer;transition:all 0.3s}
+  .seq-step:hover{border-color:#333}
+  .seq-step.active{border-color:#00C853;background:rgba(0,200,83,0.05)}
+  .seq-num{font-size:20px;font-weight:900;color:#00C853;margin-bottom:4px}
+  .seq-timing{font-size:10px;font-weight:700;color:#555}
+  .seq-type{font-size:10px;font-weight:600;color:#888;margin-top:2px}
+
+  .email-preview{background:#0c0c0e;border:1px solid #1c1c20;border-radius:16px;overflow:hidden;margin-top:12px}
+  .email-header{background:#111118;padding:16px 20px;border-bottom:1px solid #1c1c20}
+  .email-from{font-size:11px;color:#666;margin-bottom:4px}
+  .email-subject{font-size:15px;font-weight:800}
+  .email-timing{font-size:11px;color:#00C853;font-weight:700;margin-top:6px}
+  .email-body{padding:20px;font-size:13px;line-height:1.8;color:#ccc}
+  .email-body p{margin-bottom:12px}
+  .email-body .cta-btn{display:inline-block;background:#00C853;color:#0a0a0a;font-weight:800;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:13px;margin:8px 0}
+  .email-body .ps{color:#888;font-size:12px;border-top:1px solid #1c1c20;padding-top:12px;margin-top:16px}
+
+  .copy-all-btn{width:100%;padding:14px;border:2px solid #00C853;border-radius:12px;background:transparent;color:#00C853;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;margin-top:12px}
+  .copy-all-btn:hover{background:rgba(0,200,83,0.1)}
+  .copy-all-btn.copied{background:rgba(0,200,83,0.15);border-color:#00E676}
+
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:0}
+  .stat-box{background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:14px;text-align:center}
+  .stat-label{font-size:10px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+  .stat-value{font-size:18px;font-weight:900}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Secuencia de Email</h1>
+    <p>5 emails listos para copiar y pegar en tu herramienta de email marketing. Solo mete los datos de tu tienda.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tipo de secuencia</div>
+    <div class="type-options" id="type-options">
+      <div class="type-opt active" data-type="abandoned" onclick="selectType(this)">
+        <div class="opt-icon">\uD83D\uDED2</div>
+        <div class="opt-name">Carrito abandonado</div>
+        <div class="opt-desc">Recupera ventas perdidas</div>
+      </div>
+      <div class="type-opt" data-type="welcome" onclick="selectType(this)">
+        <div class="opt-icon">\uD83D\uDC4B</div>
+        <div class="opt-name">Bienvenida</div>
+        <div class="opt-desc">Nuevo suscriptor o cliente</div>
+      </div>
+      <div class="type-opt" data-type="postpurchase" onclick="selectType(this)">
+        <div class="opt-icon">\uD83D\uDCE6</div>
+        <div class="opt-name">Post-compra</div>
+        <div class="opt-desc">Fideliza y genera reseñas</div>
+      </div>
+      <div class="type-opt" data-type="winback" onclick="selectType(this)">
+        <div class="opt-icon">\uD83D\uDD04</div>
+        <div class="opt-name">Win-back</div>
+        <div class="opt-desc">Reactiva clientes inactivos</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu tienda</div>
+    <div class="field">
+      <label>Nombre de la tienda</label>
+      <input type="text" id="store-name" placeholder="Ej: NaturalSkin">
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Tipo de producto</label>
+        <select id="product-type">
+          <option value="cosmética">Cosmética / Belleza</option>
+          <option value="moda">Moda / Ropa</option>
+          <option value="tecnología">Tecnología / Gadgets</option>
+          <option value="hogar">Hogar / Decoración</option>
+          <option value="fitness">Fitness / Deporte</option>
+          <option value="alimentación">Alimentación / Suplementos</option>
+          <option value="mascotas">Mascotas</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Producto estrella</label>
+        <input type="text" id="hero-product" placeholder="Ej: Sérum Vitamina C">
+      </div>
+    </div>
+    <div class="field">
+      <label>Propuesta de valor (1 frase)</label>
+      <input type="text" id="value-prop" placeholder="Ej: Cosmética natural que funciona de verdad">
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Descuento de bienvenida</label>
+        <input type="text" id="discount" placeholder="Ej: 15% con código HOLA15">
+      </div>
+      <div class="field">
+        <label>URL de la tienda</label>
+        <input type="text" id="store-url" placeholder="tutienda.com">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tono de comunicación</div>
+    <div class="tone-options" id="tone-options">
+      <div class="tone-opt active" data-tone="cercano" onclick="selectTone(this)">Cercano</div>
+      <div class="tone-opt" data-tone="profesional" onclick="selectTone(this)">Profesional</div>
+      <div class="tone-opt" data-tone="premium" onclick="selectTone(this)">Premium</div>
+      <div class="tone-opt" data-tone="divertido" onclick="selectTone(this)">Divertido</div>
+      <div class="tone-opt" data-tone="urgente" onclick="selectTone(this)">Urgente</div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generate()">GENERAR SECUENCIA COMPLETA</button>
+
+  <div class="results" id="results">
+    <div class="card">
+      <div class="card-title">Tu secuencia</div>
+      <div class="sequence-overview" id="sequence-overview"></div>
+      <div id="email-display"></div>
+      <button class="copy-all-btn" id="copy-all-btn" onclick="copyAll()">COPIAR ESTE EMAIL</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Métricas esperadas</div>
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+
+    <div class="footer">
+      <div class="brand">MENTORIUM</div>
+      <div class="handle">@javier.sanchezecom</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedType = 'abandoned';
+let selectedTone = 'cercano';
+let generatedEmails = [];
+let currentEmailIdx = 0;
+
+function selectType(el){
+  document.querySelectorAll('.type-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  selectedType = el.dataset.type;
+}
+function selectTone(el){
+  document.querySelectorAll('.tone-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  selectedTone = el.dataset.tone;
+}
+
+const TONE_MAP = {
+  cercano: {saludo:'Ey,',despedida:'Un abrazo,',style:'coloquial, como un amigo'},
+  profesional: {saludo:'Hola,',despedida:'Un saludo,',style:'formal pero humano'},
+  premium: {saludo:'Estimado/a,',despedida:'Atentamente,',style:'elegante y exclusivo'},
+  divertido: {saludo:'Buenas!',despedida:'Hasta pronto!',style:'alegre, con humor'},
+  urgente: {saludo:'',despedida:'',style:'directo, sin rodeos, escasez'}
+};
+
+function generate(){
+  const store = document.getElementById('store-name').value.trim() || 'Tu Tienda';
+  const productType = document.getElementById('product-type').value;
+  const hero = document.getElementById('hero-product').value.trim() || 'tu producto favorito';
+  const valueProp = document.getElementById('value-prop').value.trim() || 'productos que marcan la diferencia';
+  const discount = document.getElementById('discount').value.trim() || '10% de descuento';
+  const url = document.getElementById('store-url').value.trim() || 'tutienda.com';
+  const tone = TONE_MAP[selectedTone];
+
+  generatedEmails = [];
+
+  if(selectedType === 'abandoned'){
+    generatedEmails = [
+      {
+        timing: '1 hora', type: 'Recordatorio',
+        subject: `\u00BFTe has dejado algo? Tu ${hero} te espera`,
+        body: `<p>${tone.saludo}</p><p>Has estado a punto de conseguir tu ${hero} pero no has terminado el pedido.</p><p>Lo entendemos. A veces la vida interrumpe. Pero tu carrito sigue guardado y listo para ti.</p><p>Solo te faltan unos clics:</p><p><span class="cta-btn">COMPLETAR MI PEDIDO</span></p><p class="ps">PD: Tu carrito se guarda durante 48 horas. Después, no podemos garantizar disponibilidad.</p>`
+      },
+      {
+        timing: '12 horas', type: 'Valor',
+        subject: `Por qué ${hero} se ha convertido en nuestro más vendido`,
+        body: `<p>${tone.saludo}</p><p>Antes de que decidas, quiero contarte algo sobre ${hero}.</p><p>No es un producto más de ${productType}. Es el resultado de meses de desarrollo para resolver un problema real: que ${valueProp.toLowerCase()}.</p><p>Lo que dicen nuestros clientes:</p><p><em>"Lo probé sin muchas expectativas y ahora no puedo vivir sin él."</em></p><p><em>"La diferencia se nota desde la primera semana."</em></p><p>Tu carrito sigue guardado:</p><p><span class="cta-btn">VOLVER A MI CARRITO</span></p><p class="ps">PD: Envío rápido. Devolución fácil. Sin riesgo.</p>`
+      },
+      {
+        timing: '24 horas', type: 'Incentivo',
+        subject: `\uD83C\uDF81 ${discount} para tu pedido pendiente`,
+        body: `<p>${tone.saludo}</p><p>Tu ${hero} sigue en el carrito. Y queremos ponértelo fácil.</p><p>Hemos activado un <strong>${discount}</strong> exclusivo para ti. Solo válido durante las próximas 24 horas.</p><p>Es nuestra forma de decirte: no te lo pienses más.</p><p><span class="cta-btn">USAR MI DESCUENTO</span></p><p class="ps">PD: Este descuento es personal e intransferible. Caduca mañana.</p>`
+      },
+      {
+        timing: '48 horas', type: 'Escasez',
+        subject: `Último aviso: tu carrito se vacía pronto`,
+        body: `<p>Sin rodeos:</p><p>Tu ${hero} lleva 48 horas guardado en tu carrito. Hoy lo liberamos para que otros clientes puedan acceder.</p><p>Si lo quieres, es ahora.</p><p>Si no, no pasa nada. Pero no queremos que te quedes sin él por no haberlo visto a tiempo.</p><p><span class="cta-btn">FINALIZAR PEDIDO AHORA</span></p><p class="ps">PD: Tu ${discount} sigue activo. Pero solo hasta esta noche.</p>`
+      },
+      {
+        timing: '5 días', type: 'Último intento',
+        subject: `\u00BFPodemos ayudarte con algo?`,
+        body: `<p>${tone.saludo}</p><p>Hace unos días dejaste un pedido sin terminar en ${store}.</p><p>No queremos insistir. Pero sí queremos saber: \u00bfhubo algún problema? \u00bfAlgo que no te convenció?</p><p>Si tienes cualquier duda sobre ${hero}, nuestro equipo puede ayudarte:</p><p>\u2022 \u00bfTallas? \u00bfColores? \u00bfIngredientes?<br>\u2022 \u00bfEnvío? \u00bfDevoluciones?<br>\u2022 \u00bfResultados esperados?</p><p>Responde a este email y te contestamos en menos de 24h.</p><p>${tone.despedida}<br>El equipo de ${store}</p>`
+      }
+    ];
+  } else if(selectedType === 'welcome'){
+    generatedEmails = [
+      {
+        timing: 'Inmediato', type: 'Bienvenida',
+        subject: `Bienvenido/a a ${store} \u2014 tu ${discount} te espera`,
+        body: `<p>${tone.saludo}</p><p>Bienvenido/a a ${store}. Acabas de unirte a una comunidad de personas que buscan ${valueProp.toLowerCase()}.</p><p>Como prometimos, aquí tienes tu <strong>${discount}</strong> para tu primera compra.</p><p>Aplícalo directamente en ${url}.</p><p><span class="cta-btn">IR A LA TIENDA</span></p><p class="ps">PD: Nuestro bestseller es ${hero}. Más del 85% de los nuevos clientes empiezan por ahí. Por algo será.</p>`
+      },
+      {
+        timing: '2 días', type: 'Historia',
+        subject: `La historia detrás de ${store}`,
+        body: `<p>${tone.saludo}</p><p>No montamos ${store} para vender por vender.</p><p>Lo creamos porque vimos un problema en el mundo de la ${productType}: demasiadas marcas que prometen mucho y entregan poco.</p><p>Nuestra filosofía es simple: ${valueProp}. Sin letra pequeña.</p><p>Cada producto que ves en nuestra tienda ha pasado por un proceso de selección brutal. Solo vendemos lo que usaríamos nosotros mismos.</p><p>\u00bfQuieres comprobarlo?</p><p><span class="cta-btn">VER PRODUCTOS</span></p><p>${tone.despedida}<br>${store}</p>`
+      },
+      {
+        timing: '4 días', type: 'Prueba social',
+        subject: `Esto es lo que dicen de ${hero}`,
+        body: `<p>${tone.saludo}</p><p>No te lo decimos nosotros. Te lo dicen nuestros clientes:</p><p><strong>\u2605\u2605\u2605\u2605\u2605</strong> \u2014 <em>"Llevaba meses buscando algo así. ${hero} me ha cambiado la vida."</em></p><p><strong>\u2605\u2605\u2605\u2605\u2605</strong> \u2014 <em>"La calidad es brutal. Ya he repetido pedido."</em></p><p><strong>\u2605\u2605\u2605\u2605\u2605</strong> \u2014 <em>"El envío fue rapidísimo y el producto supera expectativas."</em></p><p>+500 clientes satisfechos no pueden estar equivocados.</p><p><span class="cta-btn">VER ${hero.toUpperCase()}</span></p><p class="ps">PD: Recuerda que tu ${discount} sigue activo.</p>`
+      },
+      {
+        timing: '7 días', type: 'Educativo',
+        subject: `3 errores que cometes con tu ${productType} (y cómo evitarlos)`,
+        body: `<p>${tone.saludo}</p><p>Hoy no te vamos a vender nada. Solo queremos que sepas esto:</p><p><strong>Error #1:</strong> Elegir por precio. Lo barato sale caro. Compras dos veces y acabas gastando más.</p><p><strong>Error #2:</strong> No investigar ingredientes/materiales. El 80% de los productos del mercado usan componentes de relleno que no aportan nada.</p><p><strong>Error #3:</strong> No tener una rutina. Comprar un buen producto y usarlo mal es lo mismo que no comprarlo.</p><p>En ${store} hemos creado guías gratuitas para que saques el máximo de cada producto.</p><p><span class="cta-btn">VER GUÍAS GRATIS</span></p><p>${tone.despedida}<br>${store}</p>`
+      },
+      {
+        timing: '10 días', type: 'Conversión',
+        subject: `\u00DAltima oportunidad: tu ${discount} caduca pronto`,
+        body: `<p>${tone.saludo}</p><p>Tu ${discount} de bienvenida caduca en 48 horas.</p><p>Si estabas esperando el momento perfecto: es ahora.</p><p>Nuestras recomendaciones para tu primera compra:</p><p>\u2022 <strong>${hero}</strong> \u2014 nuestro bestseller<br>\u2022 Los packs ahorro \u2014 la mejor relación calidad-precio<br>\u2022 Las novedades de temporada \u2014 lo último en ${productType}</p><p><span class="cta-btn">USAR MI ${discount.toUpperCase()}</span></p><p class="ps">PD: Envío gratis + devolución fácil. No tienes nada que perder.</p>`
+      }
+    ];
+  } else if(selectedType === 'postpurchase'){
+    generatedEmails = [
+      {
+        timing: 'Inmediato', type: 'Confirmación',
+        subject: `\u2705 Pedido confirmado \u2014 Esto es lo que viene ahora`,
+        body: `<p>${tone.saludo}</p><p>Tu pedido en ${store} está confirmado. Esto es lo que va a pasar:</p><p><strong>1.</strong> Preparamos tu pedido hoy.<br><strong>2.</strong> Recibirás un email con el número de seguimiento.<br><strong>3.</strong> En pocos días lo tendrás en casa.</p><p>Si tienes cualquier duda, responde a este email. Estamos aquí.</p><p>${tone.despedida}<br>El equipo de ${store}</p><p class="ps">PD: \u00bfTe hacemos una pregunta rápida? \u00bfCómo nos encontraste? (Responde con una palabra: Google, Instagram, amigo, otro). Nos ayuda un montón.</p>`
+      },
+      {
+        timing: '3 días', type: 'Educación',
+        subject: `Cómo sacarle el máximo a tu ${hero}`,
+        body: `<p>${tone.saludo}</p><p>Tu pedido está en camino. Mientras llega, queremos que estés preparado/a para sacarle el máximo.</p><p><strong>Consejo #1:</strong> Cuando lo recibas, tómate un minuto para revisar todo el packaging. Hemos incluido instrucciones detalladas.</p><p><strong>Consejo #2:</strong> Los mejores resultados se notan con uso constante. Dale al menos 2-3 semanas antes de juzgar.</p><p><strong>Consejo #3:</strong> Guarda la factura por si necesitas gestionar alguna devolución (aunque esperamos que no sea el caso).</p><p>\u00bfPreguntas? Estamos a un email de distancia.</p><p>${tone.despedida}<br>${store}</p>`
+      },
+      {
+        timing: '7 días', type: 'Feedback',
+        subject: `\u00bfQué tal tu experiencia con ${store}?`,
+        body: `<p>${tone.saludo}</p><p>Ya habrás tenido tiempo de probar tu compra. \u00bfQué te parece?</p><p>Tu opinión nos importa de verdad. No es un email automático más (bueno, sí, pero lo decimos en serio).</p><p>Puedes dejarnos una reseña rápida \u2014 tarda menos de 30 segundos:</p><p><span class="cta-btn">DEJAR MI RESEÑA</span></p><p>Si algo no te ha convencido, preferimos que nos lo digas a nosotros antes de publicarlo. Respondemos siempre.</p><p>${tone.despedida}<br>${store}</p>`
+      },
+      {
+        timing: '14 días', type: 'Cross-sell',
+        subject: `Los que compraron ${hero} también llevan esto`,
+        body: `<p>${tone.saludo}</p><p>Viendo tu compra de ${hero}, creemos que esto te puede interesar:</p><p>El 73% de nuestros clientes que empiezan con ${hero} acaban completando su rutina con productos complementarios.</p><p>No es que necesites más cosas. Es que juntos, el resultado es exponencialmente mejor.</p><p><span class="cta-btn">VER RECOMENDACIONES</span></p><p class="ps">PD: Los packs tienen un descuento especial para clientes existentes. Solo por ser parte de la familia ${store}.</p>`
+      },
+      {
+        timing: '30 días', type: 'Recompra',
+        subject: `\u00bfYa se te está acabando? Repon antes de quedarte sin`,
+        body: `<p>${tone.saludo}</p><p>Si nuestros cálculos no fallan, tu ${hero} estará a punto de agotarse.</p><p>Repon ahora y asegúrate de no quedarte sin:</p><p><span class="cta-btn">REPETIR PEDIDO</span></p><p>\u00bfSabías que puedes activar la reposición automática? Así nunca te quedas sin stock y además te ahorras un 10% en cada envío.</p><p>${tone.despedida}<br>${store}</p>`
+      }
+    ];
+  } else { // winback
+    generatedEmails = [
+      {
+        timing: '30 días inactivo', type: 'Te echamos de menos',
+        subject: `Hace tiempo que no te vemos por ${store}...`,
+        body: `<p>${tone.saludo}</p><p>Hace un tiempo que no pasas por ${store} y queríamos saber cómo estás.</p><p>Desde tu última visita, hemos añadido novedades que creemos que te van a gustar.</p><p>Sin presión. Solo queríamos recordarte que seguimos aquí, con ${valueProp.toLowerCase()}.</p><p><span class="cta-btn">VER NOVEDADES</span></p><p>${tone.despedida}<br>${store}</p>`
+      },
+      {
+        timing: '37 días', type: 'Novedades',
+        subject: `Lo nuevo en ${store} \u2014 creemos que te va a flipar`,
+        body: `<p>${tone.saludo}</p><p>Desde la última vez que compraste, hemos lanzado 3 productos nuevos en ${productType} que arrasan:</p><p>\u2022 <strong>Novedad 1</strong> \u2014 ya es nuestro #2 en ventas<br>\u2022 <strong>Novedad 2</strong> \u2014 agotado 2 veces y vuelta en stock<br>\u2022 <strong>Novedad 3</strong> \u2014 4.9 estrellas de media</p><p>Échales un ojo. Merece la pena.</p><p><span class="cta-btn">VER NOVEDADES</span></p><p>${tone.despedida}<br>${store}</p>`
+      },
+      {
+        timing: '45 días', type: 'Incentivo',
+        subject: `Esto es solo para ti: ${discount}`,
+        body: `<p>${tone.saludo}</p><p>No enviamos este email a todo el mundo. Solo a clientes que ya confiaron en nosotros y a quienes echamos de menos.</p><p>Aquí tienes un <strong>${discount}</strong> exclusivo para que vuelvas:</p><p><span class="cta-btn">ACTIVAR MI DESCUENTO</span></p><p>Válido durante 7 días. Para ti solo.</p><p>${tone.despedida}<br>${store}</p>`
+      },
+      {
+        timing: '55 días', type: 'Último intento',
+        subject: `\u00bfSeguimos en contacto?`,
+        body: `<p>${tone.saludo}</p><p>Queremos ser respetuosos con tu bandeja de entrada. Si ya no te interesa recibir noticias de ${store}, lo entendemos perfectamente.</p><p>Pero si todavía quieres estar al día de novedades, ofertas exclusivas y contenido útil sobre ${productType}, solo tienes que hacer clic:</p><p><span class="cta-btn">SÍ, QUIERO SEGUIR</span></p><p>Si no haces clic, dejaremos de escribirte. Sin rencores.</p><p>${tone.despedida}<br>${store}</p>`
+      },
+      {
+        timing: '60 días', type: 'Despedida',
+        subject: `Adiós (pero no para siempre)`,
+        body: `<p>${tone.saludo}</p><p>Este es el último email que recibirás de ${store} por un tiempo.</p><p>No queremos molestar. Pero queremos que sepas que la puerta siempre está abierta.</p><p>Si algún día necesitas ${productType} de calidad, con ${valueProp.toLowerCase()}, ya sabes dónde estamos: ${url}</p><p>Ha sido un placer tenerte.</p><p>${tone.despedida}<br>El equipo de ${store}</p><p class="ps">PD: Si cambias de opinión, solo visita ${url} y vuelve a suscribirte. Te recibiremos con los brazos abiertos.</p>`
+      }
+    ];
+  }
+
+  renderSequence();
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderSequence(){
+  const overviewEl = document.getElementById('sequence-overview');
+  overviewEl.innerHTML = '';
+  generatedEmails.forEach((em, i) => {
+    const step = document.createElement('div');
+    step.className = 'seq-step' + (i === currentEmailIdx ? ' active' : '');
+    step.innerHTML = `<div class="seq-num">${i+1}</div><div class="seq-timing">${em.timing}</div><div class="seq-type">${em.type}</div>`;
+    step.onclick = () => { currentEmailIdx = i; renderSequence(); };
+    overviewEl.appendChild(step);
+  });
+
+  const em = generatedEmails[currentEmailIdx];
+  const store = document.getElementById('store-name').value.trim() || 'Tu Tienda';
+  document.getElementById('email-display').innerHTML = `
+    <div class="email-preview">
+      <div class="email-header">
+        <div class="email-from">De: ${store} &lt;hola@${(document.getElementById('store-url').value.trim()||'tutienda.com')}&gt;</div>
+        <div class="email-subject">${em.subject}</div>
+        <div class="email-timing">Envío: ${em.timing} después del trigger</div>
+      </div>
+      <div class="email-body">${em.body}</div>
+    </div>
+  `;
+
+  // Stats
+  const statsMap = {
+    abandoned: {open:'45-55%', click:'8-12%', conv:'5-10%'},
+    welcome: {open:'50-60%', click:'10-15%', conv:'3-8%'},
+    postpurchase: {open:'40-50%', click:'6-10%', conv:'2-5%'},
+    winback: {open:'20-30%', click:'3-6%', conv:'1-3%'}
+  };
+  const stats = statsMap[selectedType];
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-box"><div class="stat-label">Open rate</div><div class="stat-value" style="color:#00C853">${stats.open}</div></div>
+    <div class="stat-box"><div class="stat-label">Click rate</div><div class="stat-value" style="color:#F5A623">${stats.click}</div></div>
+    <div class="stat-box"><div class="stat-label">Conversión</div><div class="stat-value">${stats.conv}</div></div>
+  `;
+}
+
+function copyAll(){
+  const em = generatedEmails[currentEmailIdx];
+  const plain = em.subject + '\n\n' + document.querySelector('.email-body').innerText;
+  navigator.clipboard.writeText(plain).then(()=>{
+    const btn = document.getElementById('copy-all-btn');
+    btn.textContent = 'COPIADO';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPIAR ESTE EMAIL';btn.classList.remove('copied');},2000);
+  });
+}
+</script>
+</body>
+</html>

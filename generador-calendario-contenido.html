@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Calendario de Contenido — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:600px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:440px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+
+  select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px;font-family:inherit;outline:none;cursor:pointer;transition:border-color 0.3s;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+  select:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  select option{background:#111;color:#fff}
+
+  input[type=text]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input[type=text]:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+
+  .day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px}
+  .day-btn{padding:12px 0;border:1px solid #1c1c20;border-radius:8px;background:#0c0c0e;color:#555;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;text-align:center}
+  .day-btn.active{background:#00C853;color:#0a0a0a;border-color:#00C853}
+  .day-btn:hover{border-color:#333}
+  .day-btn.active:hover{background:#00E676}
+
+  .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .type-btn{padding:12px 14px;border:1px solid #1c1c20;border-radius:10px;background:#0c0c0e;color:#888;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:left;display:flex;align-items:center;gap:8px}
+  .type-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .type-btn.active{border-color:#00C853;color:#fff;background:rgba(0,200,83,0.05)}
+  .type-btn:hover{border-color:#333}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .week-header{display:grid;grid-template-columns:80px 1fr;gap:0;margin-top:16px;margin-bottom:4px}
+  .week-header span{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#555;padding:8px 0}
+
+  .day-row{display:grid;grid-template-columns:80px 1fr;gap:0;border-bottom:1px solid #141416;transition:background 0.2s}
+  .day-row:hover{background:#111113}
+  .day-name{font-size:14px;font-weight:800;color:#888;padding:18px 0;display:flex;align-items:center}
+  .day-name.today{color:#00C853}
+  .day-content{padding:14px 0 14px 16px;display:flex;flex-direction:column;gap:8px}
+  .day-off{padding:18px 0 18px 16px;font-size:13px;color:#333;font-weight:500;font-style:italic}
+
+  .content-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;background:#111113;border:1px solid #1c1c20;transition:all 0.3s}
+  .content-pill:hover{border-color:#00C853;transform:translateX(4px)}
+  .content-pill .pill-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .content-pill .pill-type{color:#888;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+  .content-pill .pill-kw{color:#00C853;font-size:11px;font-weight:700;margin-left:auto}
+
+  .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+  .summary-box{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center;transition:all 0.3s}
+  .summary-box:hover{border-color:#00C853;transform:translateY(-2px)}
+  .summary-box .s-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  .summary-box .s-value{font-size:24px;font-weight:900;color:#00C853;letter-spacing:-1px}
+  .summary-box .s-sub{font-size:10px;color:#444;margin-top:4px;font-weight:600}
+
+  .cta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+  .cta-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:14px;transition:all 0.3s}
+  .cta-card:hover{border-color:#00C853}
+  .cta-card .cc-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-bottom:6px}
+  .cta-card .cc-list{font-size:12px;color:#888;line-height:1.8}
+  .cta-card .cc-list span{display:block;padding-left:12px;position:relative}
+  .cta-card .cc-list span::before{content:'';position:absolute;left:0;top:8px;width:4px;height:4px;border-radius:50%;background:#00C853}
+
+  .insight{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:1px solid #1a3a25;border-radius:14px;padding:18px;margin-top:16px}
+  .insight .tag{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#00C853;margin-bottom:8px}
+  .insight p{font-size:13px;color:#999;line-height:1.7;font-weight:500}
+  .insight strong{color:#fff}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Calendario de Contenido</h1>
+    <p>Selecciona tus días activos, tipos de contenido y keywords. Genera tu calendario semanal listo para ejecutar.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Días activos</div>
+    <div class="field">
+      <label>Selecciona los días que publicas</label>
+      <div class="day-grid">
+        <div class="day-btn active" data-day="0" onclick="toggleDay(this)">LUN</div>
+        <div class="day-btn active" data-day="1" onclick="toggleDay(this)">MAR</div>
+        <div class="day-btn active" data-day="2" onclick="toggleDay(this)">MIÉ</div>
+        <div class="day-btn" data-day="3" onclick="toggleDay(this)">JUE</div>
+        <div class="day-btn active" data-day="4" onclick="toggleDay(this)">VIE</div>
+        <div class="day-btn" data-day="5" onclick="toggleDay(this)">SÁB</div>
+        <div class="day-btn" data-day="6" onclick="toggleDay(this)">DOM</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tipos de contenido</div>
+    <div class="field">
+      <label>Selecciona los formatos que usas</label>
+      <div class="type-grid">
+        <div class="type-btn active" data-type="reel" onclick="toggleType(this)"><span class="dot" style="background:#00C853"></span>Reel educativo</div>
+        <div class="type-btn active" data-type="carrusel" onclick="toggleType(this)"><span class="dot" style="background:#2979FF"></span>Carrusel</div>
+        <div class="type-btn active" data-type="story" onclick="toggleType(this)"><span class="dot" style="background:#FF9800"></span>Story embudo</div>
+        <div class="type-btn" data-type="live" onclick="toggleType(this)"><span class="dot" style="background:#AB47BC"></span>Directo / Live</div>
+        <div class="type-btn active" data-type="hook" onclick="toggleType(this)"><span class="dot" style="background:#ff5252"></span>Reel hook viral</div>
+        <div class="type-btn" data-type="collab" onclick="toggleType(this)"><span class="dot" style="background:#00BCD4"></span>Colaboración</div>
+        <div class="type-btn active" data-type="autoridad" onclick="toggleType(this)"><span class="dot" style="background:#FFD600"></span>Post autoridad</div>
+        <div class="type-btn" data-type="testimonio" onclick="toggleType(this)"><span class="dot" style="background:#78909C"></span>Testimonio</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Nicho y keywords</div>
+    <div class="field">
+      <label>Sector / nicho principal</label>
+      <select id="niche">
+        <option value="ecommerce">Ecommerce / Dropshipping</option>
+        <option value="servicios">Servicios profesionales</option>
+        <option value="saas">SaaS / Software</option>
+        <option value="formacion">Formación online</option>
+        <option value="fitness">Fitness / Salud</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Keywords principales (separadas por coma)</label>
+      <input type="text" id="keywords" placeholder="márgenes, escalar, proveedor, conversión" value="márgenes, escalar, proveedor, conversión, sistema">
+      <div class="hint">Las rotará entre los contenidos de la semana</div>
+    </div>
+    <div class="field">
+      <label>Objetivo principal esta semana</label>
+      <select id="goal">
+        <option value="autoridad">Construir autoridad</option>
+        <option value="leads">Generar leads</option>
+        <option value="engagement">Maximizar engagement</option>
+        <option value="mixto">Mixto equilibrado</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generate()">GENERAR CALENDARIO</button>
+
+  <div class="results" id="results">
+    <div class="summary-grid" id="summaryGrid"></div>
+    <div id="calendarOutput"></div>
+    <div class="cta-row" id="ctaRow"></div>
+    <div class="insight" id="insightBox">
+      <div class="tag">Estrategia semanal</div>
+      <p id="insightText"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+const dayNames = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const typeColors = {reel:'#00C853',carrusel:'#2979FF',story:'#FF9800',live:'#AB47BC',hook:'#ff5252',collab:'#00BCD4',autoridad:'#FFD600',testimonio:'#78909C'};
+const typeLabels = {reel:'Reel educativo',carrusel:'Carrusel',story:'Story embudo',live:'Directo',hook:'Reel hook viral',collab:'Colaboración',autoridad:'Post autoridad',testimonio:'Testimonio'};
+
+const ctaTypes = {
+  autoridad:['Comenta "SISTEMA"','Guarda este post','Comparte con alguien que lo necesite'],
+  leads:['Comenta "GUÍA" y te lo envío','Enlace en bio','DM con "INFO"'],
+  engagement:['¿Tú qué opinas?','Vota en stories','Comenta tu caso'],
+  mixto:['Comenta "QUIERO"','Guarda para después','Enlace en bio']
+};
+
+const topicsByNiche = {
+  ecommerce:['Error #1 que mata márgenes','Cómo elegir proveedor sin quemar dinero','Tu tienda no convierte: esto es lo que falla','Escalar sin sistema = escalar pérdidas','Datos que debes mirar cada lunes','De 5K a 30K/mes: qué cambia de verdad','Por qué facturas mucho y no te queda nada','El coste oculto de las devoluciones','Cómo saber si tu producto tiene recorrido','Shopify vs otras plataformas: la verdad'],
+  servicios:['Por qué cobras poco y trabajas mucho','El error de vender horas','Cómo automatizar sin perder calidad','Clientes que pagan bien vs clientes tóxicos','Sistema de captación sin ads','Tu propuesta de valor no es clara','Pricing: cómo subir precios sin perder clientes','Testimonios que venden solos','El embudo invisible que ya tienes','De freelance a empresa: el salto mental'],
+  saas:['Métricas SaaS que importan de verdad','Churn: el asesino silencioso','De 0 a 100 usuarios: estrategia real','Pricing tiers que convierten','Onboarding que retiene','Product-led growth sin presupuesto','Tu landing no convierte: por qué','El error del feature creep','Cómo validar antes de construir','MRR vs ARR: qué mirar'],
+  formacion:['Por qué nadie compra tu curso','El precio no es el problema','Cómo crear sin grabar 200 horas','La escalera de valor que funciona','Email marketing para cursos','Testimonios que cierran ventas','Lanzamiento vs evergreen','Tu lead magnet no atrae al ICP correcto','Comunidad como retención','De 0 a tu primer alumno de pago'],
+  fitness:['Por qué tus seguidores no compran','Contenido que atrae clientes, no likes','Cómo vender entrenamiento online','El error del precio bajo','Casos de transformación que venden','Tu embudo de stories no funciona','De entrenador a marca personal','Retención de clientes: la clave','Cómo escalar sin trabajar más horas','Nutrición + entreno: la oferta completa'],
+  otro:['El error que comete el 90%','Cómo diferenciarte sin bajar precio','Sistema que funciona sin ti','De 0 a resultados: timeline real','Lo que nadie te cuenta sobre emprender','Datos vs intuición: qué funciona','El coste de no tener sistema','Por qué copiar no funciona','Tu cliente ideal no es quien crees','Escalar sin perder calidad']
+};
+
+function toggleDay(el){el.classList.toggle('active')}
+function toggleType(el){el.classList.toggle('active')}
+
+function generate(){
+  const activeDays = [];
+  document.querySelectorAll('.day-btn.active').forEach(b => activeDays.push(parseInt(b.dataset.day)));
+  const activeTypes = [];
+  document.querySelectorAll('.type-btn.active').forEach(b => activeTypes.push(b.dataset.type));
+
+  if(activeDays.length === 0 || activeTypes.length === 0){
+    alert('Selecciona al menos un día y un tipo de contenido');
+    return;
+  }
+
+  const niche = document.getElementById('niche').value;
+  const kws = document.getElementById('keywords').value.split(',').map(k=>k.trim()).filter(k=>k);
+  const goal = document.getElementById('goal').value;
+  const topics = topicsByNiche[niche] || topicsByNiche.otro;
+
+  // Strategy: distribute types across days with smart rotation
+  const goalWeights = {
+    autoridad:{reel:3,carrusel:3,autoridad:4,hook:2,story:1,testimonio:3,live:1,collab:2},
+    leads:{reel:2,carrusel:2,autoridad:1,hook:3,story:4,testimonio:2,live:2,collab:1},
+    engagement:{reel:3,carrusel:2,autoridad:1,hook:4,story:2,testimonio:1,live:3,collab:3},
+    mixto:{reel:3,carrusel:3,autoridad:2,hook:2,story:2,testimonio:2,live:1,collab:1}
+  };
+  const weights = goalWeights[goal];
+
+  // Sort types by weight for this goal
+  const sortedTypes = [...activeTypes].sort((a,b)=>(weights[b]||1)-(weights[a]||1));
+
+  let calendar = [];
+  let topicIdx = Math.floor(Math.random()*topics.length);
+  let kwIdx = 0;
+
+  for(let d = 0; d < 7; d++){
+    if(activeDays.includes(d)){
+      // Pick 1-2 content types per day
+      const numPieces = activeDays.length <= 3 ? 2 : 1;
+      let dayContent = [];
+      for(let p = 0; p < numPieces && p < sortedTypes.length; p++){
+        const typeIndex = (d + p) % sortedTypes.length;
+        const type = sortedTypes[typeIndex];
+        const topic = topics[topicIdx % topics.length];
+        const kw = kws.length > 0 ? kws[kwIdx % kws.length] : '';
+        dayContent.push({type, topic, keyword: kw});
+        topicIdx++;
+        kwIdx++;
+      }
+      calendar.push({day: d, active: true, content: dayContent});
+    } else {
+      calendar.push({day: d, active: false, content: []});
+    }
+  }
+
+  // Summary
+  let totalPieces = 0;
+  let typeCounts = {};
+  calendar.forEach(d => {
+    d.content.forEach(c => {
+      totalPieces++;
+      typeCounts[c.type] = (typeCounts[c.type]||0) + 1;
+    });
+  });
+
+  document.getElementById('summaryGrid').innerHTML =
+    '<div class="summary-box"><div class="s-label">Piezas</div><div class="s-value">'+totalPieces+'</div><div class="s-sub">esta semana</div></div>'+
+    '<div class="summary-box"><div class="s-label">Días activos</div><div class="s-value">'+activeDays.length+'</div><div class="s-sub">de 7</div></div>'+
+    '<div class="summary-box"><div class="s-label">Formatos</div><div class="s-value">'+activeTypes.length+'</div><div class="s-sub">tipos diferentes</div></div>';
+
+  // Calendar
+  let calHTML = '<div class="card" style="margin-top:16px"><div class="card-title">Tu semana</div>';
+  calendar.forEach(d => {
+    if(d.active){
+      calHTML += '<div class="day-row"><div class="day-name">'+dayNames[d.day]+'</div><div class="day-content">';
+      d.content.forEach(c => {
+        calHTML += '<div class="content-pill"><span class="pill-dot" style="background:'+typeColors[c.type]+'"></span><span style="color:#fff;font-weight:700;font-size:13px">'+c.topic+'</span></div>';
+        calHTML += '<div style="display:flex;align-items:center;gap:12px;padding-left:16px;margin-top:-4px"><span class="pill-type">'+typeLabels[c.type]+'</span>'+(c.keyword?'<span class="pill-kw">#'+c.keyword+'</span>':'')+'</div>';
+      });
+      calHTML += '</div></div>';
+    } else {
+      calHTML += '<div class="day-row"><div class="day-name">'+dayNames[d.day]+'</div><div class="day-off">Descanso</div></div>';
+    }
+  });
+  calHTML += '</div>';
+  document.getElementById('calendarOutput').innerHTML = calHTML;
+
+  // CTA suggestions
+  const ctas = ctaTypes[goal];
+  const kwList = kws.slice(0,4);
+  document.getElementById('ctaRow').innerHTML =
+    '<div class="cta-card"><div class="cc-label">CTAs sugeridos</div><div class="cc-list">'+ctas.map(c=>'<span>'+c+'</span>').join('')+'</div></div>'+
+    '<div class="cta-card"><div class="cc-label">Keywords a rotar</div><div class="cc-list">'+kwList.map(k=>'<span>#'+k+'</span>').join('')+'</div></div>';
+
+  // Insight
+  let insightText = 'Con <strong>'+totalPieces+' piezas en '+activeDays.length+' días</strong>, mantienes frecuencia sin quemar. ';
+  if(goal === 'autoridad') insightText += 'Prioriza carruseles y reels educativos. <strong>Sin CTA directo</strong> en el 60% del contenido. Que la gente te siga por valor, no por venta.';
+  else if(goal === 'leads') insightText += 'Usa <strong>keywords en stories</strong> y cierre con CTA claro. ManyChat captura el lead. El contenido principal calienta, las stories convierten.';
+  else if(goal === 'engagement') insightText += 'Hooks virales + preguntas abiertas. <strong>Los primeros 3 segundos</strong> son todo. Prioriza comentarios sobre likes.';
+  else insightText += 'Mezcla equilibrada: autoridad que posiciona + hooks que atraen + stories que convierten. <strong>40% valor / 30% lead / 20% emocional / 10% CTA directo.</strong>';
+
+  document.getElementById('insightText').innerHTML = insightText;
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

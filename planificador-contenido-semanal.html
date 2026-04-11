@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planificador de Contenido Semanal — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,#0a0a12,#12121e);color:#fff;min-height:100vh}
+  .container{max-width:500px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .badge{display:inline-block;background:linear-gradient(135deg,#C45830,#e86830);color:#fff;font-size:10px;font-weight:800;padding:6px 16px;border-radius:100px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:8px}
+  .header p{font-size:13px;color:#666;line-height:1.5}
+  .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:20px;margin-bottom:14px}
+  .card-title{font-size:11px;font-weight:800;color:#C45830;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12px;font-weight:600;color:#888;margin-bottom:6px}
+  .field select{width:100%;background:#0c0c14;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#fff;font-size:14px;font-weight:600;padding:12px;font-family:inherit;outline:none}
+  .field select:focus{border-color:#C45830}
+  .field select option{background:#12121e}
+  .btn{width:100%;padding:14px;background:linear-gradient(135deg,#C45830,#e86830);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px}
+  .calendar{display:none;margin-top:20px}
+  .day{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px;margin-bottom:10px}
+  .day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .day-name{font-size:14px;font-weight:800}
+  .day-type{font-size:10px;font-weight:700;padding:4px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:1px}
+  .type-lm{background:rgba(45,140,78,0.15);color:#2D8C4E}
+  .type-qa{background:rgba(88,130,196,0.15);color:#5882C4}
+  .type-cta{background:rgba(196,88,48,0.15);color:#C45830}
+  .type-libre{background:rgba(255,255,255,0.05);color:#888}
+  .type-poll{background:rgba(200,170,40,0.12);color:#C8AA28}
+  .type-wn{background:rgba(180,60,180,0.15);color:#B43CB4}
+  .day-content{font-size:13px;color:#aaa;line-height:1.5}
+  .day-content strong{color:#fff}
+  .day-keyword{display:inline-block;background:rgba(196,88,48,0.1);color:#C45830;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;margin-top:8px}
+  .tip{background:rgba(196,88,48,0.05);border:1px solid rgba(196,88,48,0.1);border-radius:12px;padding:14px;margin-top:16px;font-size:12px;color:#888;line-height:1.6}
+  .tip strong{color:#C45830}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#C45830;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">Planificador</div>
+    <h1>Tu semana de contenido en 2 minutos</h1>
+    <p>Elige tu objetivo y tu nivel. Te genero el calendario completo.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu situación</div>
+    <div class="field"><label>Objetivo principal esta semana</label>
+      <select id="objetivo">
+        <option value="leads">Generar leads (DMs cualificados)</option>
+        <option value="autoridad">Construir autoridad (seguidores)</option>
+        <option value="ventas">Empujar a ventas (llamadas)</option>
+        <option value="lanzamiento">Pre-lanzamiento de algo</option>
+      </select>
+    </div>
+    <div class="field"><label>¿Cuántas piezas puedes publicar?</label>
+      <select id="piezas">
+        <option value="3">3 por semana (mínimo)</option>
+        <option value="5" selected>5 por semana (recomendado)</option>
+        <option value="7">7 por semana (agresivo)</option>
+      </select>
+    </div>
+    <div class="field"><label>Tu recurso lead magnet</label>
+      <select id="recurso">
+        <option value="calculadora">Calculadora (márgenes, break-even, etc.)</option>
+        <option value="checklist">Checklist/Auditoría</option>
+        <option value="guia">Guía/Clase grabada</option>
+        <option value="plantilla">Plantilla/Template</option>
+      </select>
+    </div>
+    <div class="field"><label>Keyword ManyChat</label>
+      <select id="keyword">
+        <option value="NÚMEROS">NÚMEROS</option>
+        <option value="AUDITORÍA">AUDITORÍA</option>
+        <option value="EMAILS">EMAILS</option>
+        <option value="PRODUCTO">PRODUCTO</option>
+        <option value="LANDING">LANDING</option>
+        <option value="PROMPTS">PROMPTS</option>
+        <option value="GUÍA">GUÍA</option>
+      </select>
+    </div>
+    <button class="btn" onclick="gen()">Generar mi semana</button>
+  </div>
+
+  <div class="calendar" id="cal"></div>
+
+  <div class="footer">Herramienta gratuita de <span>MENTORIUM</span></div>
+</div>
+<script>
+function gen(){
+  var obj=document.getElementById('objetivo').value;
+  var piezas=parseInt(document.getElementById('piezas').value);
+  var recurso=document.getElementById('recurso').value;
+  var kw=document.getElementById('keyword').value;
+
+  var templates={
+    leads:{
+      7:[
+        {day:'Lunes',type:'LM',typeCls:'type-lm',content:'<strong>Reel con caso de éxito</strong> — resultado de alumno + proceso + "Comenta '+kw+'"',kw:kw},
+        {day:'Martes',type:'Q&A',typeCls:'type-qa',content:'<strong>Caja de preguntas</strong> en stories — responde las 3 mejores en vídeo selfie. Setter escribe a todos.'},
+        {day:'Miércoles',type:'LM',typeCls:'type-lm',content:'<strong>Carrusel educativo</strong> — el problema + 3 pasos + prueba + "Comenta '+kw+'"',kw:kw},
+        {day:'Jueves',type:'Libre',typeCls:'type-libre',content:'<strong>Stories de wins</strong> — screenshots de resultados + lifestyle. Sin CTA. Calentar.'},
+        {day:'Viernes',type:'LM',typeCls:'type-lm',content:'<strong>Reel diagnóstico</strong> — verdad incómoda + cómo arreglarlo + "Comenta '+kw+'"',kw:kw},
+        {day:'Sábado',type:'Libre',typeCls:'type-libre',content:'<strong>Lifestyle</strong> — foto/vídeo personal. Humanizar. Sin vender.'},
+        {day:'Domingo',type:'CTA',typeCls:'type-cta',content:'<strong>Stories QUE HAGO</strong> — secuencia de 7 stories explicando qué haces y cómo ayudas. CTA directo.'},
+      ],
+      5:[
+        {day:'Lunes',type:'LM',typeCls:'type-lm',content:'<strong>Reel caso éxito</strong> + "Comenta '+kw+'"',kw:kw},
+        {day:'Miércoles',type:'LM',typeCls:'type-lm',content:'<strong>Carrusel</strong> — problema + pasos + prueba + CTA',kw:kw},
+        {day:'Jueves',type:'Q&A',typeCls:'type-qa',content:'<strong>Caja preguntas</strong> — respuestas en vídeo'},
+        {day:'Viernes',type:'LM',typeCls:'type-lm',content:'<strong>Reel diagnóstico</strong> + "Comenta '+kw+'"',kw:kw},
+        {day:'Sábado',type:'Libre',typeCls:'type-libre',content:'<strong>Lifestyle + wins</strong> — stories'},
+      ],
+      3:[
+        {day:'Lunes',type:'LM',typeCls:'type-lm',content:'<strong>Reel caso éxito</strong> + "Comenta '+kw+'"',kw:kw},
+        {day:'Miércoles',type:'LM',typeCls:'type-lm',content:'<strong>Carrusel</strong> + CTA',kw:kw},
+        {day:'Viernes',type:'LM',typeCls:'type-lm',content:'<strong>Reel diagnóstico</strong> + "Comenta '+kw+'"',kw:kw},
+      ]
+    },
+    autoridad:{
+      7:[
+        {day:'Lunes',type:'Libre',typeCls:'type-libre',content:'<strong>Reel opinión radical</strong> — rompe creencia del sector. Sin CTA.'},
+        {day:'Martes',type:'LM',typeCls:'type-lm',content:'<strong>Carrusel educativo</strong> — valor puro + "Comenta '+kw+'"',kw:kw},
+        {day:'Miércoles',type:'Libre',typeCls:'type-libre',content:'<strong>Reel mindset/CEO</strong> — reflexión personal con peso'},
+        {day:'Jueves',type:'LM',typeCls:'type-lm',content:'<strong>Reel caso alumno</strong> + proceso + "Comenta '+kw+'"',kw:kw},
+        {day:'Viernes',type:'Q&A',typeCls:'type-qa',content:'<strong>Caja preguntas</strong> — demuestra expertise'},
+        {day:'Sábado',type:'Libre',typeCls:'type-libre',content:'<strong>Behind the scenes</strong> — cómo trabajas, tu setup, tu día'},
+        {day:'Domingo',type:'Libre',typeCls:'type-libre',content:'<strong>Lifestyle</strong> — foto personal. Conexión humana.'},
+      ],
+      5:[
+        {day:'Lunes',type:'Libre',typeCls:'type-libre',content:'<strong>Reel opinión radical</strong> — sin CTA'},
+        {day:'Miércoles',type:'LM',typeCls:'type-lm',content:'<strong>Carrusel educativo</strong> + "Comenta '+kw+'"',kw:kw},
+        {day:'Jueves',type:'LM',typeCls:'type-lm',content:'<strong>Reel caso alumno</strong> + CTA',kw:kw},
+        {day:'Viernes',type:'Libre',typeCls:'type-libre',content:'<strong>Reel mindset</strong> — reflexión'},
+        {day:'Sábado',type:'Libre',typeCls:'type-libre',content:'<strong>Lifestyle</strong>'},
+      ],
+      3:[
+        {day:'Lunes',type:'Libre',typeCls:'type-libre',content:'<strong>Reel opinión</strong> — sin CTA'},
+        {day:'Miércoles',type:'LM',typeCls:'type-lm',content:'<strong>Carrusel</strong> + CTA',kw:kw},
+        {day:'Viernes',type:'LM',typeCls:'type-lm',content:'<strong>Reel caso alumno</strong>',kw:kw},
+      ]
+    },
+    ventas:{
+      7:[
+        {day:'Lunes',type:'LM',typeCls:'type-lm',content:'<strong>Wins de alumnos</strong> — muchos resultados juntos + "Comenta '+kw+'"',kw:kw},
+        {day:'Martes',type:'LM',typeCls:'type-lm',content:'<strong>Reel caso éxito detallado</strong> — antes/después + proceso',kw:kw},
+        {day:'Miércoles',type:'CTA',typeCls:'type-cta',content:'<strong>Stories QUE HAGO</strong> — secuencia de 7 stories + doc entregables'},
+        {day:'Jueves',type:'LM',typeCls:'type-lm',content:'<strong>Carrusel</strong> — resultados + proceso + recurso',kw:kw},
+        {day:'Viernes',type:'WN',typeCls:'type-wn',content:'<strong>Why Now</strong> — urgencia real (plazas limitadas, subida precio, etc.)'},
+        {day:'Sábado',type:'CTA',typeCls:'type-cta',content:'<strong>Stories de cierre</strong> — últimos días/plazas. CTA directo.'},
+        {day:'Domingo',type:'Libre',typeCls:'type-libre',content:'<strong>Testimonios</strong> — vídeos/screenshots de alumnos'},
+      ],
+      5:[
+        {day:'Lunes',type:'LM',typeCls:'type-lm',content:'<strong>Wins</strong> + "Comenta '+kw+'"',kw:kw},
+        {day:'Miércoles',type:'CTA',typeCls:'type-cta',content:'<strong>QUE HAGO</strong> — stories + doc'},
+        {day:'Jueves',type:'LM',typeCls:'type-lm',content:'<strong>Carrusel</strong> + CTA',kw:kw},
+        {day:'Viernes',type:'WN',typeCls:'type-wn',content:'<strong>Why Now</strong> — urgencia'},
+        {day:'Sábado',type:'Libre',typeCls:'type-libre',content:'<strong>Testimonios</strong>'},
+      ],
+      3:[
+        {day:'Lunes',type:'LM',typeCls:'type-lm',content:'<strong>Wins + caso éxito</strong>',kw:kw},
+        {day:'Miércoles',type:'CTA',typeCls:'type-cta',content:'<strong>QUE HAGO</strong> directo'},
+        {day:'Viernes',type:'WN',typeCls:'type-wn',content:'<strong>Why Now</strong>'},
+      ]
+    },
+    lanzamiento:{
+      7:[
+        {day:'Lunes',type:'Libre',typeCls:'type-libre',content:'<strong>Teaser</strong> — "Estoy preparando algo..."'},
+        {day:'Martes',type:'LM',typeCls:'type-lm',content:'<strong>Wins</strong> — resultados que validan lo que viene',kw:kw},
+        {day:'Miércoles',type:'Poll',typeCls:'type-poll',content:'<strong>Encuesta</strong> — "¿Qué te gustaría aprender?" — abre conversaciones'},
+        {day:'Jueves',type:'Libre',typeCls:'type-libre',content:'<strong>Behind the scenes</strong> — preparando el lanzamiento'},
+        {day:'Viernes',type:'WN',typeCls:'type-wn',content:'<strong>Anuncio</strong> — qué es + primeros X plazas'},
+        {day:'Sábado',type:'CTA',typeCls:'type-cta',content:'<strong>Stories QUE INCLUYE</strong> — entregables, formato, precio'},
+        {day:'Domingo',type:'CTA',typeCls:'type-cta',content:'<strong>Cierre</strong> — últimas plazas / precio sube mañana'},
+      ],
+      5:[
+        {day:'Lunes',type:'Libre',typeCls:'type-libre',content:'<strong>Teaser</strong>'},
+        {day:'Miércoles',type:'LM',typeCls:'type-lm',content:'<strong>Wins</strong> que validan',kw:kw},
+        {day:'Viernes',type:'WN',typeCls:'type-wn',content:'<strong>Anuncio</strong>'},
+        {day:'Sábado',type:'CTA',typeCls:'type-cta',content:'<strong>Entregables</strong>'},
+        {day:'Domingo',type:'CTA',typeCls:'type-cta',content:'<strong>Cierre urgencia</strong>'},
+      ],
+      3:[
+        {day:'Miércoles',type:'Libre',typeCls:'type-libre',content:'<strong>Teaser + wins</strong>'},
+        {day:'Viernes',type:'WN',typeCls:'type-wn',content:'<strong>Anuncio</strong>'},
+        {day:'Domingo',type:'CTA',typeCls:'type-cta',content:'<strong>Cierre</strong>'},
+      ]
+    }
+  };
+
+  var days=templates[obj][piezas]||templates[obj][5];
+  var html='';
+  days.forEach(function(d){
+    html+='<div class="day">';
+    html+='<div class="day-header"><div class="day-name">'+d.day+'</div><div class="day-type '+d.typeCls+'">'+d.type+'</div></div>';
+    html+='<div class="day-content">'+d.content+'</div>';
+    if(d.kw)html+='<div class="day-keyword">Keyword: '+d.kw+'</div>';
+    html+='</div>';
+  });
+
+  html+='<div class="tip"><strong>Recuerda:</strong> Stories TODOS los días aunque no publiques reel. Formato texto (nunca hablado). Estructura Santi: gancho → win → caso → recurso.</div>';
+
+  document.getElementById('cal').innerHTML=html;
+  document.getElementById('cal').style.display='block';
+  document.getElementById('cal').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

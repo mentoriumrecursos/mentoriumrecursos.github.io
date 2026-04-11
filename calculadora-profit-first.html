@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Profit First — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field label .val{color:#00C853;font-weight:800;font-size:14px}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .row .num-input{width:100px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px 12px;text-align:right;font-family:inherit;outline:none}
+  .row .num-input:focus{border-color:#00C853}
+  .row .unit{color:#555;font-size:13px;font-weight:600;min-width:20px}
+  .phase-tabs{display:flex;gap:8px;margin-bottom:20px}
+  .phase-tab{flex:1;padding:10px;background:#1a1a1e;border:1px solid #2a2a2e;border-radius:10px;text-align:center;cursor:pointer;font-size:12px;font-weight:700;color:#888;transition:all 0.2s}
+  .phase-tab:hover{border-color:#333}
+  .phase-tab.active{background:rgba(0,200,83,0.1);border-color:#00C853;color:#00C853}
+  .phase-label{font-size:9px;display:block;margin-top:2px;opacity:0.7}
+  .alloc-bar{height:48px;background:#1c1c20;border-radius:12px;overflow:hidden;display:flex;margin-bottom:16px;position:relative}
+  .alloc-seg{height:100%;transition:width 0.4s ease;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:10px;font-weight:800;color:rgba(255,255,255,0.95);overflow:hidden;white-space:nowrap;min-width:0}
+  .alloc-seg .seg-pct{font-size:13px;font-weight:900}
+  .alloc-seg .seg-label{font-size:8px;opacity:0.8;letter-spacing:0.5px}
+  .alloc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .alloc-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center}
+  .alloc-card .ac-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+  .alloc-card .ac-pct{font-size:14px;font-weight:800;margin-bottom:2px}
+  .alloc-card .ac-amount{font-size:22px;font-weight:900;letter-spacing:-1px}
+  .alloc-card .ac-monthly{font-size:11px;color:#666;margin-top:4px}
+  .alloc-card.profit{border-color:#1a3a20}.alloc-card.profit .ac-label{color:#00C853}.alloc-card.profit .ac-amount{color:#00C853}
+  .alloc-card.owner{border-color:#1a2a3a}.alloc-card.owner .ac-label{color:#4a9eff}.alloc-card.owner .ac-amount{color:#4a9eff}
+  .alloc-card.tax{border-color:#2a2a1a}.alloc-card.tax .ac-label{color:#C8AA28}.alloc-card.tax .ac-amount{color:#C8AA28}
+  .alloc-card.opex{border-color:#2a1a1a}.alloc-card.opex .ac-label{color:#ff6b6b}.alloc-card.opex .ac-amount{color:#ff6b6b}
+  .result-box{background:#0d1a0f;border:2px solid #1a3a20;border-radius:16px;padding:24px;text-align:center;margin-top:16px}
+  .result-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:6px}
+  .result-amount{font-size:42px;font-weight:900;letter-spacing:-2px;color:#00C853}
+  .result-sub{font-size:13px;color:#666;margin-top:4px;font-weight:600}
+  .comparison{margin-top:16px}
+  .comp-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #141416;font-size:13px}
+  .comp-row .cl{color:#666;font-weight:500}
+  .comp-row .cv{font-weight:700}
+  .comp-row .cv.green{color:#00C853}
+  .comp-row .cv.red{color:#ff6b6b}
+  .comp-row .cv.yellow{color:#C8AA28}
+  .insight-box{background:#0d1a0f;border:1px solid #1a3a20;border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#5a9a65;line-height:1.7}
+  .insight-box strong{color:#fff}
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora Profit First</h1>
+    <p>Primero tu beneficio. Despues los gastos. Asi se monta un negocio que te paga de verdad.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Facturacion</div>
+    <div class="field">
+      <label>Facturacion mensual <span class="val" id="lbl_rev">20.000 EUR</span></label>
+      <div class="row">
+        <input type="range" min="1000" max="200000" step="500" value="20000" id="sl_rev" oninput="sync('rev')">
+        <input type="number" class="num-input" id="in_rev" value="20000" oninput="sync('rev',true)">
+        <span class="unit">EUR</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Fase de tu negocio</div>
+    <p style="font-size:12px;color:#555;margin-bottom:14px">Profit First recomienda porcentajes distintos segun la fase. Elige la tuya o personaliza.</p>
+    <div class="phase-tabs">
+      <div class="phase-tab" data-phase="inicio" onclick="setPhase('inicio')">
+        Inicio<span class="phase-label">&lt;10K/mes</span>
+      </div>
+      <div class="phase-tab active" data-phase="crecimiento" onclick="setPhase('crecimiento')">
+        Crecimiento<span class="phase-label">10-50K</span>
+      </div>
+      <div class="phase-tab" data-phase="escala" onclick="setPhase('escala')">
+        Escala<span class="phase-label">50K+</span>
+      </div>
+      <div class="phase-tab" data-phase="custom" onclick="setPhase('custom')">
+        Personalizar
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Beneficio <span class="val" id="lbl_profit">10%</span></label>
+      <div class="row">
+        <input type="range" min="1" max="30" step="1" value="10" id="sl_profit" oninput="sync('profit')">
+        <input type="number" class="num-input" id="in_profit" value="10" oninput="sync('profit',true)">
+        <span class="unit">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Salario propietario <span class="val" id="lbl_owner">35%</span></label>
+      <div class="row">
+        <input type="range" min="5" max="60" step="1" value="35" id="sl_owner" oninput="sync('owner')">
+        <input type="number" class="num-input" id="in_owner" value="35" oninput="sync('owner',true)">
+        <span class="unit">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Impuestos <span class="val" id="lbl_tax">15%</span></label>
+      <div class="row">
+        <input type="range" min="5" max="40" step="1" value="15" id="sl_tax" oninput="sync('tax')">
+        <input type="number" class="num-input" id="in_tax" value="15" oninput="sync('tax',true)">
+        <span class="unit">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Gastos operativos <span class="val" id="lbl_opex">40%</span></label>
+      <div class="row">
+        <input type="range" min="10" max="70" step="1" value="40" id="sl_opex" oninput="sync('opex')">
+        <input type="number" class="num-input" id="in_opex" value="40" oninput="sync('opex',true)">
+        <span class="unit">%</span>
+      </div>
+    </div>
+    <div id="totalWarn" style="font-size:12px;font-weight:700;color:#ff6b6b;text-align:center;margin-top:8px;display:none"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Distribucion Profit First</div>
+    <div class="alloc-bar" id="allocBar"></div>
+    <div class="alloc-grid">
+      <div class="alloc-card profit">
+        <div class="ac-label">Beneficio</div>
+        <div class="ac-pct" id="res_profit_pct">10%</div>
+        <div class="ac-amount" id="res_profit">2.000 EUR</div>
+        <div class="ac-monthly">Intocable. Tu premio.</div>
+      </div>
+      <div class="alloc-card owner">
+        <div class="ac-label">Tu salario</div>
+        <div class="ac-pct" id="res_owner_pct">35%</div>
+        <div class="ac-amount" id="res_owner">7.000 EUR</div>
+        <div class="ac-monthly">Lo que te llevas a casa</div>
+      </div>
+      <div class="alloc-card tax">
+        <div class="ac-label">Impuestos</div>
+        <div class="ac-pct" id="res_tax_pct">15%</div>
+        <div class="ac-amount" id="res_tax">3.000 EUR</div>
+        <div class="ac-monthly">Reserva fiscal</div>
+      </div>
+      <div class="alloc-card opex">
+        <div class="ac-label">Gastos operativos</div>
+        <div class="ac-pct" id="res_opex_pct">40%</div>
+        <div class="ac-amount" id="res_opex">8.000 EUR</div>
+        <div class="ac-monthly">Todo lo demas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-box">
+    <div class="result-label">Tu beneficio real anual</div>
+    <div class="result-amount" id="anualProfit">24.000 EUR</div>
+    <div class="result-sub" id="anualSub">Beneficio puro que se queda en tu cuenta, sin tocar</div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">Comparativa anual</div>
+    <div class="comparison">
+      <div class="comp-row"><span class="cl">Facturacion anual</span><span class="cv" id="c_rev">240.000 EUR</span></div>
+      <div class="comp-row"><span class="cl">Beneficio anual acumulado</span><span class="cv green" id="c_profit">24.000 EUR</span></div>
+      <div class="comp-row"><span class="cl">Salario anual propietario</span><span class="cv green" id="c_owner">84.000 EUR</span></div>
+      <div class="comp-row"><span class="cl">Reserva impuestos anual</span><span class="cv yellow" id="c_tax">36.000 EUR</span></div>
+      <div class="comp-row"><span class="cl">Gastos operativos anuales</span><span class="cv red" id="c_opex">96.000 EUR</span></div>
+      <div class="comp-row"><span class="cl">Total que te queda (beneficio + salario)</span><span class="cv green" id="c_total">108.000 EUR</span></div>
+    </div>
+  </div>
+
+  <div class="insight-box" id="insightBox">
+    <strong>Diagnostico:</strong> Con un 10% de beneficio y 35% de salario, te quedas con 9.000 EUR/mes en total.
+    La regla Profit First dice: si no puedes operar con el % que queda para gastos, tu negocio tiene un problema de gastos, no de ingresos.
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+<script>
+var phases = {
+  inicio:      {profit:5,  owner:50, tax:15, opex:30},
+  crecimiento: {profit:10, owner:35, tax:15, opex:40},
+  escala:      {profit:15, owner:25, tax:15, opex:45},
+  custom:      null
+};
+var currentPhase = 'crecimiento';
+
+function fmt(n){return n.toLocaleString('es-ES',{maximumFractionDigits:0})}
+
+function sync(key, fromInput){
+  var sl = document.getElementById('sl_'+key);
+  var inp = document.getElementById('in_'+key);
+  if(fromInput){sl.value=inp.value}else{inp.value=sl.value}
+
+  if(key!=='rev' && currentPhase!=='custom'){
+    setPhase('custom');
+  }
+
+  updateLabels();
+  calculate();
+}
+
+function updateLabels(){
+  document.getElementById('lbl_rev').textContent = fmt(+document.getElementById('in_rev').value)+' EUR';
+  document.getElementById('lbl_profit').textContent = document.getElementById('in_profit').value+'%';
+  document.getElementById('lbl_owner').textContent = document.getElementById('in_owner').value+'%';
+  document.getElementById('lbl_tax').textContent = document.getElementById('in_tax').value+'%';
+  document.getElementById('lbl_opex').textContent = document.getElementById('in_opex').value+'%';
+}
+
+function setPhase(p){
+  currentPhase = p;
+  document.querySelectorAll('.phase-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelector('.phase-tab[data-phase="'+p+'"]').classList.add('active');
+
+  if(phases[p]){
+    var v = phases[p];
+    document.getElementById('sl_profit').value=v.profit; document.getElementById('in_profit').value=v.profit;
+    document.getElementById('sl_owner').value=v.owner; document.getElementById('in_owner').value=v.owner;
+    document.getElementById('sl_tax').value=v.tax; document.getElementById('in_tax').value=v.tax;
+    document.getElementById('sl_opex').value=v.opex; document.getElementById('in_opex').value=v.opex;
+    updateLabels();
+    calculate();
+  }
+}
+
+function calculate(){
+  var rev = +document.getElementById('in_rev').value;
+  var profit = +document.getElementById('in_profit').value;
+  var owner = +document.getElementById('in_owner').value;
+  var tax = +document.getElementById('in_tax').value;
+  var opex = +document.getElementById('in_opex').value;
+  var total = profit + owner + tax + opex;
+
+  var warn = document.getElementById('totalWarn');
+  if(total !== 100){
+    warn.textContent = 'Los porcentajes suman '+total+'%. Deben sumar 100%.';
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+
+  var pAmt = rev * profit / 100;
+  var oAmt = rev * owner / 100;
+  var tAmt = rev * tax / 100;
+  var eAmt = rev * opex / 100;
+
+  document.getElementById('res_profit_pct').textContent = profit+'%';
+  document.getElementById('res_profit').textContent = fmt(pAmt)+' EUR';
+  document.getElementById('res_owner_pct').textContent = owner+'%';
+  document.getElementById('res_owner').textContent = fmt(oAmt)+' EUR';
+  document.getElementById('res_tax_pct').textContent = tax+'%';
+  document.getElementById('res_tax').textContent = fmt(tAmt)+' EUR';
+  document.getElementById('res_opex_pct').textContent = opex+'%';
+  document.getElementById('res_opex').textContent = fmt(eAmt)+' EUR';
+
+  document.getElementById('anualProfit').textContent = fmt(pAmt*12)+' EUR';
+  document.getElementById('c_rev').textContent = fmt(rev*12)+' EUR';
+  document.getElementById('c_profit').textContent = fmt(pAmt*12)+' EUR';
+  document.getElementById('c_owner').textContent = fmt(oAmt*12)+' EUR';
+  document.getElementById('c_tax').textContent = fmt(tAmt*12)+' EUR';
+  document.getElementById('c_opex').textContent = fmt(eAmt*12)+' EUR';
+  document.getElementById('c_total').textContent = fmt((pAmt+oAmt)*12)+' EUR';
+
+  var bar = '';
+  if(total > 0){
+    bar += '<div class="alloc-seg" style="width:'+((profit/total)*100)+'%;background:#00C853"><span class="seg-pct">'+profit+'%</span><span class="seg-label">BENEFICIO</span></div>';
+    bar += '<div class="alloc-seg" style="width:'+((owner/total)*100)+'%;background:#4a9eff"><span class="seg-pct">'+owner+'%</span><span class="seg-label">SALARIO</span></div>';
+    bar += '<div class="alloc-seg" style="width:'+((tax/total)*100)+'%;background:#C8AA28"><span class="seg-pct">'+tax+'%</span><span class="seg-label">IMPUESTOS</span></div>';
+    bar += '<div class="alloc-seg" style="width:'+((opex/total)*100)+'%;background:#ff6b6b"><span class="seg-pct">'+opex+'%</span><span class="seg-label">GASTOS</span></div>';
+  }
+  document.getElementById('allocBar').innerHTML = bar;
+
+  var totalTuyo = pAmt + oAmt;
+  var ins = document.getElementById('insightBox');
+  if(profit >= 15){
+    ins.innerHTML = '<strong>Excelente.</strong> Con un '+profit+'% de beneficio estas operando como un negocio maduro. Te quedas con '+fmt(totalTuyo)+' EUR/mes entre beneficio y salario. El beneficio no se toca — es tu colchon y tu recompensa.';
+  } else if(profit >= 8){
+    ins.innerHTML = '<strong>Vas bien.</strong> Un '+profit+'% de beneficio es solido para la fase de crecimiento. Te quedas con '+fmt(totalTuyo)+' EUR/mes. El siguiente paso: subir ese beneficio al 15% recortando gastos operativos, no facturando mas.';
+  } else {
+    ins.innerHTML = '<strong>Atencion.</strong> Solo un '+profit+'% va a beneficio. Eso son '+fmt(pAmt)+' EUR/mes que no cubren ni un imprevisto gordo. La filosofia Profit First es clara: reduce gastos hasta que el beneficio tenga sentido. No factures mas — gasta menos.';
+  }
+}
+
+calculate();
+</script>
+</body>
+</html>

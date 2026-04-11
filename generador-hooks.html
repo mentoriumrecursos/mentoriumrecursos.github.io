@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Hooks Virales — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#08080a;color:#fff;min-height:100vh}
+  .container{max-width:480px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#C45830;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:16px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#C45830}
+  .field select option{background:#111;color:#fff}
+  .btn{width:100%;padding:16px;background:#C45830;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px}
+  .btn:hover{background:#a33d20}
+  .hooks-list{margin-top:20px}
+  .hook-card{background:#111113;border:1px solid #1c1c20;border-radius:14px;padding:20px;margin-bottom:12px;position:relative}
+  .hook-type{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C45830;margin-bottom:8px}
+  .hook-text{font-size:18px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:10px}
+  .hook-why{font-size:12px;color:#555;line-height:1.5}
+  .copy-btn{position:absolute;top:16px;right:16px;padding:6px 14px;background:transparent;border:1px solid #333;border-radius:6px;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+  .copy-btn:active{background:#C45830;border-color:#C45830;color:#fff}
+  .score{display:inline-block;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:800;margin-top:6px}
+  .score-high{background:rgba(45,140,78,0.15);color:#2D8C4E}
+  .score-mid{background:rgba(200,170,40,0.1);color:#C8AA28}
+  .footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #1a1a1a}
+  .footer .brand{font-size:12px;font-weight:800;color:#C45830;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Hooks Virales</h1>
+    <p>10 hooks para tu reel. Estilo Ramiro + Santi. Listos para usar.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu reel</div>
+    <div class="field"><label>Tema del reel</label><input type="text" id="tema" placeholder="Ej: por que tu tienda no escala, márgenes reales, email marketing..."></div>
+    <div class="field"><label>Dato o número clave (si tienes)</label><input type="text" id="dato" placeholder="Ej: 354K en un trimestre, 30K facturación 2K limpios..."></div>
+    <div class="field"><label>Para quien</label>
+      <select id="para">
+        <option value="estancado">Operador estancado (factura pero no le queda)</option>
+        <option value="principiante">Quiere empezar (tiene dinero, no sabe como)</option>
+      </select>
+    </div>
+    <div class="field"><label>Voz</label>
+      <select id="voz">
+        <option value="javi">Javi (directo, seco, datos duros)</option>
+        <option value="jordi">Jordi (reflexivo, CEO, pausado)</option>
+      </select>
+    </div>
+    <button class="btn" onclick="generar()">Generar 10 hooks</button>
+  </div>
+
+  <div class="hooks-list" id="hooks"></div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+<script>
+function generar(){
+  var tema = document.getElementById('tema').value || 'tu tienda no escala';
+  var dato = document.getElementById('dato').value || '';
+  var para = document.getElementById('para').value;
+  var voz = document.getElementById('voz').value;
+
+  var hooks = [];
+
+  // TIPO 1: Dato impactante
+  if(dato){
+    hooks.push({type:'Dato impactante',text:dato+'.',why:'El número especifico para el scroll. La gente necesita saber más.',score:'alto'});
+  }
+  hooks.push({type:'Dato impactante',text:voz=='javi'?'Facturo millones al año con mis tiendas. Y el 80% de las que veo pierden dinero por lo mismo.':'El año que más creci no fue el que más facture.',why:'Credencial + tension. La gente quiere saber "por que mismo".',score:'alto'});
+
+  // TIPO 2: Pregunta que duele
+  hooks.push({type:'Pregunta que duele',text:para=='estancado'?'Cuantas horas trabajas a la semana? Y cuanto te queda limpio?':'Cuanto llevas pensando en montar tu tienda sin dar el paso?',why:'Ataca la inseguridad del ICP directamente.',score:'alto'});
+
+  // TIPO 3: Rompe creencia
+  hooks.push({type:'Rompe creencia',text:voz=='javi'?'El problema no son tus ads. Ni tu producto. Ni tu agencia.':'La mayoria cree que escalar es meter más dinero en ads.',why:'Contradice lo que el ICP cree. Genera curiosidad inmediata.',score:'alto'});
+
+  // TIPO 4: Formato comentario hater
+  hooks.push({type:'Respuesta a hater',text:'"Dice que factura 10K al dia jajaja que fantasma." Bueno, hago un poquito más. Y si tu quieres hacer aunque sea 10K al mes, escucha.',why:'El formato hater genera engagement por la polemica + respuesta con autoridad.',score:'medio'});
+
+  // TIPO 5: Caso alumno
+  hooks.push({type:'Caso alumno',text:para=='estancado'?'Mi alumno facturaba 30K. Le quedaban 1.200. En 3 meses lo arreglamos.':'Mi alumno empezo de cero hace 4 meses. Hoy factura '+( dato||'5K al mes')+'.', why:'Prueba social inmediata. La gente quiere ese resultado.',score:'alto'});
+
+  // TIPO 6: Reto directo
+  hooks.push({type:'Reto directo',text:voz=='javi'?'Deja de scrollear. Esto te va a doler.':'Necesito que pares un segundo y pienses en algo.',why:'Rompe el patron de scroll. Directo al espectador.',score:'medio'});
+
+  // TIPO 7: Metafora
+  hooks.push({type:'Metafora',text:'Tu tienda es como un balde pinchado. No importa cuanta agua le metas, la plata se va igual.',why:'Las metaforas se recuerdan. "Balde pinchado" es de Ramiro y funciona brutal.',score:'alto'});
+
+  // TIPO 8: Negativo
+  hooks.push({type:'Negativo/frustracion',text:para=='estancado'?'Llevas 6 meses. Tercera tienda. Cuarto producto. El problema sigue.':'Estas dispuesto a trabajar 40 años para otro pero no puedes dedicarle un año a tu negocio.',why:'Empieza con la frustracion del ICP. Se sienten identificados.',score:'alto'});
+
+  // TIPO 9: Numero especifico
+  hooks.push({type:'Numero especifico',text:'El 68% abandona en el checkout. Y tu no lo sabes.',why:'Numero concreto + "y tu no lo sabes" = curiosidad + inseguridad.',score:'alto'});
+
+  // TIPO 10: Formato pregunta TikTok
+  hooks.push({type:'Pregunta TikTok',text:'Aqui me preguntan: '+( voz=='javi'?'Javi':'Jordi')+', que harias si hoy empezaras de 0 en ecommerce?',why:'Formato probado. Genera expectativa de respuesta experta.',score:'medio'});
+
+  var html = '<div style="font-size:13px;color:#555;margin-bottom:16px;text-align:center;">10 hooks para: <strong style="color:#fff">'+tema+'</strong></div>';
+  hooks.forEach(function(h,i){
+    var scoreClass = h.score=='alto'?'score-high':'score-mid';
+    html += '<div class="hook-card">';
+    html += '<button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector(\'.hook-text\').textContent);this.textContent=\'Copiado!\';setTimeout(()=>this.textContent=\'Copiar\',1500)">Copiar</button>';
+    html += '<div class="hook-type">'+(i+1)+'. '+h.type+'</div>';
+    html += '<div class="hook-text">'+h.text+'</div>';
+    html += '<div class="hook-why">'+h.why+'</div>';
+    html += '<span class="score '+scoreClass+'">Potencial '+h.score+'</span>';
+    html += '</div>';
+  });
+
+  document.getElementById('hooks').innerHTML = html;
+  document.getElementById('hooks').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

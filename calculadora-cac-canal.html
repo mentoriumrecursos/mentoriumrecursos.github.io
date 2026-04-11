@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora CAC por Canal — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .channel-block{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:18px;margin-bottom:12px;transition:border-color 0.3s}
+  .channel-block:hover{border-color:#00C853}
+  .channel-block:last-child{margin-bottom:0}
+  .channel-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .channel-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#0a0a0a;flex-shrink:0}
+  .channel-name{font-size:14px;font-weight:700}
+  .channel-remove{margin-left:auto;background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all 0.2s}
+  .channel-remove:hover{color:#ff4444;background:rgba(255,68,68,0.1)}
+
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+  .field-row:last-child{margin-bottom:0}
+  .mini-field label{font-size:11px;font-weight:600;color:#666;margin-bottom:5px;display:block}
+  .mini-field input{width:100%;background:#111113;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:14px;font-weight:700;padding:10px 12px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  .mini-field input:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+
+  .add-channel{width:100%;padding:14px;border:2px dashed #1c1c20;border-radius:12px;background:transparent;color:#555;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.3s;margin-top:4px}
+  .add-channel:hover{border-color:#00C853;color:#00C853;background:rgba(0,200,83,0.03)}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .winner-box{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#0a1a0f,#111113);border:2px solid #1a3a25;border-radius:18px;margin-bottom:16px}
+  .winner-label{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:8px}
+  .winner-name{font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+  .winner-cac{font-size:48px;font-weight:900;letter-spacing:-2px;color:#00C853;line-height:1}
+  .winner-sub{font-size:13px;color:#666;margin-top:10px;font-weight:600}
+
+  .ranking{margin-top:0}
+  .rank-item{display:grid;grid-template-columns:32px 1fr 90px 80px;gap:12px;align-items:center;padding:14px 16px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;margin-bottom:8px;transition:all 0.3s}
+  .rank-item:hover{border-color:#1f1f25}
+  .rank-pos{font-size:16px;font-weight:900;color:#333}
+  .rank-pos.gold{color:#00C853}
+  .rank-channel{font-size:14px;font-weight:700}
+  .rank-cac{font-size:16px;font-weight:900;text-align:right}
+  .rank-cac.best{color:#00C853}
+  .rank-cac.mid{color:#F5A623}
+  .rank-cac.worst{color:#E53935}
+  .rank-bar-wrap{position:relative;height:6px;background:#1c1c20;border-radius:3px;overflow:hidden;grid-column:1/-1;margin-top:4px}
+  .rank-bar{height:100%;border-radius:3px;transition:width 0.8s ease}
+
+  .insight-box{background:#0d0d00;border:1px solid #2a2200;border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#a89840;line-height:1.7}
+  .insight-box strong{color:#fff}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora de CAC por Canal</h1>
+    <p>Compara el coste de adquisición real de cada canal. Descubre dónde cada euro rinde más.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Canales de adquisición</div>
+    <div id="channels-container"></div>
+    <button class="add-channel" onclick="addChannel()">+ Añadir canal</button>
+  </div>
+
+  <button class="btn" onclick="calculate()">COMPARAR CANALES</button>
+
+  <div class="results" id="results">
+    <div class="winner-box" id="winner-box">
+      <div class="winner-label">Canal más rentable</div>
+      <div class="winner-name" id="winner-name">—</div>
+      <div class="winner-cac" id="winner-cac">—</div>
+      <div class="winner-sub" id="winner-sub">por cliente adquirido</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Ranking completo</div>
+      <div class="ranking" id="ranking"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Resumen</div>
+      <div id="summary-details"></div>
+    </div>
+
+    <div class="insight-box" id="insight"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+const CHANNEL_PRESETS = [
+  {name:'Meta Ads', color:'#1877F2', icon:'M'},
+  {name:'Google Ads', color:'#4285F4', icon:'G'},
+  {name:'TikTok Ads', color:'#ff0050', icon:'T'},
+  {name:'SEO / Orgánico', color:'#00C853', icon:'S'},
+  {name:'Email Marketing', color:'#F5A623', icon:'E'},
+  {name:'Influencers', color:'#C13584', icon:'I'},
+  {name:'Referidos', color:'#7C4DFF', icon:'R'},
+  {name:'WhatsApp', color:'#25D366', icon:'W'},
+];
+let channelCount = 0;
+const maxChannels = 8;
+
+function addChannel(presetIdx){
+  if(channelCount >= maxChannels) return;
+  const container = document.getElementById('channels-container');
+  const idx = channelCount;
+  const preset = presetIdx !== undefined ? CHANNEL_PRESETS[presetIdx] : CHANNEL_PRESETS[idx % CHANNEL_PRESETS.length];
+
+  const block = document.createElement('div');
+  block.className = 'channel-block';
+  block.id = 'ch-'+idx;
+  block.innerHTML = `
+    <div class="channel-header">
+      <div class="channel-icon" style="background:${preset.color}">${preset.icon}</div>
+      <input type="text" value="${preset.name}" class="channel-name-input" style="background:transparent;border:none;color:#fff;font-size:14px;font-weight:700;font-family:inherit;outline:none;flex:1" data-idx="${idx}">
+      ${channelCount > 1 ? '<button class="channel-remove" onclick="removeChannel('+idx+')">&times;</button>' : ''}
+    </div>
+    <div class="field-row">
+      <div class="mini-field">
+        <label>Gasto mensual (&euro;)</label>
+        <input type="number" id="spend-${idx}" placeholder="0" min="0">
+      </div>
+      <div class="mini-field">
+        <label>Clientes obtenidos</label>
+        <input type="number" id="clients-${idx}" placeholder="0" min="0">
+      </div>
+    </div>
+  `;
+  block.style.animation = 'fadeUp 0.3s ease';
+  container.appendChild(block);
+  channelCount++;
+}
+
+function removeChannel(idx){
+  const el = document.getElementById('ch-'+idx);
+  if(el) el.remove();
+}
+
+function calculate(){
+  const channels = [];
+  document.querySelectorAll('.channel-block').forEach(block => {
+    const nameInput = block.querySelector('.channel-name-input');
+    const idx = nameInput.dataset.idx;
+    const name = nameInput.value.trim() || 'Canal';
+    const spend = parseFloat(document.getElementById('spend-'+idx)?.value) || 0;
+    const clients = parseInt(document.getElementById('clients-'+idx)?.value) || 0;
+    if(spend > 0 && clients > 0){
+      channels.push({name, spend, clients, cac: spend/clients});
+    }
+  });
+
+  if(channels.length < 2){
+    alert('Introduce datos en al menos 2 canales para comparar.');
+    return;
+  }
+
+  channels.sort((a,b) => a.cac - b.cac);
+
+  const best = channels[0];
+  const worst = channels[channels.length-1];
+  const totalSpend = channels.reduce((s,c) => s + c.spend, 0);
+  const totalClients = channels.reduce((s,c) => s + c.clients, 0);
+  const avgCac = totalSpend / totalClients;
+
+  document.getElementById('winner-name').textContent = best.name;
+  document.getElementById('winner-cac').textContent = best.cac.toFixed(2) + ' \u20ac';
+  document.getElementById('winner-sub').textContent = `por cliente \u2014 ${((1 - best.cac/worst.cac)*100).toFixed(0)}% más barato que ${worst.name}`;
+
+  const rankingEl = document.getElementById('ranking');
+  rankingEl.innerHTML = '';
+  const maxCac = worst.cac;
+
+  channels.forEach((ch, i) => {
+    const pct = (ch.cac / maxCac * 100);
+    const cls = i === 0 ? 'best' : (i === channels.length-1 ? 'worst' : 'mid');
+    const barColor = i === 0 ? '#00C853' : (i === channels.length-1 ? '#E53935' : '#F5A623');
+    const item = document.createElement('div');
+    item.className = 'rank-item';
+    item.innerHTML = `
+      <div class="rank-pos ${i===0?'gold':''}">#${i+1}</div>
+      <div class="rank-channel">${ch.name}</div>
+      <div class="rank-cac ${cls}">${ch.cac.toFixed(2)} \u20ac</div>
+      <div style="font-size:12px;color:#666;text-align:right">${ch.clients} clientes</div>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%;background:${barColor}"></div></div>
+    `;
+    rankingEl.appendChild(item);
+  });
+
+  const summaryEl = document.getElementById('summary-details');
+  summaryEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Gasto total</div>
+        <div style="font-size:22px;font-weight:900">${totalSpend.toLocaleString('es-ES')} \u20ac</div>
+      </div>
+      <div style="background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Clientes totales</div>
+        <div style="font-size:22px;font-weight:900">${totalClients.toLocaleString('es-ES')}</div>
+      </div>
+      <div style="background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">CAC medio</div>
+        <div style="font-size:22px;font-weight:900">${avgCac.toFixed(2)} \u20ac</div>
+      </div>
+      <div style="background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Ahorro potencial</div>
+        <div style="font-size:22px;font-weight:900;color:#00C853">${((avgCac - best.cac) * totalClients).toFixed(0)} \u20ac</div>
+      </div>
+    </div>
+  `;
+
+  const savingsIfAllBest = (totalSpend - best.cac * totalClients).toFixed(0);
+  const worstPct = ((worst.cac / best.cac - 1) * 100).toFixed(0);
+
+  document.getElementById('insight').innerHTML = `
+    <strong>Diagnóstico:</strong> Tu canal más eficiente es <strong>${best.name}</strong> con un CAC de ${best.cac.toFixed(2)}\u20ac.
+    <strong>${worst.name}</strong> te cuesta un ${worstPct}% más por cliente.
+    Si redistribuyeras presupuesto hacia ${best.name}, podrías ahorrar hasta <strong>${parseInt(savingsIfAllBest).toLocaleString('es-ES')}\u20ac/mes</strong>.
+    Ojo: no se trata de meter todo en un canal, sino de saber dónde cada euro trabaja más.
+  `;
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// Initialize with 3 default channels
+addChannel(0);
+addChannel(1);
+addChannel(2);
+</script>
+</body>
+</html>

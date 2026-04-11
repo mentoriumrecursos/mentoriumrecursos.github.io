@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Pol&iacute;tica de Devoluciones &mdash; Mentorium</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+.container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+
+.header{text-align:center;padding:30px 0 20px}
+.logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+.header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+.header p{font-size:13px;color:#555;line-height:1.5}
+
+.card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+.field select,.field input[type=text],.field input[type=number],.field textarea{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:14px;font-weight:500;padding:12px 14px;font-family:inherit;outline:none;transition:border-color 0.2s}
+.field select:focus,.field input:focus,.field textarea:focus{border-color:#00C853}
+.field textarea{resize:vertical;min-height:70px}
+.field select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.field select option{background:#111;color:#fff}
+.field .hint{font-size:11px;color:#444;margin-top:4px}
+
+.checkbox-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.checkbox-group label{display:flex;align-items:center;gap:6px;font-size:12px;color:#999;cursor:pointer;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;padding:8px 12px;transition:all 0.2s}
+.checkbox-group label:hover{border-color:#333}
+.checkbox-group input[type=checkbox]{accent-color:#00C853;width:14px;height:14px}
+.checkbox-group label.checked{border-color:#00C853;color:#fff;background:#0a1a0f}
+
+.btn{width:100%;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.5px;transition:all 0.2s;margin-top:8px}
+.btn:hover{background:#00E676;transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+
+.output-area{display:none;margin-top:16px}
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.output-header h3{font-size:14px;font-weight:700;color:#00C853}
+.copy-btn{background:#1c1c20;border:1px solid #2a2a2e;color:#999;font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.copy-btn:hover{background:#00C853;color:#0a0a0a;border-color:#00C853}
+.copy-btn.copied{background:#00C853;color:#0a0a0a;border-color:#00C853}
+.output-text{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:20px;font-size:13px;color:#ccc;line-height:1.8;white-space:pre-wrap;max-height:500px;overflow-y:auto}
+.output-text h4{color:#fff;font-size:14px;font-weight:700;margin:16px 0 8px;padding-top:12px;border-top:1px solid #1c1c20}
+.output-text h4:first-child{border-top:none;margin-top:0;padding-top:0}
+.output-text strong{color:#00C853}
+
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-box{background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:12px;text-align:center}
+.stat-box .num{font-size:20px;font-weight:900;color:#00C853}
+.stat-box .lab{font-size:10px;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+.footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+.footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+.footer .sub{font-size:12px;color:#333;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Pol&iacute;tica de Devoluciones</h1>
+    <p>Genera una pol&iacute;tica legal y profesional lista para copiar y pegar en tu tienda.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de tu tienda</div>
+    <div class="field">
+      <label>Nombre de la tienda</label>
+      <input type="text" id="storeName" placeholder="Ej: MiTiendaOnline.com">
+    </div>
+    <div class="field">
+      <label>Tipo de tienda</label>
+      <select id="storeType">
+        <option value="moda">Moda y accesorios</option>
+        <option value="electronica">Electr&oacute;nica y gadgets</option>
+        <option value="hogar">Hogar y decoraci&oacute;n</option>
+        <option value="belleza">Belleza y cuidado personal</option>
+        <option value="deporte">Deporte y fitness</option>
+        <option value="mascotas">Mascotas</option>
+        <option value="general">Tienda general / multiproducto</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Modelo de env&iacute;o</label>
+      <select id="shippingModel">
+        <option value="dropshipping">Dropshipping (proveedor env&iacute;a directo)</option>
+        <option value="almacen">Almac&eacute;n propio / fulfillment</option>
+        <option value="mixto">Modelo mixto</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Condiciones de devoluci&oacute;n</div>
+    <div class="field">
+      <label>Regi&oacute;n de env&iacute;o principal</label>
+      <select id="region">
+        <option value="espana">Espa&ntilde;a peninsular</option>
+        <option value="europa">Uni&oacute;n Europea</option>
+        <option value="latam">Latinoam&eacute;rica</option>
+        <option value="global">Env&iacute;o global</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Plazo de devoluci&oacute;n (d&iacute;as)</label>
+      <select id="returnWindow">
+        <option value="14">14 d&iacute;as (m&iacute;nimo legal UE)</option>
+        <option value="30" selected>30 d&iacute;as (est&aacute;ndar recomendado)</option>
+        <option value="60">60 d&iacute;as (premium)</option>
+        <option value="90">90 d&iacute;as (garant&iacute;a extendida)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tipo de reembolso</label>
+      <select id="refundType">
+        <option value="completo">Reembolso completo</option>
+        <option value="parcial">Reembolso sin gastos de env&iacute;o</option>
+        <option value="credito">Cr&eacute;dito en tienda</option>
+        <option value="mixto">Opci&oacute;n reembolso + cr&eacute;dito</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>&iquest;Qui&eacute;n paga el env&iacute;o de devoluci&oacute;n?</label>
+      <select id="returnShipping">
+        <option value="cliente">El cliente</option>
+        <option value="tienda">La tienda</option>
+        <option value="defecto">La tienda solo si es defecto</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Productos excluidos de devoluci&oacute;n</label>
+      <div class="checkbox-group" id="exclusions">
+        <label><input type="checkbox" value="higiene"> Higiene personal</label>
+        <label><input type="checkbox" value="interiores"> Ropa interior</label>
+        <label><input type="checkbox" value="personalizados"> Personalizados</label>
+        <label><input type="checkbox" value="digitales"> Productos digitales</label>
+        <label><input type="checkbox" value="rebajas"> Art&iacute;culos en rebajas</label>
+        <label><input type="checkbox" value="perecederos"> Perecederos</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Contacto</div>
+    <div class="field">
+      <label>Email de atenci&oacute;n al cliente</label>
+      <input type="text" id="email" placeholder="soporte@tutienda.com">
+    </div>
+    <div class="field">
+      <label>Plazo de respuesta (d&iacute;as h&aacute;biles)</label>
+      <select id="responseTime">
+        <option value="1">1 d&iacute;a h&aacute;bil</option>
+        <option value="2" selected>2 d&iacute;as h&aacute;biles</option>
+        <option value="3">3 d&iacute;as h&aacute;biles</option>
+        <option value="5">5 d&iacute;as h&aacute;biles</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generatePolicy()">Generar pol&iacute;tica de devoluciones</button>
+
+  <div class="output-area" id="outputArea">
+    <div class="stats-row">
+      <div class="stat-box"><div class="num" id="statWords">0</div><div class="lab">Palabras</div></div>
+      <div class="stat-box"><div class="num" id="statSections">0</div><div class="lab">Secciones</div></div>
+      <div class="stat-box"><div class="num" id="statScore">0</div><div class="lab">Score legal</div></div>
+    </div>
+    <div class="output-header">
+      <h3>Tu pol&iacute;tica de devoluciones</h3>
+      <button class="copy-btn" id="copyBtn" onclick="copyPolicy()">Copiar texto</button>
+    </div>
+    <div class="output-text" id="outputText"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="sub">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.checkbox-group input').forEach(cb => {
+  cb.addEventListener('change', function() {
+    this.closest('label').classList.toggle('checked', this.checked);
+  });
+});
+
+function generatePolicy() {
+  const name = document.getElementById('storeName').value.trim() || 'Tu Tienda';
+  const type = document.getElementById('storeType').value;
+  const ship = document.getElementById('shippingModel').value;
+  const region = document.getElementById('region').value;
+  const days = document.getElementById('returnWindow').value;
+  const refund = document.getElementById('refundType').value;
+  const retShip = document.getElementById('returnShipping').value;
+  const email = document.getElementById('email').value.trim() || 'soporte@tutienda.com';
+  const resp = document.getElementById('responseTime').value;
+
+  const exclusionChecks = document.querySelectorAll('#exclusions input:checked');
+  const exclusions = Array.from(exclusionChecks).map(c => c.value);
+
+  const typeNames = {moda:'moda y accesorios',electronica:'electr\u00f3nica y gadgets',hogar:'hogar y decoraci\u00f3n',belleza:'belleza y cuidado personal',deporte:'deporte y fitness',mascotas:'productos para mascotas',general:'productos varios'};
+  const regionNames = {espana:'Espa\u00f1a peninsular',europa:'pa\u00edses de la Uni\u00f3n Europea',latam:'Latinoam\u00e9rica',global:'env\u00edos internacionales'};
+  const refundNames = {completo:'reembolso completo del importe pagado',parcial:'reembolso del importe del producto (sin gastos de env\u00edo)',credito:'cr\u00e9dito equivalente para usar en tu pr\u00f3xima compra',mixto:'reembolso monetario o cr\u00e9dito en tienda (a elecci\u00f3n del cliente)'};
+  const retShipText = {cliente:'Los gastos de env\u00edo de devoluci\u00f3n corren por cuenta del cliente.',tienda:name+' se hace cargo de todos los gastos de env\u00edo de devoluci\u00f3n.',defecto:name+' cubre los gastos de env\u00edo de devoluci\u00f3n \u00fanicamente cuando el producto presenta defectos de fabricaci\u00f3n o se ha enviado un art\u00edculo incorrecto. En el resto de casos, el coste de devoluci\u00f3n es responsabilidad del cliente.'};
+
+  const exclusionTexts = {higiene:'Productos de higiene personal abiertos o usados.',interiores:'Ropa interior y ba\u00f1adores por razones de higiene.',personalizados:'Art\u00edculos personalizados o hechos a medida.',digitales:'Productos digitales, descargas o licencias ya activadas.',rebajas:'Art\u00edculos adquiridos en rebajas o liquidaci\u00f3n (se aplican condiciones especiales).',perecederos:'Productos perecederos o con fecha de caducidad.'};
+
+  let condicionDrop = '';
+  if (ship === 'dropshipping') {
+    condicionDrop = `\n\nNota importante sobre tiempos de env\u00edo: Dado que nuestros productos se env\u00edan directamente desde el fabricante o distribuidor autorizado, el plazo de devoluci\u00f3n de ${days} d\u00edas naturales comienza a contar desde la fecha de recepci\u00f3n del paquete por parte del cliente (no desde la fecha de compra).`;
+  }
+
+  let legalUE = '';
+  if (region === 'espana' || region === 'europa') {
+    legalUE = `\n\n7. DERECHO DE DESISTIMIENTO (NORMATIVA UE)\n\nDe conformidad con la Directiva 2011/83/UE y el Real Decreto Legislativo 1/2007, el consumidor tiene derecho a desistir del contrato en un plazo de 14 d\u00edas naturales sin necesidad de justificaci\u00f3n. En ${name}, ampliamos este plazo a ${days} d\u00edas naturales para tu mayor tranquilidad.\n\nPara ejercer el derecho de desistimiento, deber\u00e1s notificarnos tu decisi\u00f3n mediante una declaraci\u00f3n inequ\u00edvoca (por ejemplo, un correo electr\u00f3nico a ${email}).`;
+  }
+
+  let excList = '';
+  if (exclusions.length > 0) {
+    excList = '\n\nProductos excluidos de devoluci\u00f3n:\n' + exclusions.map(e => '\u2022 ' + exclusionTexts[e]).join('\n');
+  } else {
+    excList = '\n\nNo existen categor\u00edas especiales excluidas de nuestra pol\u00edtica de devoluci\u00f3n. Todos los productos son elegibles siempre que cumplan las condiciones descritas.';
+  }
+
+  const policy = `POL\u00cdTICA DE DEVOLUCIONES \u2014 ${name.toUpperCase()}
+${'='.repeat(40)}
+
+\u00daltima actualizaci\u00f3n: ${new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})}
+
+En ${name} queremos que est\u00e9s 100% satisfecho con tu compra de ${typeNames[type]}. Si por cualquier motivo no est\u00e1s conforme con tu pedido, aqu\u00ed tienes toda la informaci\u00f3n sobre c\u00f3mo proceder.
+
+1. PLAZO DE DEVOLUCI\u00d3N
+
+Dispones de ${days} d\u00edas naturales desde la recepci\u00f3n del producto para solicitar una devoluci\u00f3n. El producto debe estar sin usar, en su embalaje original y con todas las etiquetas intactas.${condicionDrop}
+
+2. C\u00d3MO SOLICITAR UNA DEVOLUCI\u00d3N
+
+Paso 1: Env\u00eda un correo a ${email} indicando tu n\u00famero de pedido y el motivo de la devoluci\u00f3n.
+Paso 2: Nuestro equipo te responder\u00e1 en un m\u00e1ximo de ${resp} d\u00eda${resp > 1 ? 's' : ''} h\u00e1bil${resp > 1 ? 'es' : ''} con las instrucciones de env\u00edo.
+Paso 3: Empaqueta el producto de forma segura y env\u00edalo a la direcci\u00f3n que te indiquemos.
+Paso 4: Una vez recibido y verificado el estado del producto, procesaremos tu ${refund === 'credito' ? 'cr\u00e9dito' : 'reembolso'}.
+
+3. TIPO DE REEMBOLSO
+
+Una vez aprobada la devoluci\u00f3n, recibir\u00e1s ${refundNames[refund]}. El plazo de procesamiento es de 5 a 10 d\u00edas h\u00e1biles desde la recepci\u00f3n del producto en nuestras instalaciones.${refund === 'mixto' ? '\n\nSi eliges cr\u00e9dito en tienda, a\u00f1adiremos un 10% extra como agradecimiento por tu confianza.' : ''}
+
+4. GASTOS DE ENV\u00cdO DE DEVOLUCI\u00d3N
+
+${retShipText[retShip]}
+
+Para env\u00edos dentro de ${regionNames[region]}, recomendamos utilizar un servicio de env\u00edo con n\u00famero de seguimiento para garantizar la trazabilidad del paquete.
+
+5. CONDICIONES DEL PRODUCTO${excList}
+
+Condiciones generales para aceptar la devoluci\u00f3n:
+\u2022 El producto debe estar sin usar y en las mismas condiciones en que lo recibiste.
+\u2022 Debe incluir el embalaje original, etiquetas y todos los accesorios.
+\u2022 Adjunta el comprobante de compra o n\u00famero de pedido.
+
+6. PRODUCTOS DEFECTUOSOS O ENV\u00cdOS INCORRECTOS
+
+Si has recibido un producto defectuoso, da\u00f1ado o diferente al que pediste, cont\u00e1ctanos inmediatamente a ${email}. En estos casos:
+\u2022 ${name} cubre todos los gastos de devoluci\u00f3n.
+\u2022 Te enviaremos un reemplazo sin coste adicional o procesaremos el reembolso completo.
+\u2022 Te pediremos fotograf\u00edas del producto y del embalaje para agilizar el proceso.${legalUE}
+
+${region === 'espana' || region === 'europa' ? '8' : '7'}. CONTACTO
+
+Para cualquier duda sobre devoluciones, contacta con nosotros:
+\u2022 Email: ${email}
+\u2022 Tiempo de respuesta: ${resp} d\u00eda${resp > 1 ? 's' : ''} h\u00e1bil${resp > 1 ? 'es' : ''}
+\u2022 Horario: Lunes a Viernes, 9:00 - 18:00 (hora peninsular)
+
+Gracias por confiar en ${name}. Tu satisfacci\u00f3n es nuestra prioridad.`;
+
+  const words = policy.split(/\s+/).length;
+  const sections = (policy.match(/^\d+\./gm) || []).length;
+  let score = 70;
+  if (region === 'espana' || region === 'europa') score += 15;
+  if (exclusions.length > 0) score += 5;
+  if (parseInt(days) >= 30) score += 5;
+  if (email !== 'soporte@tutienda.com') score += 5;
+  score = Math.min(score, 100);
+
+  document.getElementById('statWords').textContent = words;
+  document.getElementById('statSections').textContent = sections;
+  document.getElementById('statScore').textContent = score + '/100';
+  document.getElementById('outputText').textContent = policy;
+  document.getElementById('outputArea').style.display = 'block';
+  document.getElementById('outputArea').scrollIntoView({behavior:'smooth'});
+}
+
+function copyPolicy() {
+  const text = document.getElementById('outputText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar texto'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

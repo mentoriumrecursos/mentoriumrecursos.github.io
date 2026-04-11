@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría Express de Tu Tienda — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+  .container { max-width: 480px; margin: 0 auto; padding: 30px 20px; }
+
+  .header { text-align: center; margin-bottom: 40px; }
+  .header .brand { font-size: 12px; font-weight: 700; letter-spacing: 4px; color: #C45830; text-transform: uppercase; margin-bottom: 12px; }
+  .header h1 { font-size: 26px; font-weight: 900; line-height: 1.2; margin-bottom: 8px; }
+  .header p { font-size: 14px; color: #666; }
+
+  .progress-bar { background: #151515; border-radius: 100px; height: 8px; margin-bottom: 30px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #C45830; border-radius: 100px; transition: width 0.3s; }
+
+  .category { margin-bottom: 30px; }
+  .cat-title { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830; margin-bottom: 14px; }
+
+  .check-item {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: #111; border: 1px solid #1a1a1a;
+    border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; user-select: none;
+  }
+  .check-item:hover { border-color: #333; }
+  .check-item.checked { border-color: #2D8C4E; background: rgba(45,140,78,0.05); }
+  .check-item .box {
+    width: 24px; height: 24px; border: 2px solid #333; border-radius: 6px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .check-item.checked .box { background: #2D8C4E; border-color: #2D8C4E; }
+  .check-item.checked .box::after { content: '✓'; color: #fff; font-size: 14px; font-weight: 900; }
+  .check-item .text { font-size: 14px; font-weight: 500; color: #ccc; line-height: 1.4; }
+  .check-item.checked .text { color: #666; text-decoration: line-through; }
+
+  .score-section { background: #111; border: 1px solid #1a1a1a; border-radius: 16px; padding: 30px; text-align: center; margin-top: 30px; }
+  .score-section h2 { font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830; margin-bottom: 20px; }
+  .score { font-size: 64px; font-weight: 900; line-height: 1; margin-bottom: 8px; }
+  .score-label { font-size: 14px; color: #666; margin-bottom: 20px; }
+  .grade { font-size: 18px; font-weight: 800; padding: 10px 24px; border-radius: 8px; display: inline-block; }
+  .grade-f { background: rgba(196,88,48,0.15); color: #C45830; }
+  .grade-d { background: rgba(196,88,48,0.1); color: #C45830; }
+  .grade-c { background: rgba(200,170,40,0.1); color: #C8AA28; }
+  .grade-b { background: rgba(45,140,78,0.1); color: #2D8C4E; }
+  .grade-a { background: rgba(45,140,78,0.15); color: #2D8C4E; }
+  .diagnosis { margin-top: 20px; font-size: 14px; color: #888; line-height: 1.6; text-align: left; }
+  .diagnosis strong { color: #fff; }
+
+  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #1a1a1a; }
+  .footer p { font-size: 12px; color: #444; margin-bottom: 4px; }
+  .footer .handle { font-size: 14px; font-weight: 700; color: #C45830; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="brand">Mentorium</div>
+    <h1>Auditoría Express de Tu Tienda</h1>
+    <p>20 puntos que determinan si tu tienda está lista para escalar.</p>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+  <div class="category">
+    <div class="cat-title">Conversión</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Tasa de conversión por encima del 2%</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Checkout optimizado (menos de 3 pasos)</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Métodos de pago: tarjeta + PayPal + Bizum/Klarna</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Página de producto con fotos reales + beneficios claros</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Velocidad de carga inferior a 3 segundos</div></div>
+  </div>
+
+  <div class="category">
+    <div class="cat-title">Publicidad</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">ROAS mínimo 2x en los últimos 30 días</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Coste por adquisición (CAC) inferior al 30% del ticket medio</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Al menos 3 creativos distintos testeados este mes</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Pixel configurado con eventos de conversión correctos</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Retargeting activo (visitantes + carrito abandonado)</div></div>
+  </div>
+
+  <div class="category">
+    <div class="cat-title">Email Marketing</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Flow de bienvenida activo (mínimo 3 emails)</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Flow de carrito abandonado activo</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Flow post-compra (review + upsell)</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Al menos 1 campaña de email por semana</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Recuperando al menos el 15% de carritos abandonados</div></div>
+  </div>
+
+  <div class="category">
+    <div class="cat-title">Márgenes y Datos</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Margen neto real calculado y actualizado esta semana</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Tabla de márgenes por producto (sabes cuál te da dinero)</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Dashboard de KPIs que revisas a diario</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Devoluciones contabilizadas y bajo el 5%</div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text">Sabes exactamente tu break-even mensual</div></div>
+  </div>
+
+  <div class="score-section">
+    <h2>Tu puntuación</h2>
+    <div class="score" id="score">0/20</div>
+    <div class="score-label" id="scoreLabel">Marca los puntos que cumples</div>
+    <div class="grade" id="gradeBox">—</div>
+    <div class="diagnosis" id="diagnosis"></div>
+  </div>
+
+  <div class="footer">
+    <p>Herramienta gratuita de</p>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('checked');
+  updateScore();
+}
+
+function updateScore() {
+  const total = document.querySelectorAll('.check-item').length;
+  const checked = document.querySelectorAll('.check-item.checked').length;
+  const pct = (checked / total * 100);
+
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('score').textContent = checked + '/' + total;
+
+  const g = document.getElementById('gradeBox');
+  const d = document.getElementById('diagnosis');
+  const l = document.getElementById('scoreLabel');
+
+  if (checked <= 5) {
+    g.className = 'grade grade-f'; g.textContent = 'CRÍTICO';
+    l.textContent = 'Tu tienda necesita una revisión urgente';
+    d.innerHTML = '<strong>Diagnóstico:</strong> Tu tienda tiene problemas estructurales graves. Escalar ahora sería tirar dinero. Necesitas arreglar los fundamentales antes de gastar un euro más en ads.';
+  } else if (checked <= 10) {
+    g.className = 'grade grade-d'; g.textContent = 'DÉBIL';
+    l.textContent = 'Hay base pero falta mucho';
+    d.innerHTML = '<strong>Diagnóstico:</strong> Tienes algunos elementos correctos pero los agujeros están costándote dinero cada día. Prioriza: conversión primero, luego email flows, luego ads.';
+  } else if (checked <= 14) {
+    g.className = 'grade grade-c'; g.textContent = 'MEJORABLE';
+    l.textContent = 'Estás en el camino correcto';
+    d.innerHTML = '<strong>Diagnóstico:</strong> Tu tienda funciona pero deja dinero en la mesa. Los puntos que faltan son probablemente los que marcan la diferencia entre sobrevivir y escalar.';
+  } else if (checked <= 17) {
+    g.className = 'grade grade-b'; g.textContent = 'BIEN';
+    l.textContent = 'Tu tienda está casi lista para escalar';
+    d.innerHTML = '<strong>Diagnóstico:</strong> Buen trabajo. Tienes los fundamentales cubiertos. Cierra los puntos que faltan y puedes escalar con confianza.';
+  } else {
+    g.className = 'grade grade-a'; g.textContent = 'EXCELENTE';
+    l.textContent = 'Tu tienda está lista para escalar';
+    d.innerHTML = '<strong>Diagnóstico:</strong> Tu tienda opera con sistema. Los datos están limpios, la conversión es sólida y los márgenes aguantan crecimiento. Es momento de escalar.';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditor de Imagenes de Producto — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh}
+  .container{max-width:500px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+  .header h1{font-size:21px;font-weight:900;margin-bottom:6px;line-height:1.3}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field label .val{color:#00C853;font-weight:800}
+  .field select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:14px;font-weight:600;padding:12px;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+  .field select:focus{border-color:#00C853}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .row .num{width:60px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#00C853}
+  .checks-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .check-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+  .check-card:hover{border-color:#333}
+  .check-card.active{border-color:#00C853;background:rgba(0,200,83,0.06)}
+  .check-card .icon{font-size:22px;margin-bottom:6px}
+  .check-card .name{font-size:12px;font-weight:700;color:#888}
+  .check-card.active .name{color:#00C853}
+  .check-card input{display:none}
+  .btn{width:100%;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;padding:14px;border:none;border-radius:10px;cursor:pointer;font-family:inherit;margin-top:8px;transition:opacity .2s}
+  .btn:hover{opacity:.9}
+  .result{display:none}
+  .score-circle{text-align:center;margin-bottom:20px}
+  .circle-wrap{width:140px;height:140px;margin:0 auto 12px;position:relative}
+  .circle-bg{fill:none;stroke:#1c1c20;stroke-width:10}
+  .circle-fg{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s,stroke .3s;transform:rotate(-90deg);transform-origin:50% 50%}
+  .circle-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:36px;font-weight:900}
+  .circle-label{font-size:13px;color:#888}
+  .grade-bar{display:flex;justify-content:center;gap:4px;margin-bottom:20px}
+  .grade-seg{width:40px;height:6px;border-radius:3px;background:#1c1c20}
+  .checklist{margin-bottom:20px}
+  .check-row{display:flex;align-items:flex-start;gap:12px;padding:14px;border-bottom:1px solid #1c1c20}
+  .check-row:last-child{border-bottom:none}
+  .check-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;margin-top:2px}
+  .check-icon.pass{background:rgba(0,200,83,0.15);color:#00C853}
+  .check-icon.fail{background:rgba(244,67,54,0.15);color:#F44336}
+  .check-icon.warn{background:rgba(255,193,7,0.15);color:#FFC107}
+  .check-info h4{font-size:13px;font-weight:700;margin-bottom:3px}
+  .check-info h4.pass{color:#00C853}
+  .check-info h4.fail{color:#F44336}
+  .check-info h4.warn{color:#FFC107}
+  .check-info p{font-size:12px;color:#666;line-height:1.5}
+  .check-info .action{font-size:12px;color:#00C853;font-weight:700;margin-top:4px;line-height:1.4}
+  .priority{background:rgba(244,67,54,0.06);border:1px solid rgba(244,67,54,0.15);border-radius:12px;padding:16px;margin-bottom:12px}
+  .priority .title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#F44336;margin-bottom:10px}
+  .priority .item{font-size:13px;color:#ccc;line-height:1.6;padding:4px 0}
+  .priority .item strong{color:#fff}
+  .impact{background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:12px;padding:16px;margin-top:12px;font-size:13px;color:#888;line-height:1.6}
+  .impact strong{color:#00C853}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#00C853;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Auditor de Imagenes de Producto</h1>
+    <p>Evalua si tus imagenes de producto cumplen los estandares que convierten. Cada elemento faltante es conversion perdida.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu producto</div>
+    <div class="field">
+      <label>Categoria del producto</label>
+      <select id="category">
+        <option value="ropa">Ropa y moda</option>
+        <option value="electronica">Electronica</option>
+        <option value="hogar">Hogar y decoracion</option>
+        <option value="belleza">Belleza y cosmetica</option>
+        <option value="fitness">Fitness y deporte</option>
+        <option value="joyeria">Joyeria y accesorios</option>
+        <option value="general" selected>Producto general</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Numero de imagenes <span class="val" id="lbl_imgs">4</span></label>
+      <div class="row"><input type="range" min="1" max="15" value="4" id="sl_imgs" oninput="syncSlider()"><input type="number" class="num" id="in_imgs" value="4" min="1" max="20" oninput="syncInput()"></div>
+    </div>
+    <div class="field">
+      <label>Que elementos tienes</label>
+      <div class="checks-grid">
+        <label class="check-card" onclick="toggle(this)">
+          <input type="checkbox" value="white">
+          <div class="icon">&#9723;</div>
+          <div class="name">Fondo blanco</div>
+        </label>
+        <label class="check-card" onclick="toggle(this)">
+          <input type="checkbox" value="lifestyle">
+          <div class="icon">&#127968;</div>
+          <div class="name">Foto lifestyle</div>
+        </label>
+        <label class="check-card" onclick="toggle(this)">
+          <input type="checkbox" value="scale">
+          <div class="icon">&#128207;</div>
+          <div class="name">Referencia de tamano</div>
+        </label>
+        <label class="check-card" onclick="toggle(this)">
+          <input type="checkbox" value="detail">
+          <div class="icon">&#128269;</div>
+          <div class="name">Detalle / zoom</div>
+        </label>
+        <label class="check-card" onclick="toggle(this)">
+          <input type="checkbox" value="video">
+          <div class="icon">&#9654;</div>
+          <div class="name">Video del producto</div>
+        </label>
+        <label class="check-card" onclick="toggle(this)">
+          <input type="checkbox" value="infographic">
+          <div class="icon">&#128202;</div>
+          <div class="name">Infografia / specs</div>
+        </label>
+        <label class="check-card" onclick="toggle(this)">
+          <input type="checkbox" value="packaging">
+          <div class="icon">&#128230;</div>
+          <div class="name">Packaging</div>
+        </label>
+        <label class="check-card" onclick="toggle(this)">
+          <input type="checkbox" value="ugc">
+          <div class="icon">&#128247;</div>
+          <div class="name">Foto UGC / cliente</div>
+        </label>
+      </div>
+    </div>
+    <button class="btn" onclick="audit()">Auditar imagenes</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="card">
+      <div class="card-title">Puntuacion global</div>
+      <div class="score-circle">
+        <div class="circle-wrap">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle class="circle-bg" cx="70" cy="70" r="60"/>
+            <circle class="circle-fg" id="circleFg" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="377"/>
+          </svg>
+          <div class="circle-text" id="scoreNum">0</div>
+        </div>
+        <div class="circle-label" id="scoreLabel">Calculando...</div>
+      </div>
+      <div class="grade-bar" id="gradeBar"></div>
+    </div>
+
+    <div id="priorityBox"></div>
+
+    <div class="card">
+      <div class="card-title">Analisis detallado</div>
+      <div class="checklist" id="checklist"></div>
+    </div>
+
+    <div id="impactBox"></div>
+  </div>
+
+  <div class="footer">Herramienta interna <span>Mentorium</span></div>
+</div>
+
+<script>
+function syncSlider() {
+  const v = document.getElementById('sl_imgs').value;
+  document.getElementById('in_imgs').value = v;
+  document.getElementById('lbl_imgs').textContent = v;
+}
+function syncInput() {
+  const v = document.getElementById('in_imgs').value;
+  document.getElementById('sl_imgs').value = v;
+  document.getElementById('lbl_imgs').textContent = v;
+}
+function toggle(el) {
+  el.classList.toggle('active');
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+}
+
+function audit() {
+  const cat = document.getElementById('category').value;
+  const imgs = parseInt(document.getElementById('in_imgs').value) || 1;
+  const checks = Array.from(document.querySelectorAll('.checks-grid input:checked')).map(i => i.value);
+
+  const has = (v) => checks.includes(v);
+
+  // Scoring weights by category
+  const weights = {
+    white: 15, lifestyle: 15, scale: 10, detail: 10, video: 15, infographic: 8, packaging: 5, ugc: 12
+  };
+  // Category adjustments
+  if (cat === 'ropa') { weights.lifestyle = 20; weights.scale = 15; weights.ugc = 15; weights.infographic = 5; }
+  if (cat === 'electronica') { weights.infographic = 15; weights.detail = 15; weights.video = 18; }
+  if (cat === 'hogar') { weights.lifestyle = 20; weights.scale = 15; }
+  if (cat === 'belleza') { weights.ugc = 18; weights.lifestyle = 18; weights.packaging = 10; }
+  if (cat === 'fitness') { weights.video = 20; weights.lifestyle = 18; weights.ugc = 15; }
+  if (cat === 'joyeria') { weights.detail = 18; weights.scale = 15; weights.white = 18; }
+
+  // Normalize weights to sum to 80 (20 for quantity)
+  const totalW = Object.values(weights).reduce((a,b) => a+b, 0);
+  Object.keys(weights).forEach(k => weights[k] = (weights[k] / totalW) * 80);
+
+  // Image quantity score (0-20)
+  let qtyScore = 0;
+  if (imgs >= 7) qtyScore = 20;
+  else if (imgs >= 5) qtyScore = 16;
+  else if (imgs >= 4) qtyScore = 12;
+  else if (imgs >= 3) qtyScore = 8;
+  else if (imgs >= 2) qtyScore = 4;
+  else qtyScore = 2;
+
+  let elemScore = 0;
+  Object.keys(weights).forEach(k => { if(has(k)) elemScore += weights[k]; });
+
+  const totalScore = Math.round(qtyScore + elemScore);
+  const score10 = Math.round(totalScore / 10);
+
+  // Grade
+  let grade, gradeColor, gradeLabel;
+  if (totalScore >= 85) { grade = 'A'; gradeColor = '#00C853'; gradeLabel = 'Excelente. Tus imagenes estan optimizadas para convertir.'; }
+  else if (totalScore >= 70) { grade = 'B'; gradeColor = '#00C853'; gradeLabel = 'Bien. Con algunos ajustes puedes subir la conversion significativamente.'; }
+  else if (totalScore >= 50) { grade = 'C'; gradeColor = '#FFC107'; gradeLabel = 'Mejorable. Te faltan elementos clave que tus competidores si tienen.'; }
+  else if (totalScore >= 30) { grade = 'D'; gradeColor = '#FF9800'; gradeLabel = 'Deficiente. Estas perdiendo ventas por falta de contenido visual.'; }
+  else { grade = 'F'; gradeColor = '#F44336'; gradeLabel = 'Critico. Tus imagenes no transmiten confianza para comprar online.'; }
+
+  // Render score
+  const circle = document.getElementById('circleFg');
+  const offset = 377 - (377 * totalScore / 100);
+  circle.style.strokeDashoffset = offset;
+  circle.style.stroke = gradeColor;
+  document.getElementById('scoreNum').textContent = totalScore;
+  document.getElementById('scoreNum').style.color = gradeColor;
+  document.getElementById('scoreLabel').textContent = grade + ' — ' + gradeLabel;
+
+  // Grade bar
+  const segments = 10;
+  let barHTML = '';
+  for(let i = 0; i < segments; i++) {
+    const filled = i < Math.ceil(totalScore / 10);
+    barHTML += `<div class="grade-seg" style="background:${filled ? gradeColor : '#1c1c20'}"></div>`;
+  }
+  document.getElementById('gradeBar').innerHTML = barHTML;
+
+  // Checklist items
+  const items = [
+    {key:'qty', pass: imgs >= 5, warn: imgs >= 3 && imgs < 5, title: 'Cantidad de imagenes: ' + imgs,
+      passMsg:'Tienes suficientes imagenes para mostrar el producto desde multiples angulos.',
+      warnMsg:'Tienes ' + imgs + ' imagenes. Lo minimo recomendado son 5 para ecommerce.',
+      failMsg:'Solo ' + imgs + ' imagen(es). Los productos con 5+ imagenes tienen un 25-40% mas de conversion.',
+      action: imgs < 5 ? 'Anade al menos ' + (5 - imgs) + ' imagenes mas. Prioriza: fondo blanco principal, detalle, lifestyle.' : ''},
+    {key:'white', pass: has('white'), title: 'Imagen con fondo blanco',
+      passMsg:'Tu imagen principal con fondo blanco transmite profesionalidad y es standard del sector.',
+      failMsg:'Sin fondo blanco. Es la primera imagen que ve el cliente. Amazon y los marketplaces lo exigen por algo.',
+      action: !has('white') ? 'Usa remove.bg o Canva para crear un fondo blanco limpio de tu producto principal.' : ''},
+    {key:'lifestyle', pass: has('lifestyle'), title: 'Foto lifestyle / en contexto',
+      passMsg:'Las fotos lifestyle ayudan al cliente a imaginarse usando el producto.',
+      failMsg:'Sin foto lifestyle. El cliente necesita verse usando el producto para decidir la compra.',
+      action: !has('lifestyle') ? 'Haz una foto del producto en uso real o en un escenario natural. Incluso una foto casera bien iluminada funciona.' : ''},
+    {key:'scale', pass: has('scale'), title: 'Referencia de tamano',
+      passMsg:'La referencia de tamano reduce devoluciones y dudas pre-compra.',
+      failMsg:'Sin referencia de tamano. El 22% de las devoluciones en ecommerce son por tamano inesperado.',
+      action: !has('scale') ? 'Anade una imagen con el producto junto a un objeto comun (mano, moneda, regla) o con medidas superpuestas.' : ''},
+    {key:'detail', pass: has('detail'), title: 'Imagen de detalle / zoom',
+      passMsg:'Las imagenes de detalle transmiten calidad y reducen la incertidumbre.',
+      failMsg:'Sin imagen de detalle. El cliente no puede tocar el producto, necesita ver la textura y acabados.',
+      action: !has('detail') ? 'Fotografa detalles como costuras, material, acabados, cierres o partes relevantes del producto.' : ''},
+    {key:'video', pass: has('video'), title: 'Video del producto',
+      passMsg:'El video es el formato que mas confianza genera en ecommerce.',
+      failMsg:'Sin video. Los productos con video tienen un 80% mas de conversion segun multiples estudios.',
+      action: !has('video') ? 'Graba un video de 15-30 segundos mostrando el producto desde todos los angulos. Un movil con buena luz es suficiente.' : ''},
+    {key:'infographic', pass: has('infographic'), title: 'Infografia / especificaciones',
+      passMsg:'Las infografias comunican beneficios clave de un vistazo.',
+      failMsg:'Sin infografia. Una imagen con las specs y beneficios clave acelera la decision de compra.',
+      action: !has('infographic') ? 'Crea una imagen con 3-5 beneficios principales del producto con iconos simples. Canva tiene plantillas para esto.' : ''},
+    {key:'packaging', pass: has('packaging'), title: 'Imagen del packaging',
+      passMsg:'Mostrar el packaging mejora la percepcion de valor y la experiencia de unboxing.',
+      failMsg:'Sin foto del packaging. Si tu packaging es bueno, mostrarlo sube la percepcion de valor.',
+      action: !has('packaging') ? 'Si tu producto tiene buen packaging, fotografialo. Si no, considera mejorarlo primero.' : ''},
+    {key:'ugc', pass: has('ugc'), title: 'Foto de cliente / UGC',
+      passMsg:'El UGC es la prueba social mas potente en una ficha de producto.',
+      failMsg:'Sin fotos de clientes reales. El UGC aumenta la confianza un 35% y la conversion un 29%.',
+      action: !has('ugc') ? 'Pide a clientes satisfechos que te envien fotos. Ofrece un 10% de descuento en su proxima compra a cambio.' : ''}
+  ];
+
+  let checkHTML = '';
+  let priorities = [];
+  items.forEach(item => {
+    const status = item.pass ? 'pass' : (item.warn ? 'warn' : 'fail');
+    const icon = item.pass ? '&#10003;' : (item.warn ? '!' : '&#10005;');
+    const msg = item.pass ? item.passMsg : (item.warnMsg || item.failMsg);
+    checkHTML += `<div class="check-row">
+      <div class="check-icon ${status}">${icon}</div>
+      <div class="check-info">
+        <h4 class="${status}">${item.title}</h4>
+        <p>${msg}</p>
+        ${item.action ? '<div class="action">' + item.action + '</div>' : ''}
+      </div>
+    </div>`;
+    if (!item.pass && !item.warn) priorities.push(item);
+  });
+  document.getElementById('checklist').innerHTML = checkHTML;
+
+  // Priority box
+  if (priorities.length > 0) {
+    const top3 = priorities.slice(0, 3);
+    let priHTML = '<div class="priority"><div class="title">Prioridades inmediatas</div>';
+    top3.forEach((p, i) => {
+      priHTML += `<div class="item"><strong>${i+1}.</strong> ${p.action || p.failMsg}</div>`;
+    });
+    priHTML += '</div>';
+    document.getElementById('priorityBox').innerHTML = priHTML;
+  } else {
+    document.getElementById('priorityBox').innerHTML = '';
+  }
+
+  // Impact
+  const missing = items.filter(i => !i.pass && !i.warn).length;
+  let impactHTML = '';
+  if (missing === 0) {
+    impactHTML = '<div class="impact"><strong>Tus imagenes de producto estan completas.</strong> Asegurate de que la calidad de cada imagen sea alta (buena iluminacion, nitidez, sin marcas de agua) y mide el impacto en tu tasa de conversion.</div>';
+  } else {
+    const convLoss = missing * 5;
+    impactHTML = `<div class="impact"><strong>Impacto estimado:</strong> Te faltan ${missing} elementos clave. Esto puede estar costando entre un ${convLoss - 5}% y ${convLoss + 10}% de conversion. Mejorar las imagenes es la accion con mayor ROI inmediato en ecommerce — no cuesta ads y mejora TODAS las visitas.</div>`;
+  }
+  document.getElementById('impactBox').innerHTML = impactHTML;
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

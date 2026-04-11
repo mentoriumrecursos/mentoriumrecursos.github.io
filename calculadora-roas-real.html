@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora ROAS Real — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:540px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .input-wrap{position:relative}
+  .input-wrap .prefix,.input-wrap .suffix{position:absolute;top:50%;transform:translateY(-50%);font-size:14px;font-weight:700;color:#444;pointer-events:none}
+  .input-wrap .prefix{left:14px}
+  .input-wrap .suffix{right:14px}
+  input[type=number]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:16px;font-weight:700;padding:14px 50px 14px 14px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input[type=number]:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  input[type=number].has-prefix{padding-left:36px}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .roas-hero{text-align:center;padding:30px 20px;border-radius:18px;margin-top:16px;margin-bottom:16px}
+  .roas-hero.good{background:linear-gradient(135deg,#0a1a0f,#111113);border:2px solid #1a3a25}
+  .roas-hero.bad{background:linear-gradient(135deg,#1a0a0a,#111113);border:2px solid #3a1a1a}
+  .roas-label{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:12px}
+  .roas-hero.bad .roas-label{color:#ff5252}
+
+  .comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .comp-box{text-align:center;padding:24px 16px;border-radius:14px;position:relative;overflow:hidden}
+  .comp-box.apparent{background:#111113;border:1px solid #1c1c20}
+  .comp-box.real{border:2px solid transparent}
+  .comp-box.real.pos{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border-color:#1a3a25}
+  .comp-box.real.neg{background:linear-gradient(135deg,#1a0a0a,#0c0c0e);border-color:#3a1a1a}
+  .comp-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#555;margin-bottom:10px}
+  .comp-value{font-size:36px;font-weight:900;letter-spacing:-2px;line-height:1}
+  .comp-value.green{color:#00C853}
+  .comp-value.red{color:#ff5252}
+  .comp-value.white{color:#fff}
+  .comp-sub{font-size:12px;color:#555;margin-top:8px;font-weight:600}
+  .comp-badge{display:inline-block;margin-top:10px;font-size:10px;font-weight:800;padding:4px 10px;border-radius:6px;letter-spacing:1px}
+  .comp-badge.fake{background:rgba(255,82,82,0.15);color:#ff5252}
+  .comp-badge.true{background:rgba(0,200,83,0.15);color:#00C853}
+
+  .cost-breakdown{margin-top:16px}
+  .cost-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .cost-header span{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00C853}
+  .cost-header .total{font-size:14px;font-weight:800;color:#fff}
+  .cost-bar{height:36px;background:#1c1c20;border-radius:10px;overflow:hidden;display:flex;margin-bottom:14px}
+  .cost-segment{height:100%;transition:width 0.6s ease;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:rgba(255,255,255,0.9);overflow:hidden;white-space:nowrap}
+  .cost-legend{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:#888}
+  .legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+  .legend-item .amt{margin-left:auto;font-weight:700;color:#ccc;font-size:12px}
+
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
+  .metric{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px 12px;text-align:center;transition:all 0.3s}
+  .metric:hover{border-color:#00C853;transform:translateY(-2px)}
+  .metric .m-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  .metric .m-value{font-size:20px;font-weight:900;letter-spacing:-1px;line-height:1}
+  .metric .m-value.green{color:#00C853}
+  .metric .m-value.red{color:#ff5252}
+  .metric .m-value.yellow{color:#FFD600}
+  .metric .m-sub{font-size:10px;color:#444;margin-top:6px;font-weight:600}
+
+  .insight{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:1px solid #1a3a25;border-radius:14px;padding:18px;margin-top:16px}
+  .insight.warning{background:linear-gradient(135deg,#1a0f0a,#0c0c0e);border-color:#3a2515}
+  .insight .tag{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#00C853;margin-bottom:8px}
+  .insight.warning .tag{color:#ff9800}
+  .insight p{font-size:13px;color:#999;line-height:1.7;font-weight:500}
+  .insight strong{color:#fff}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora de ROAS Real</h1>
+    <p>Tu ROAS de Meta Ads miente. Mete todos los costes ocultos y descubre el retorno real de cada euro invertido.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Ingresos y Ads</div>
+    <div class="field">
+      <label>Facturación generada por ads</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" id="revenue" class="has-prefix" value="15000" placeholder="15000">
+      </div>
+      <div class="hint">Ingresos totales atribuidos a tus campañas</div>
+    </div>
+    <div class="field">
+      <label>Inversión en ads</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" id="adSpend" class="has-prefix" value="3000" placeholder="3000">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Costes ocultos por pedido</div>
+    <div class="field">
+      <label>Coste de producto (% sobre PVP)</label>
+      <div class="input-wrap">
+        <input type="number" id="productCost" value="35" placeholder="35">
+        <span class="suffix">%</span>
+      </div>
+      <div class="hint">Lo que pagas al proveedor respecto al precio de venta</div>
+    </div>
+    <div class="field">
+      <label>Coste de envío por pedido</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" id="shippingCost" class="has-prefix" value="4.5" step="0.1" placeholder="4.50">
+      </div>
+    </div>
+    <div class="field">
+      <label>Pedido medio (AOV)</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" id="aov" class="has-prefix" value="55" placeholder="55">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Costes de plataforma</div>
+    <div class="field">
+      <label>Comisión pasarela de pago</label>
+      <div class="input-wrap">
+        <input type="number" id="paymentFee" value="2.5" step="0.1" placeholder="2.5">
+        <span class="suffix">%</span>
+      </div>
+      <div class="hint">Stripe ~2.9%, PayPal ~3.4%, Shopify Payments ~1.9%</div>
+    </div>
+    <div class="field">
+      <label>Tasa de devoluciones</label>
+      <div class="input-wrap">
+        <input type="number" id="returnRate" value="5" step="0.5" placeholder="5">
+        <span class="suffix">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Coste plataforma / herramientas mes</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" id="platformFee" class="has-prefix" value="200" placeholder="200">
+      </div>
+      <div class="hint">Shopify, apps, email marketing, etc.</div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="calculate()">CALCULAR ROAS REAL</button>
+
+  <div class="results" id="results">
+    <div class="comparison-grid">
+      <div class="comp-box apparent">
+        <div class="comp-label">ROAS Aparente</div>
+        <div class="comp-value white" id="roasApparent">5.0x</div>
+        <div class="comp-sub" id="roasApparentSub">Lo que ves en Meta</div>
+        <div class="comp-badge fake">FALSO</div>
+      </div>
+      <div class="comp-box real pos" id="roasRealBox">
+        <div class="comp-label">ROAS Real</div>
+        <div class="comp-value green" id="roasReal">1.8x</div>
+        <div class="comp-sub" id="roasRealSub">Con todos los costes</div>
+        <div class="comp-badge true" id="roasRealBadge">VERDADERO</div>
+      </div>
+    </div>
+
+    <div class="roas-hero good" id="heroBox">
+      <div class="roas-label" id="heroLabel">DIFERENCIA</div>
+      <div style="font-size:44px;font-weight:900;letter-spacing:-2px;line-height:1" id="heroValue">-64%</div>
+      <div style="font-size:13px;color:#666;margin-top:10px;font-weight:600" id="heroSub">Tu ROAS real es un 64% menor de lo que crees</div>
+    </div>
+
+    <div class="card">
+      <div class="cost-header">
+        <span>Desglose de costes</span>
+        <span class="total" id="totalCosts">0 &euro;</span>
+      </div>
+      <div class="cost-bar" id="costBar"></div>
+      <div class="cost-legend" id="costLegend"></div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="m-label">Beneficio real</div>
+        <div class="m-value green" id="mProfit">0 &euro;</div>
+        <div class="m-sub">Neto tras costes</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">Coste por pedido</div>
+        <div class="m-value yellow" id="mCostOrder">0 &euro;</div>
+        <div class="m-sub">Total por venta</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">Margen real</div>
+        <div class="m-value" id="mMargin">0%</div>
+        <div class="m-sub">Sobre facturación</div>
+      </div>
+    </div>
+
+    <div class="insight" id="insightBox">
+      <div class="tag" id="insightTag">Diagnóstico</div>
+      <p id="insightText"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+function calculate(){
+  const rev = parseFloat(document.getElementById('revenue').value)||0;
+  const ads = parseFloat(document.getElementById('adSpend').value)||0;
+  const prodPct = (parseFloat(document.getElementById('productCost').value)||0)/100;
+  const shipCost = parseFloat(document.getElementById('shippingCost').value)||0;
+  const aov = parseFloat(document.getElementById('aov').value)||1;
+  const payPct = (parseFloat(document.getElementById('paymentFee').value)||0)/100;
+  const retPct = (parseFloat(document.getElementById('returnRate').value)||0)/100;
+  const platFee = parseFloat(document.getElementById('platformFee').value)||0;
+
+  const orders = Math.round(rev / aov);
+  const productTotal = rev * prodPct;
+  const shippingTotal = orders * shipCost;
+  const paymentTotal = rev * payPct;
+  const returnTotal = rev * retPct;
+  const totalHiddenCosts = productTotal + shippingTotal + paymentTotal + returnTotal + platFee;
+  const totalCosts = totalHiddenCosts + ads;
+  const profit = rev - totalCosts;
+  const roasApp = ads > 0 ? rev / ads : 0;
+  const roasRealVal = ads > 0 ? (rev - totalHiddenCosts) / ads : 0;
+  const diffPct = roasApp > 0 ? ((roasApp - roasRealVal) / roasApp * 100) : 0;
+  const marginPct = rev > 0 ? (profit / rev * 100) : 0;
+  const costPerOrder = orders > 0 ? totalCosts / orders : 0;
+  const isPositive = profit >= 0;
+
+  document.getElementById('roasApparent').textContent = roasApp.toFixed(1) + 'x';
+  const roasRealEl = document.getElementById('roasReal');
+  roasRealEl.textContent = roasRealVal.toFixed(2) + 'x';
+  roasRealEl.className = 'comp-value ' + (isPositive ? 'green' : 'red');
+
+  const realBox = document.getElementById('roasRealBox');
+  realBox.className = 'comp-box real ' + (isPositive ? 'pos' : 'neg');
+  const realBadge = document.getElementById('roasRealBadge');
+  realBadge.className = 'comp-badge ' + (isPositive ? 'true' : 'fake');
+  realBadge.textContent = isPositive ? 'VERDADERO' : 'NEGATIVO';
+
+  const heroBox = document.getElementById('heroBox');
+  heroBox.className = 'roas-hero ' + (isPositive ? 'good' : 'bad');
+  document.getElementById('heroLabel').textContent = 'DIFERENCIA';
+  document.getElementById('heroValue').textContent = '-' + diffPct.toFixed(0) + '%';
+  document.getElementById('heroSub').textContent = 'Tu ROAS real es un ' + diffPct.toFixed(0) + '% menor de lo que crees';
+
+  document.getElementById('totalCosts').textContent = totalCosts.toFixed(0) + ' \u20AC';
+
+  const costs = [
+    {name:'Producto', val:productTotal, color:'#00C853'},
+    {name:'Ads', val:ads, color:'#2979FF'},
+    {name:'Envío', val:shippingTotal, color:'#FF9800'},
+    {name:'Pagos', val:paymentTotal, color:'#AB47BC'},
+    {name:'Devoluciones', val:returnTotal, color:'#ff5252'},
+    {name:'Plataforma', val:platFee, color:'#78909C'}
+  ];
+
+  let barHTML = '';
+  let legHTML = '';
+  costs.forEach(c => {
+    const pct = totalCosts > 0 ? (c.val / totalCosts * 100) : 0;
+    if(pct > 0){
+      barHTML += '<div class="cost-segment" style="width:'+pct+'%;background:'+c.color+'">'+(pct > 8 ? c.name : '')+'</div>';
+    }
+    legHTML += '<div class="legend-item"><span class="legend-dot" style="background:'+c.color+'"></span>'+c.name+'<span class="amt">'+c.val.toFixed(0)+' \u20AC</span></div>';
+  });
+  document.getElementById('costBar').innerHTML = barHTML;
+  document.getElementById('costLegend').innerHTML = legHTML;
+
+  const mProfitEl = document.getElementById('mProfit');
+  mProfitEl.textContent = (profit >= 0 ? '+' : '') + profit.toFixed(0) + ' \u20AC';
+  mProfitEl.className = 'm-value ' + (isPositive ? 'green' : 'red');
+  document.getElementById('mCostOrder').textContent = costPerOrder.toFixed(1) + ' \u20AC';
+  const mMarginEl = document.getElementById('mMargin');
+  mMarginEl.textContent = marginPct.toFixed(1) + '%';
+  mMarginEl.className = 'm-value ' + (marginPct >= 20 ? 'green' : marginPct >= 10 ? 'yellow' : 'red');
+
+  const ib = document.getElementById('insightBox');
+  const it = document.getElementById('insightText');
+  const itag = document.getElementById('insightTag');
+  if(profit < 0){
+    ib.className = 'insight warning';
+    itag.textContent = 'ALERTA';
+    it.innerHTML = 'Estás <strong>perdiendo ' + Math.abs(profit).toFixed(0) + ' \u20AC</strong> al mes. Tu ROAS aparente de <strong>' + roasApp.toFixed(1) + 'x</strong> oculta que cada venta te cuesta más de lo que genera. Antes de escalar, necesitas reducir costes de producto o subir el AOV.';
+  } else if(marginPct < 15){
+    ib.className = 'insight warning';
+    itag.textContent = 'PRECAUCIÓN';
+    it.innerHTML = 'Ganas <strong>' + profit.toFixed(0) + ' \u20AC</strong>, pero tu margen del <strong>' + marginPct.toFixed(1) + '%</strong> es frágil. Cualquier subida en CPM o en costes de producto te pone en pérdidas. Necesitas un margen mínimo del 20% para escalar con seguridad.';
+  } else {
+    ib.className = 'insight';
+    itag.textContent = 'DIAGNÓSTICO';
+    it.innerHTML = 'Tu negocio genera <strong>' + profit.toFixed(0) + ' \u20AC de beneficio real</strong> con un margen del <strong>' + marginPct.toFixed(1) + '%</strong>. La diferencia entre ROAS aparente (<strong>' + roasApp.toFixed(1) + 'x</strong>) y real (<strong>' + roasRealVal.toFixed(2) + 'x</strong>) es del <strong>' + diffPct.toFixed(0) + '%</strong>. Margen sano para escalar.';
+  }
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Texto de Garantia — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+  .header h1{font-size:21px;font-weight:900;margin-bottom:6px;line-height:1.3}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field select,.field input[type=text]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:14px;font-weight:600;padding:12px;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none}
+  .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+  .field select:focus,.field input[type=text]:focus{border-color:#00C853}
+  .field input[type=text]::placeholder{color:#333}
+  .checks{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .check-item{display:flex;align-items:center;gap:6px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-weight:600;color:#888;transition:all .2s}
+  .check-item:hover{border-color:#333}
+  .check-item.active{border-color:#00C853;color:#00C853;background:rgba(0,200,83,0.06)}
+  .check-item input{display:none}
+  .row-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn{width:100%;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;padding:14px;border:none;border-radius:10px;cursor:pointer;font-family:inherit;margin-top:8px;transition:opacity .2s}
+  .btn:hover{opacity:.9}
+  .output-card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;display:none}
+  .output-card .title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:16px}
+  .output-section{margin-bottom:20px}
+  .output-section h3{font-size:14px;font-weight:800;color:#fff;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #1c1c20}
+  .output-text{background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:16px;font-size:13px;color:#ccc;line-height:1.8;white-space:pre-wrap;position:relative}
+  .copy-btn{position:absolute;top:8px;right:8px;background:#1c1c20;border:1px solid #333;color:#888;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit;transition:all .2s}
+  .copy-btn:hover{background:#00C853;color:#0a0a0a;border-color:#00C853}
+  .copy-all{width:100%;background:transparent;border:2px solid #00C853;color:#00C853;font-size:14px;font-weight:800;padding:12px;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:4px}
+  .copy-all:hover{background:#00C853;color:#0a0a0a}
+  .score{display:flex;align-items:center;gap:12px;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+  .score .num{font-size:28px;font-weight:900;color:#00C853}
+  .score .info{font-size:12px;color:#888;line-height:1.5}
+  .score .info strong{color:#fff}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#00C853;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Texto de Garantia</h1>
+    <p>Genera textos de garantia y devolucion profesionales listos para pegar en tu tienda.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Configuracion</div>
+    <div class="field">
+      <label>Tipo de producto</label>
+      <select id="productType">
+        <option value="ropa">Ropa y accesorios</option>
+        <option value="electronica">Electronica y gadgets</option>
+        <option value="hogar">Hogar y decoracion</option>
+        <option value="belleza">Belleza y cuidado personal</option>
+        <option value="fitness">Fitness y deporte</option>
+        <option value="mascotas">Mascotas</option>
+        <option value="joyeria">Joyeria y bisuteria</option>
+        <option value="general">Producto general</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Nombre de tu tienda</label>
+      <input type="text" id="storeName" placeholder="Ej: MiTienda.com" value="">
+    </div>
+    <div class="row-fields">
+      <div class="field">
+        <label>Plazo de devolucion</label>
+        <select id="returnDays">
+          <option value="14">14 dias</option>
+          <option value="30" selected>30 dias</option>
+          <option value="60">60 dias</option>
+          <option value="90">90 dias</option>
+          <option value="365">365 dias</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Quien paga el envio de devolucion</label>
+        <select id="returnShip">
+          <option value="tienda">La tienda</option>
+          <option value="cliente" selected>El cliente</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Tipo de reembolso</label>
+      <select id="refundType">
+        <option value="total">Reembolso total</option>
+        <option value="parcial">Reembolso total o cambio por otro producto</option>
+        <option value="credito">Credito en tienda o reembolso</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Condiciones adicionales</label>
+      <div class="checks" id="conditions">
+        <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="precinto" checked>Con precinto/etiqueta original</label>
+        <label class="check-item active" onclick="toggleCheck(this)"><input type="checkbox" value="embalaje" checked>En embalaje original</label>
+        <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="sinuso">Sin signos de uso</label>
+        <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="factura">Con factura/comprobante</label>
+        <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="fotos">Enviar fotos del producto</label>
+        <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="defecto">Defecto de fabrica cubierto</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>Tono del texto</label>
+      <select id="tone">
+        <option value="profesional">Profesional y directo</option>
+        <option value="cercano">Cercano y amigable</option>
+        <option value="premium">Premium y exclusivo</option>
+      </select>
+    </div>
+    <button class="btn" onclick="generate()">Generar textos de garantia</button>
+  </div>
+
+  <div class="output-card" id="output">
+    <div class="title">Textos generados</div>
+    <div id="scoreBox" class="score"></div>
+
+    <div class="output-section">
+      <h3>Politica de devolucion (pagina completa)</h3>
+      <div class="output-text" id="fullPolicy"><button class="copy-btn" onclick="copyText('fullPolicy')">Copiar</button></div>
+    </div>
+
+    <div class="output-section">
+      <h3>Texto corto para ficha de producto</h3>
+      <div class="output-text" id="shortText"><button class="copy-btn" onclick="copyText('shortText')">Copiar</button></div>
+    </div>
+
+    <div class="output-section">
+      <h3>Texto para footer / banner de confianza</h3>
+      <div class="output-text" id="bannerText"><button class="copy-btn" onclick="copyText('bannerText')">Copiar</button></div>
+    </div>
+
+    <div class="output-section">
+      <h3>FAQ de garantia (para seccion de preguntas)</h3>
+      <div class="output-text" id="faqText"><button class="copy-btn" onclick="copyText('faqText')">Copiar</button></div>
+    </div>
+
+    <button class="copy-all" onclick="copyAll()">Copiar todo el contenido</button>
+  </div>
+
+  <div class="footer">Herramienta interna <span>Mentorium</span></div>
+</div>
+
+<script>
+function toggleCheck(el) {
+  el.classList.toggle('active');
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+}
+
+function getChecked() {
+  const items = document.querySelectorAll('#conditions .check-item input:checked');
+  return Array.from(items).map(i => i.value);
+}
+
+function generate() {
+  const type = document.getElementById('productType').value;
+  const store = document.getElementById('storeName').value || '[Tu Tienda]';
+  const days = document.getElementById('returnDays').value;
+  const shipBy = document.getElementById('returnShip').value;
+  const refund = document.getElementById('refundType').value;
+  const tone = document.getElementById('tone').value;
+  const conds = getChecked();
+
+  const typeNames = {ropa:'prendas',electronica:'productos electronicos',hogar:'articulos de hogar',belleza:'productos de belleza',fitness:'articulos deportivos',mascotas:'productos para mascotas',joyeria:'piezas de joyeria',general:'productos'};
+  const tn = typeNames[type];
+
+  const shipText = shipBy === 'tienda' ? 'Los gastos de envio de devolucion corren por cuenta de ' + store + '.' : 'Los gastos de envio de devolucion corren por cuenta del cliente.';
+  const refundText = refund === 'total' ? 'reembolso completo del importe' : refund === 'parcial' ? 'reembolso completo o cambio por otro producto de tu eleccion' : 'reembolso completo o credito en tienda para tu proxima compra';
+
+  let condList = '';
+  const condTexts = {
+    precinto: 'El producto debe conservar sus etiquetas y precintos originales.',
+    embalaje: 'El producto debe devolverse en su embalaje original.',
+    sinuso: 'El producto no debe presentar signos de uso.',
+    factura: 'Es necesario adjuntar el comprobante de compra.',
+    fotos: 'Te pediremos fotos del producto antes de gestionar la devolucion.',
+    defecto: 'Los defectos de fabrica estan cubiertos sin coste adicional durante los primeros ' + days + ' dias.'
+  };
+  conds.forEach(c => { if(condTexts[c]) condList += '\n- ' + condTexts[c]; });
+
+  // Score
+  let score = 5;
+  if (parseInt(days) >= 30) score++;
+  if (parseInt(days) >= 60) score++;
+  if (shipBy === 'tienda') score++;
+  if (conds.includes('defecto')) score++;
+  if (refund !== 'total') score++;
+  score = Math.min(score, 10);
+
+  let intro, closing;
+  if (tone === 'cercano') {
+    intro = 'Queremos que estes 100% satisfecho/a con tu compra en ' + store + '. Si algo no te convence, no pasa nada.';
+    closing = 'Cualquier duda, escribenos. Estamos aqui para ayudarte.';
+  } else if (tone === 'premium') {
+    intro = 'En ' + store + ' cada compra esta respaldada por nuestro compromiso de excelencia. Tu satisfaccion es nuestra prioridad absoluta.';
+    closing = 'Nuestro equipo de atencion personalizada esta a tu disposicion para cualquier consulta.';
+  } else {
+    intro = store + ' ofrece una politica de devolucion de ' + days + ' dias en todos sus ' + tn + '. A continuacion, las condiciones.';
+    closing = 'Para cualquier consulta, contacta con nuestro equipo de atencion al cliente.';
+  }
+
+  // Full policy
+  const fullPolicy = `POLITICA DE DEVOLUCION Y GARANTIA — ${store}
+
+${intro}
+
+PLAZO DE DEVOLUCION
+Dispones de ${days} dias naturales desde la recepcion del pedido para solicitar la devolucion de tus ${tn}.
+
+CONDICIONES${condList || '\n- No se requieren condiciones especiales.'}
+
+PROCESO DE DEVOLUCION
+1. Contacta con nuestro equipo indicando tu numero de pedido.
+2. Recibiras las instrucciones de envio en un plazo de 24-48h.
+3. Envia el producto siguiendo las instrucciones recibidas.
+4. Una vez recibido y verificado, tramitaremos tu ${refundText} en un plazo de 5-7 dias laborables.
+
+GASTOS DE ENVIO
+${shipText}
+
+EXCEPCIONES
+- Productos personalizados o hechos a medida no admiten devolucion.
+- Productos de higiene abiertos o usados no son reembolsables por normativa sanitaria.
+${conds.includes('defecto') ? '- Los productos con defecto de fabrica se reemplazan sin coste, incluyendo gastos de envio.' : ''}
+
+${closing}`;
+
+  // Short text
+  const shortText = tone === 'cercano'
+    ? `Garantia de satisfaccion ${days} dias. Si no te convence, te lo cambiamos o te devolvemos el dinero. Sin complicaciones.`
+    : tone === 'premium'
+    ? `Garantia ${store}: ${days} dias para devoluciones. ${refund === 'total' ? 'Reembolso integro garantizado.' : 'Reembolso o cambio garantizado.'} Tu satisfaccion, nuestra prioridad.`
+    : `Devolucion en ${days} dias. ${refund === 'total' ? 'Reembolso completo.' : 'Reembolso o cambio.'} ${shipBy === 'tienda' ? 'Envio de devolucion gratuito.' : ''} Consulta condiciones.`;
+
+  // Banner
+  const bannerText = `Garantia ${days} dias | ${refund === 'total' ? 'Devolucion sin preguntas' : 'Cambios y devoluciones faciles'} | ${shipBy === 'tienda' ? 'Devolucion gratuita' : 'Proceso sencillo'}`;
+
+  // FAQ
+  const faqText = `PREGUNTAS FRECUENTES — DEVOLUCIONES Y GARANTIA
+
+P: ¿Cuanto tiempo tengo para devolver un producto?
+R: Dispones de ${days} dias desde la recepcion del pedido.
+
+P: ¿Como inicio una devolucion?
+R: Contacta con nuestro equipo de atencion al cliente indicando tu numero de pedido. Te enviaremos las instrucciones en 24-48h.
+
+P: ¿Quien paga los gastos de envio de la devolucion?
+R: ${shipBy === 'tienda' ? 'Los gastos de devolucion los asumimos nosotros.' : 'Los gastos de devolucion corren por cuenta del comprador.'}
+
+P: ¿Cuando recibire mi reembolso?
+R: Una vez recibido y verificado el producto, tramitamos el ${refundText} en 5-7 dias laborables.
+
+P: ¿El producto tiene que estar sin abrir?
+R: ${conds.includes('precinto') ? 'Si, el producto debe conservar sus etiquetas y precintos originales.' : 'No es necesario que este sin abrir, pero debe estar en buen estado.'}
+
+P: ¿Que pasa si recibo un producto defectuoso?
+R: ${conds.includes('defecto') ? 'Los productos con defecto de fabrica se reemplazan sin coste alguno, incluyendo los gastos de envio.' : 'Contacta con nosotros y lo resolveremos lo antes posible.'}`;
+
+  // Render
+  document.getElementById('fullPolicy').innerHTML = '<button class="copy-btn" onclick="copyText(\'fullPolicy\')">Copiar</button>' + fullPolicy;
+  document.getElementById('shortText').innerHTML = '<button class="copy-btn" onclick="copyText(\'shortText\')">Copiar</button>' + shortText;
+  document.getElementById('bannerText').innerHTML = '<button class="copy-btn" onclick="copyText(\'bannerText\')">Copiar</button>' + bannerText;
+  document.getElementById('faqText').innerHTML = '<button class="copy-btn" onclick="copyText(\'faqText\')">Copiar</button>' + faqText;
+
+  const scoreColors = score >= 8 ? '#00C853' : score >= 6 ? '#FFC107' : '#F44336';
+  document.getElementById('scoreBox').innerHTML = `<div class="num" style="color:${scoreColors}">${score}/10</div><div class="info"><strong>Nivel de confianza de tu garantia</strong><br>${score >= 8 ? 'Excelente. Esta politica genera alta confianza y reduce la friccion de compra.' : score >= 6 ? 'Buena. Considera ampliar plazo o cubrir envio de devolucion para mejorar conversion.' : 'Mejorable. Un plazo mas amplio y mejores condiciones pueden aumentar tu conversion un 15-25%.'}</div>`;
+
+  document.getElementById('output').style.display = 'block';
+  document.getElementById('output').scrollIntoView({behavior:'smooth'});
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText.replace('Copiar', '').trim();
+  navigator.clipboard.writeText(text);
+  const btn = el.querySelector('.copy-btn');
+  btn.textContent = 'Copiado';
+  btn.style.background = '#00C853';
+  btn.style.color = '#0a0a0a';
+  setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = '#1c1c20'; btn.style.color = '#888'; }, 1500);
+}
+
+function copyAll() {
+  const sections = ['fullPolicy','shortText','bannerText','faqText'];
+  let all = '';
+  sections.forEach(id => {
+    all += document.getElementById(id).innerText.replace('Copiar','').trim() + '\n\n---\n\n';
+  });
+  navigator.clipboard.writeText(all.trim());
+  const btn = document.querySelector('.copy-all');
+  btn.textContent = 'Todo copiado';
+  btn.style.background = '#00C853';
+  btn.style.color = '#0a0a0a';
+  setTimeout(() => { btn.textContent = 'Copiar todo el contenido'; btn.style.background = 'transparent'; btn.style.color = '#00C853'; }, 1500);
+}
+
+// Init active states
+document.querySelectorAll('#conditions .check-item').forEach(el => {
+  if(el.querySelector('input').checked) el.classList.add('active');
+});
+</script>
+</body>
+</html>

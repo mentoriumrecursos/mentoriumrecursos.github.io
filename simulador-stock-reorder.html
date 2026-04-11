@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Stock y Reposición — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field label .live-val{color:#00C853;font-weight:800;font-size:14px}
+  .field .hint{font-size:11px;color:#444;margin-top:5px;line-height:1.4}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  .slider-wrap{display:flex;align-items:center;gap:12px}
+  .slider-wrap input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a;transition:transform 0.2s}
+  .slider-wrap input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  .slider-wrap input[type=range]::-moz-range-thumb{width:22px;height:22px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .slider-num{width:80px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:14px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .slider-num:focus{border-color:#00C853}
+
+  input[type=number]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:16px;font-weight:700;padding:14px 16px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input[type=number]:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .hero-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .hero-metric{text-align:center;padding:24px 16px;border-radius:16px;position:relative;overflow:hidden}
+  .hero-metric.primary{background:linear-gradient(135deg,#0a1a0f,#111113);border:2px solid #1a3a25;grid-column:1/-1}
+  .hero-metric.secondary{background:#111113;border:1px solid #1c1c20}
+  .hm-label{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:8px}
+  .hm-value{font-size:38px;font-weight:900;letter-spacing:-2px;line-height:1}
+  .hm-value.green{color:#00C853}
+  .hm-value.white{color:#fff}
+  .hm-sub{font-size:12px;color:#555;margin-top:8px;font-weight:600}
+  .hero-metric.primary .hm-value{font-size:48px}
+
+  .timeline{position:relative;padding:20px 0;margin-bottom:0}
+  .timeline-bar{position:relative;height:40px;background:#1c1c20;border-radius:10px;overflow:visible;margin-bottom:20px}
+  .timeline-fill{height:100%;border-radius:10px;transition:width 1s ease;position:relative}
+  .timeline-fill.safe{background:linear-gradient(90deg,#00C853,#00E676)}
+  .timeline-fill.warning{background:linear-gradient(90deg,#00C853,#F5A623)}
+  .timeline-fill.danger{background:linear-gradient(90deg,#00C853,#E53935)}
+  .timeline-marker{position:absolute;top:-8px;width:4px;height:56px;background:#fff;border-radius:2px;z-index:2;transition:left 1s ease}
+  .timeline-marker-label{position:absolute;top:-28px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;white-space:nowrap;color:#fff;background:#0a0a0a;padding:3px 8px;border-radius:4px;border:1px solid #333}
+  .timeline-labels{display:flex;justify-content:space-between;font-size:11px;color:#555;font-weight:600}
+
+  .stock-chart{padding:10px 0}
+  .chart-row{display:grid;grid-template-columns:60px 1fr 50px;gap:10px;align-items:center;margin-bottom:6px}
+  .chart-label{font-size:11px;font-weight:600;color:#666;text-align:right}
+  .chart-bar-bg{height:28px;background:#1c1c20;border-radius:6px;overflow:hidden;position:relative}
+  .chart-bar{height:100%;border-radius:6px;transition:width 0.8s ease;display:flex;align-items:center;padding:0 10px}
+  .chart-bar-text{font-size:10px;font-weight:800;color:#0a0a0a;white-space:nowrap}
+  .chart-val{font-size:12px;font-weight:700}
+  .chart-reorder{position:absolute;height:100%;width:2px;background:#F5A623;top:0;z-index:1}
+  .chart-zero{position:absolute;height:100%;width:2px;background:#E53935;top:0;right:0;z-index:1}
+
+  .detail-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #141416;font-size:13px}
+  .detail-row:last-child{border:none}
+  .detail-row .lab{color:#666;font-weight:500}
+  .detail-row .val{font-weight:700}
+
+  .insight-box{background:#0d0d00;border:1px solid #2a2200;border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#a89840;line-height:1.7}
+  .insight-box strong{color:#fff}
+
+  .alert-box{padding:16px;border-radius:12px;font-size:13px;font-weight:600;line-height:1.6;margin-bottom:16px}
+  .alert-box.danger{background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);color:#ff6b6b}
+  .alert-box.warning{background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);color:#F5A623}
+  .alert-box.safe{background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:#00C853}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Simulador de Stock y Reposición</h1>
+    <p>Calcula cuándo pedir, cuánto pedir y cuánto stock de seguridad necesitas para no quedarte sin producto.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de venta</div>
+    <div class="field">
+      <label>Ventas diarias promedio <span class="live-val" id="lbl-daily">10</span></label>
+      <div class="slider-wrap">
+        <input type="range" min="1" max="200" value="10" id="daily-sales" oninput="updateLabel('daily-sales','lbl-daily',' uds')">
+        <input type="number" class="slider-num" value="10" id="daily-sales-num" oninput="syncSlider('daily-sales','daily-sales-num','lbl-daily',' uds')">
+      </div>
+      <div class="hint">Media de unidades vendidas por día en los últimos 30 días</div>
+    </div>
+    <div class="field">
+      <label>Variación de demanda <span class="live-val" id="lbl-variance">20%</span></label>
+      <div class="slider-wrap">
+        <input type="range" min="0" max="80" value="20" id="demand-var" oninput="updateLabel('demand-var','lbl-variance','%')">
+        <input type="number" class="slider-num" value="20" id="demand-var-num" oninput="syncSlider('demand-var','demand-var-num','lbl-variance','%')">
+      </div>
+      <div class="hint">Cuánto varían tus ventas entre días buenos y malos. 0% = estable, 50%+ = muy variable</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Proveedor y logística</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Lead time (días)</label>
+        <input type="number" id="lead-time" value="14" min="1" max="120" placeholder="14">
+        <div class="hint">Días desde que pides hasta que llega</div>
+      </div>
+      <div class="field">
+        <label>Variación lead time (días)</label>
+        <input type="number" id="lead-var" value="3" min="0" max="30" placeholder="3">
+        <div class="hint">Días que puede retrasarse el envío</div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:12px">
+      <div class="field">
+        <label>Stock actual (uds)</label>
+        <input type="number" id="current-stock" value="200" min="0" placeholder="200">
+      </div>
+      <div class="field">
+        <label>Coste por unidad (&euro;)</label>
+        <input type="number" id="unit-cost" value="8" min="0" step="0.01" placeholder="8.00">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Costes de inventario</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Coste de pedido (&euro;)</label>
+        <input type="number" id="order-cost" value="150" min="0" placeholder="150">
+        <div class="hint">Envío + gestión por cada pedido</div>
+      </div>
+      <div class="field">
+        <label>Coste almacenaje (%/año)</label>
+        <input type="number" id="holding-pct" value="20" min="0" max="100" placeholder="20">
+        <div class="hint">% del valor del producto al año</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="calculate()">CALCULAR PUNTO DE REPOSICIÓN</button>
+
+  <div class="results" id="results">
+    <div class="hero-metrics">
+      <div class="hero-metric primary">
+        <div class="hm-label">Punto de reposición</div>
+        <div class="hm-value green" id="reorder-point">—</div>
+        <div class="hm-sub" id="reorder-sub">Pide cuando tu stock baje a este nivel</div>
+      </div>
+      <div class="hero-metric secondary">
+        <div class="hm-label">Stock de seguridad</div>
+        <div class="hm-value white" id="safety-stock">—</div>
+        <div class="hm-sub">unidades de colchón</div>
+      </div>
+      <div class="hero-metric secondary">
+        <div class="hm-label">Cantidad óptima (EOQ)</div>
+        <div class="hm-value white" id="eoq">—</div>
+        <div class="hm-sub">unidades por pedido</div>
+      </div>
+    </div>
+
+    <div class="alert-box" id="stock-alert"></div>
+
+    <div class="card">
+      <div class="card-title">Proyección de stock (8 semanas)</div>
+      <div class="stock-chart" id="stock-chart"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Detalle del cálculo</div>
+      <div id="calc-details"></div>
+    </div>
+
+    <div class="insight-box" id="insight"></div>
+
+    <div class="footer">
+      <div class="brand">MENTORIUM</div>
+      <div class="handle">@javier.sanchezecom</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateLabel(sliderId, labelId, suffix){
+  const v = document.getElementById(sliderId).value;
+  document.getElementById(labelId).textContent = v + (suffix||'');
+  const numId = sliderId + '-num';
+  const numEl = document.getElementById(numId);
+  if(numEl) numEl.value = v;
+}
+function syncSlider(sliderId, numId, labelId, suffix){
+  const v = document.getElementById(numId).value;
+  document.getElementById(sliderId).value = v;
+  document.getElementById(labelId).textContent = v + (suffix||'');
+}
+
+function calculate(){
+  const dailySales = parseFloat(document.getElementById('daily-sales').value) || 10;
+  const demandVar = (parseFloat(document.getElementById('demand-var').value) || 20) / 100;
+  const leadTime = parseFloat(document.getElementById('lead-time').value) || 14;
+  const leadVar = parseFloat(document.getElementById('lead-var').value) || 3;
+  const currentStock = parseInt(document.getElementById('current-stock').value) || 0;
+  const unitCost = parseFloat(document.getElementById('unit-cost').value) || 8;
+  const orderCost = parseFloat(document.getElementById('order-cost').value) || 150;
+  const holdingPct = (parseFloat(document.getElementById('holding-pct').value) || 20) / 100;
+
+  // Standard deviation of daily demand
+  const demandSD = dailySales * demandVar;
+
+  // Safety stock = Z * sqrt(leadTime * demandSD^2 + dailySales^2 * leadVarSD^2)
+  // Using Z = 1.65 for 95% service level
+  const Z = 1.65;
+  const safetyStock = Math.ceil(Z * Math.sqrt(leadTime * Math.pow(demandSD, 2) + Math.pow(dailySales, 2) * Math.pow(leadVar, 2)));
+
+  // Reorder point = (daily sales * lead time) + safety stock
+  const reorderPoint = Math.ceil(dailySales * leadTime + safetyStock);
+
+  // EOQ (Economic Order Quantity) = sqrt(2 * D * S / H)
+  const annualDemand = dailySales * 365;
+  const holdingCostPerUnit = unitCost * holdingPct;
+  const eoq = Math.ceil(Math.sqrt(2 * annualDemand * orderCost / holdingCostPerUnit));
+
+  // Days until reorder
+  const daysUntilReorder = currentStock > reorderPoint ? Math.floor((currentStock - reorderPoint) / dailySales) : 0;
+  const daysUntilStockout = Math.floor(currentStock / dailySales);
+
+  // Display
+  document.getElementById('reorder-point').textContent = reorderPoint + ' uds';
+  document.getElementById('safety-stock').textContent = safetyStock + ' uds';
+  document.getElementById('eoq').textContent = eoq + ' uds';
+
+  // Alert
+  const alertEl = document.getElementById('stock-alert');
+  if(currentStock <= safetyStock){
+    alertEl.className = 'alert-box danger';
+    alertEl.innerHTML = `<strong>ALERTA CRÍTICA:</strong> Tu stock actual (${currentStock} uds) está por debajo del stock de seguridad (${safetyStock} uds). Pide AHORA. Te quedan ${daysUntilStockout} días antes de quedarte a cero.`;
+  } else if(currentStock <= reorderPoint){
+    alertEl.className = 'alert-box warning';
+    alertEl.innerHTML = `<strong>Es momento de pedir:</strong> Tu stock actual (${currentStock} uds) ya está por debajo del punto de reposición (${reorderPoint} uds). Haz el pedido hoy para no agotar stock.`;
+  } else {
+    alertEl.className = 'alert-box safe';
+    alertEl.innerHTML = `<strong>Stock OK:</strong> Tienes ${currentStock} uds. Tu próximo pedido debería ser en unos <strong>${daysUntilReorder} días</strong>, cuando el stock baje a ${reorderPoint} uds.`;
+  }
+
+  // Stock chart (8 weeks projection)
+  const chartEl = document.getElementById('stock-chart');
+  chartEl.innerHTML = '';
+  let projStock = currentStock;
+  const maxStock = Math.max(currentStock, reorderPoint + eoq);
+  const reorderPct = (reorderPoint / maxStock * 100);
+
+  for(let w = 0; w <= 8; w++){
+    const weekStock = Math.max(0, currentStock - (dailySales * 7 * w));
+    // Simulate reorder: if stock drops below reorder point, add EOQ after lead time
+    let displayStock = weekStock;
+    if(w > 0 && (currentStock - dailySales * 7 * (w-1)) <= reorderPoint && w * 7 >= leadTime){
+      displayStock = weekStock + eoq;
+    }
+    displayStock = Math.max(0, Math.min(displayStock, maxStock));
+    const pct = (displayStock / maxStock * 100);
+    const color = displayStock <= safetyStock ? '#E53935' : displayStock <= reorderPoint ? '#F5A623' : '#00C853';
+
+    chartEl.innerHTML += `
+      <div class="chart-row">
+        <div class="chart-label">${w===0?'Hoy':'Sem '+w}</div>
+        <div class="chart-bar-bg">
+          <div class="chart-reorder" style="left:${reorderPct}%"></div>
+          <div class="chart-bar" style="width:${Math.max(pct,3)}%;background:${color}">
+            <span class="chart-bar-text">${Math.round(displayStock)}</span>
+          </div>
+        </div>
+        <div class="chart-val" style="color:${color}">${Math.round(displayStock)}</div>
+      </div>
+    `;
+  }
+
+  // Details
+  const ordersPerYear = Math.ceil(annualDemand / eoq);
+  const avgInventory = eoq / 2 + safetyStock;
+  const annualHoldingCost = avgInventory * holdingCostPerUnit;
+  const annualOrderCost = ordersPerYear * orderCost;
+  const totalInventoryCost = annualHoldingCost + annualOrderCost;
+
+  document.getElementById('calc-details').innerHTML = `
+    <div class="detail-row"><span class="lab">Demanda diaria promedio</span><span class="val">${dailySales} uds/día</span></div>
+    <div class="detail-row"><span class="lab">Desviación estándar de demanda</span><span class="val">\u00b1${demandSD.toFixed(1)} uds/día</span></div>
+    <div class="detail-row"><span class="lab">Lead time del proveedor</span><span class="val">${leadTime} días (\u00b1${leadVar})</span></div>
+    <div class="detail-row"><span class="lab">Nivel de servicio</span><span class="val">95%</span></div>
+    <div class="detail-row"><span class="lab">Demanda durante lead time</span><span class="val">${Math.round(dailySales * leadTime)} uds</span></div>
+    <div class="detail-row"><span class="lab">Stock de seguridad</span><span class="val">${safetyStock} uds</span></div>
+    <div class="detail-row"><span class="lab">Pedidos al año (estimado)</span><span class="val">${ordersPerYear}</span></div>
+    <div class="detail-row"><span class="lab">Inventario medio</span><span class="val">${Math.round(avgInventory)} uds (${(avgInventory*unitCost).toFixed(0)}\u20ac)</span></div>
+    <div class="detail-row"><span class="lab">Coste anual de almacenaje</span><span class="val">${annualHoldingCost.toFixed(0)}\u20ac</span></div>
+    <div class="detail-row"><span class="lab">Coste anual de pedidos</span><span class="val">${annualOrderCost.toFixed(0)}\u20ac</span></div>
+    <div class="detail-row"><span class="lab">Coste total de inventario/año</span><span class="val" style="color:#00C853;font-size:15px">${totalInventoryCost.toFixed(0)}\u20ac</span></div>
+  `;
+
+  // Insight
+  const daysOfStock = Math.round(eoq / dailySales);
+  document.getElementById('insight').innerHTML = `
+    <strong>Resumen:</strong> Pide <strong>${eoq} unidades</strong> cada vez que tu stock baje a <strong>${reorderPoint} unidades</strong>.
+    Eso te da stock para <strong>${daysOfStock} días</strong> más un colchón de seguridad de <strong>${safetyStock} unidades</strong>.
+    Con tu ritmo actual, harás unos <strong>${ordersPerYear} pedidos al año</strong> con un coste de inventario total de <strong>${totalInventoryCost.toFixed(0)}\u20ac/año</strong>.
+    ${currentStock <= reorderPoint ? 'Deberías hacer un pedido HOY.' : `Tu próximo pedido debería ser en unos ${daysUntilReorder} días.`}
+  `;
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Buyer Persona — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+
+  input[type=text],input[type=number],select,textarea{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input:focus,select:focus,textarea:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  select{cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+  select option{background:#111;color:#fff}
+  textarea{resize:vertical;min-height:80px;line-height:1.5}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+
+  .range-row{display:grid;grid-template-columns:1fr 20px 1fr;gap:8px;align-items:center}
+  .range-row .sep{text-align:center;color:#444;font-weight:700;font-size:14px}
+
+  .chip-group{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{padding:8px 14px;border:1px solid #1c1c20;border-radius:8px;font-size:12px;font-weight:600;color:#888;cursor:pointer;transition:all 0.2s;background:#0c0c0e;user-select:none}
+  .chip:hover{border-color:#333;color:#bbb}
+  .chip.active{border-color:#00C853;color:#00C853;background:rgba(0,200,83,0.08)}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .persona-card{background:linear-gradient(135deg,#0f1a13,#111113);border:2px solid #1a3a25;border-radius:18px;padding:28px 24px;margin-top:16px}
+  .persona-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #1a2a1f}
+  .persona-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#00C853,#00E676);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#0a0a0a;flex-shrink:0}
+  .persona-name{font-size:22px;font-weight:900;letter-spacing:-0.5px}
+  .persona-subtitle{font-size:13px;color:#666;margin-top:4px;font-weight:500}
+
+  .persona-section{margin-bottom:20px}
+  .persona-section:last-child{margin-bottom:0}
+  .persona-section-title{font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#00C853;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .persona-section-title::after{content:'';flex:1;height:1px;background:#1a2a1f}
+
+  .persona-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .persona-tag{padding:6px 12px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:6px;font-size:12px;font-weight:600;color:#aaa}
+
+  .persona-text{font-size:13px;color:#999;line-height:1.8;font-weight:500}
+  .persona-text strong{color:#fff}
+
+  .persona-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .persona-stat{background:rgba(0,0,0,0.3);border:1px solid #1a2a1f;border-radius:10px;padding:14px;text-align:center}
+  .persona-stat .stat-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-bottom:4px}
+  .persona-stat .stat-value{font-size:18px;font-weight:900;color:#fff}
+
+  .quote-box{background:rgba(0,0,0,0.3);border-left:3px solid #00C853;border-radius:0 10px 10px 0;padding:16px;margin-top:6px}
+  .quote-box p{font-size:13px;color:#bbb;font-style:italic;line-height:1.6;font-weight:500}
+
+  .copy-btn{width:100%;padding:12px;border:1px solid #00C853;border-radius:10px;background:transparent;color:#00C853;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.3s;margin-top:16px}
+  .copy-btn:hover{background:rgba(0,200,83,0.1)}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Buyer Persona</h1>
+    <p>Crea un perfil detallado de tu cliente ideal. Deja de vender a todo el mundo y empieza a hablarle a una persona concreta.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos demográficos</div>
+    <div class="field">
+      <label>Nombre del negocio / nicho</label>
+      <input type="text" id="niche" placeholder="Ej: Tienda de suplementos deportivos">
+    </div>
+    <div class="field">
+      <label>Género principal</label>
+      <select id="gender">
+        <option value="hombre">Hombre</option>
+        <option value="mujer">Mujer</option>
+        <option value="ambos">Ambos</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Rango de edad</label>
+      <div class="range-row">
+        <input type="number" id="ageMin" value="25" min="16" max="80" placeholder="25">
+        <span class="sep">—</span>
+        <input type="number" id="ageMax" value="40" min="16" max="80" placeholder="40">
+      </div>
+    </div>
+    <div class="field">
+      <label>Presupuesto mensual disponible</label>
+      <select id="budget">
+        <option value="bajo">Bajo (menos de 100&euro;/mes)</option>
+        <option value="medio" selected>Medio (100-500&euro;/mes)</option>
+        <option value="alto">Alto (500-2.000&euro;/mes)</option>
+        <option value="premium">Premium (+2.000&euro;/mes)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Puntos de dolor</div>
+    <div class="field">
+      <label>Selecciona los que encajen (puedes elegir varios)</label>
+      <div class="chip-group" id="painPoints">
+        <div class="chip" data-val="No tiene tiempo">No tiene tiempo</div>
+        <div class="chip" data-val="No sabe por dónde empezar">No sabe por dónde empezar</div>
+        <div class="chip" data-val="Ha probado y ha fallado">Ha probado y ha fallado</div>
+        <div class="chip" data-val="Gasta mucho sin retorno">Gasta mucho sin retorno</div>
+        <div class="chip" data-val="No confía en las soluciones">No confía en las soluciones</div>
+        <div class="chip" data-val="Tiene miedo a equivocarse">Tiene miedo a equivocarse</div>
+        <div class="chip" data-val="Quiere resultados rápidos">Quiere resultados rápidos</div>
+        <div class="chip" data-val="Se siente solo en el proceso">Se siente solo en el proceso</div>
+        <div class="chip" data-val="Compara demasiado sin decidir">Compara demasiado sin decidir</div>
+        <div class="chip" data-val="No diferencia opciones">No diferencia opciones</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Objetivos y motivación</div>
+    <div class="field">
+      <label>Selecciona sus objetivos principales</label>
+      <div class="chip-group" id="goals">
+        <div class="chip" data-val="Ganar más dinero">Ganar más dinero</div>
+        <div class="chip" data-val="Libertad de tiempo">Libertad de tiempo</div>
+        <div class="chip" data-val="Dejar su trabajo">Dejar su trabajo</div>
+        <div class="chip" data-val="Escalar su negocio">Escalar su negocio</div>
+        <div class="chip" data-val="Automatizar procesos">Automatizar procesos</div>
+        <div class="chip" data-val="Aprender una habilidad">Aprender una habilidad</div>
+        <div class="chip" data-val="Mejorar su salud">Mejorar su salud</div>
+        <div class="chip" data-val="Estatus y reconocimiento">Estatus y reconocimiento</div>
+        <div class="chip" data-val="Seguridad financiera">Seguridad financiera</div>
+        <div class="chip" data-val="Impactar a otros">Impactar a otros</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Contexto adicional (opcional)</label>
+      <textarea id="context" placeholder="Ej: Trabaja como empleado en una oficina, ve mucho YouTube sobre negocios online..."></textarea>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generate()">GENERAR BUYER PERSONA</button>
+
+  <div class="results" id="results">
+    <div class="persona-card" id="personaCard">
+      <div class="persona-header">
+        <div class="persona-avatar" id="avatar">?</div>
+        <div>
+          <div class="persona-name" id="personaName">—</div>
+          <div class="persona-subtitle" id="personaSub">—</div>
+        </div>
+      </div>
+
+      <div class="persona-section">
+        <div class="persona-section-title">Perfil</div>
+        <div class="persona-stat-grid">
+          <div class="persona-stat"><div class="stat-label">Edad</div><div class="stat-value" id="pAge">—</div></div>
+          <div class="persona-stat"><div class="stat-label">Presupuesto</div><div class="stat-value" id="pBudget">—</div></div>
+          <div class="persona-stat"><div class="stat-label">Nivel digital</div><div class="stat-value" id="pDigital">—</div></div>
+          <div class="persona-stat"><div class="stat-label">Urgencia</div><div class="stat-value" id="pUrgency">—</div></div>
+        </div>
+      </div>
+
+      <div class="persona-section">
+        <div class="persona-section-title">Historia</div>
+        <div class="persona-text" id="pStory">—</div>
+      </div>
+
+      <div class="persona-section">
+        <div class="persona-section-title">Frustraciones</div>
+        <div class="persona-tags" id="pPains"></div>
+      </div>
+
+      <div class="persona-section">
+        <div class="persona-section-title">Objetivos</div>
+        <div class="persona-tags" id="pGoals"></div>
+      </div>
+
+      <div class="persona-section">
+        <div class="persona-section-title">Frase que diría</div>
+        <div class="quote-box"><p id="pQuote">—</p></div>
+      </div>
+
+      <div class="persona-section">
+        <div class="persona-section-title">Dónde encontrarlo</div>
+        <div class="persona-text" id="pChannels">—</div>
+      </div>
+
+      <div class="persona-section">
+        <div class="persona-section-title">Cómo venderle</div>
+        <div class="persona-text" id="pSelling">—</div>
+      </div>
+
+      <button class="copy-btn" onclick="copyPersona()">COPIAR PERFIL COMPLETO</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click',()=>chip.classList.toggle('active'));
+});
+
+const namesM=['Carlos','Marcos','Alejandro','David','Daniel','Pablo','Javier','Alberto','Hugo','Sergio','Adrián','Iván'];
+const namesF=['Laura','María','Ana','Sara','Lucía','Carmen','Elena','Paula','Marta','Andrea','Sofía','Clara'];
+const jobsM=['empleado de oficina','autónomo','gerente de tienda','freelance','ingeniero','comercial','técnico','profesor'];
+const jobsF=['empleada de oficina','autónoma','gerente de tienda','freelance','ingeniera','comercial','técnica','profesora'];
+
+const digitalLevels=['Básico','Intermedio','Avanzado'];
+const urgencies=['Baja','Media','Alta','Muy alta'];
+
+function getSelected(id){
+  return Array.from(document.querySelectorAll('#'+id+' .chip.active')).map(c=>c.dataset.val);
+}
+
+function rand(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function randRange(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+
+function generate(){
+  const niche=document.getElementById('niche').value.trim();
+  const gender=document.getElementById('gender').value;
+  const ageMin=parseInt(document.getElementById('ageMin').value)||25;
+  const ageMax=parseInt(document.getElementById('ageMax').value)||40;
+  const budget=document.getElementById('budget').value;
+  const pains=getSelected('painPoints');
+  const goals=getSelected('goals');
+  const context=document.getElementById('context').value.trim();
+
+  if(!niche){alert('Escribe el nicho o tipo de negocio.');return}
+  if(pains.length===0){alert('Selecciona al menos un punto de dolor.');return}
+  if(goals.length===0){alert('Selecciona al menos un objetivo.');return}
+
+  const isMale=gender==='hombre'||(gender==='ambos'&&Math.random()>0.5);
+  const name=isMale?rand(namesM):rand(namesF);
+  const jobs=isMale?jobsM:jobsF;
+  const age=randRange(ageMin,ageMax);
+  const job=rand(jobs);
+  const initial=name[0];
+
+  const budgetLabel={bajo:'< 100\u20AC/mes',medio:'100-500\u20AC/mes',alto:'500-2K\u20AC/mes',premium:'+2K\u20AC/mes'}[budget];
+  const digital=rand(digitalLevels);
+  const urgency=pains.length>=4?rand(['Alta','Muy alta']):pains.length>=2?rand(['Media','Alta']):rand(['Baja','Media']);
+
+  document.getElementById('avatar').textContent=initial;
+  document.getElementById('personaName').textContent=name;
+  document.getElementById('personaSub').textContent=age+' años \u00B7 '+job.charAt(0).toUpperCase()+job.slice(1)+' \u00B7 '+niche;
+  document.getElementById('pAge').textContent=age+' años';
+  document.getElementById('pBudget').textContent=budgetLabel;
+  document.getElementById('pDigital').textContent=digital;
+  document.getElementById('pUrgency').textContent=urgency;
+
+  // Story
+  const stories=[
+    name+' tiene '+age+' años y trabaja como <strong>'+job+'</strong>. Lleva meses investigando sobre <strong>'+niche+'</strong> pero no termina de dar el paso. '+
+    (pains.includes('Ha probado y ha fallado')?'Ya intentó algo parecido antes y perdió dinero, lo que le genera desconfianza.':'Consume contenido todos los días pero no pasa a la acción.')+
+    ' Su día a día es rutina y siente que necesita un cambio real.',
+
+    'Con '+age+' años, '+name+' ya no quiere seguir en el mismo sitio. Como <strong>'+job+'</strong>, su techo es claro y lo sabe. '+
+    'Ha descubierto el mundo del <strong>'+niche+'</strong> y ve la oportunidad, pero '+(pains.includes('Tiene miedo a equivocarse')?'el miedo a equivocarse le paraliza.':'no sabe por dónde empezar y eso le frustra.')+
+    ' Necesita alguien que le diga exactamente qué hacer.',
+
+    name+', '+age+' años. <strong>'+job.charAt(0).toUpperCase()+job.slice(1)+'</strong> de lunes a viernes. Los fines de semana se los pasa viendo vídeos sobre <strong>'+niche+'</strong>. '+
+    (pains.includes('Gasta mucho sin retorno')?'Ya ha invertido en cursos y herramientas pero no ha visto retorno.':'Tiene la motivación pero le falta el sistema.')+
+    ' Quiere resultados, no más teoría.'
+  ];
+  document.getElementById('pStory').innerHTML=rand(stories)+(context?' <strong>Contexto:</strong> '+context:'');
+
+  // Pains
+  const painsHTML=pains.map(p=>'<div class="persona-tag">'+p+'</div>').join('');
+  document.getElementById('pPains').innerHTML=painsHTML;
+
+  // Goals
+  const goalsHTML=goals.map(g=>'<div class="persona-tag">'+g+'</div>').join('');
+  document.getElementById('pGoals').innerHTML=goalsHTML;
+
+  // Quote
+  const quotes=[
+    '\u00ABYa he probado de todo y nada me funciona. Necesito a alguien que me diga exactamente qué hacer, paso a paso.\u00BB',
+    '\u00ABNo quiero otro curso. Quiero que alguien que ya lo ha hecho me guíe. No tengo tiempo para probar cosas al azar.\u00BB',
+    '\u00ABSé que la oportunidad está ahí. Lo veo cada día. Pero cada vez que intento algo, me pierdo y vuelvo al punto de partida.\u00BB',
+    '\u00ABEstoy harto de facturar bien y que no me quede nada. Algo estoy haciendo mal pero no sé qué es.\u00BB',
+    '\u00ABQuiero dejar mi trabajo pero no me puedo permitir el lujo de equivocarme. Necesito un plan que funcione.\u00BB'
+  ];
+  document.getElementById('pQuote').textContent=rand(quotes);
+
+  // Channels
+  const channels=['<strong>Instagram</strong> (reels de emprendimiento y ecommerce)',
+    '<strong>YouTube</strong> (vídeos largos de tutoriales y casos de éxito)',
+    '<strong>TikTok</strong> (contenido rápido de resultados y lifestyle)',
+    '<strong>Podcasts</strong> (negocios online en transporte o gimnasio)',
+    '<strong>Telegram/Discord</strong> (comunidades de emprendedores)'];
+  const selectedChannels=channels.sort(()=>Math.random()-0.5).slice(0,3);
+  document.getElementById('pChannels').innerHTML=selectedChannels.join(' \u00B7 ');
+
+  // Selling approach
+  const sellingApproaches=[
+    'Muéstrale <strong>casos reales de personas como '+((isMale)?'él':'ella')+'</strong>. No quiere teoría, quiere pruebas. Usa números concretos, timelines reales y testimonios sin filtro. El CTA debe ser una acción de bajo riesgo: una llamada de diagnóstico, no una venta directa.',
+    'Habla de su <strong>dolor actual</strong>, no de tu producto. '+name+' necesita sentir que entiendes su situación antes de escuchar tu solución. Contenido que diagnostique su problema = engagement + confianza. Después, el paso natural es pedir ayuda.',
+    'La clave con '+name+' es <strong>romper la desconfianza</strong>. Muestra el proceso, no solo los resultados. Detrás de cámaras, errores reales, números sin maquillar. Cuando vea que eres transparente, se abrirá a la venta.'
+  ];
+  document.getElementById('pSelling').innerHTML=rand(sellingApproaches);
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function copyPersona(){
+  const card=document.getElementById('personaCard');
+  const text=card.innerText.replace(/COPIAR PERFIL COMPLETO/g,'').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.querySelector('.copy-btn');
+    btn.textContent='\u2713 COPIADO AL PORTAPAPELES';
+    btn.style.borderColor='#00E676';
+    btn.style.color='#00E676';
+    setTimeout(()=>{btn.textContent='COPIAR PERFIL COMPLETO';btn.style.borderColor='#00C853';btn.style.color='#00C853'},2000);
+  });
+}
+</script>
+</body>
+</html>

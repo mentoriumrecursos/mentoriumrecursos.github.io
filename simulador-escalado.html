@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Escalado — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#08080a;color:#fff;min-height:100vh}
+  .container{max-width:480px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#C45830;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field label .val{color:#C45830;font-weight:800}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#C45830;border-radius:50%;cursor:pointer;border:3px solid #08080a}
+  .row .num{width:80px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#C45830}
+  .row .u{color:#555;font-size:13px;font-weight:600;width:16px}
+  .scenarios{margin-top:20px}
+  .scenario{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:14px}
+  .scenario h3{font-size:16px;font-weight:800;margin-bottom:14px}
+  .scenario.conservative h3{color:#C8AA28}
+  .scenario.realistic h3{color:#2D8C4E}
+  .scenario.aggressive h3{color:#C45830}
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .metric{padding:12px;background:#0c0c0e;border-radius:8px;text-align:center}
+  .metric .num{font-size:22px;font-weight:900;line-height:1}
+  .metric .desc{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+  .verdict-box{margin-top:14px;padding:14px;border-radius:10px;font-size:13px;line-height:1.6}
+  .verdict-box strong{color:#fff}
+  .verdict-safe{background:rgba(45,140,78,0.08);border:1px solid rgba(45,140,78,0.2);color:#66aa77}
+  .verdict-risky{background:rgba(200,170,40,0.08);border:1px solid rgba(200,170,40,0.2);color:#aaa066}
+  .verdict-danger{background:rgba(196,88,48,0.08);border:1px solid rgba(196,88,48,0.2);color:#cc8866}
+  .timeline{margin-top:14px}
+  .tl-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:13px}
+  .tl-month{color:#C45830;font-weight:800;width:50px;flex-shrink:0}
+  .tl-text{color:#aaa}
+  .tl-text strong{color:#fff}
+  .footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #1a1a1a}
+  .footer .brand{font-size:12px;font-weight:800;color:#C45830;letter-spacing:3px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Simulador de Escalado</h1>
+    <p>Hasta donde puedes escalar sin perder dinero. Con 3 escenarios.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu situacion actual</div>
+    <div class="field">
+      <label>Facturación mensual actual <span class="val" id="lbl_rev">10000</span></label>
+      <div class="row"><input type="range" min="1000" max="100000" step="500" value="10000" id="sl_rev" oninput="s('rev')"><input type="number" class="num" id="in_rev" value="10000" oninput="s('rev',1)"><span class="u">E</span></div>
+    </div>
+    <div class="field">
+      <label>Margen neto actual <span class="val" id="lbl_margin">15%</span></label>
+      <div class="row"><input type="range" min="2" max="40" value="15" id="sl_margin" oninput="s('margin')"><input type="number" class="num" id="in_margin" value="15" oninput="s('margin',1)"><span class="u">%</span></div>
+    </div>
+    <div class="field">
+      <label>Gasto en ads mensual <span class="val" id="lbl_ads">2000</span></label>
+      <div class="row"><input type="range" min="0" max="30000" step="100" value="2000" id="sl_ads" oninput="s('ads')"><input type="number" class="num" id="in_ads" value="2000" oninput="s('ads',1)"><span class="u">E</span></div>
+    </div>
+    <div class="field">
+      <label>ROAS actual <span class="val" id="lbl_roas">3.0x</span></label>
+      <div class="row"><input type="range" min="1" max="10" step="0.1" value="3" id="sl_roas" oninput="s('roas')"><input type="number" class="num" id="in_roas" value="3" step="0.1" oninput="s('roas',1)"><span class="u">x</span></div>
+    </div>
+  </div>
+
+  <div class="scenarios" id="scenarios"></div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle" style="font-size:13px;color:#444;margin-top:4px">@javier.sanchezecom</div>
+  </div>
+</div>
+<script>
+function s(k,fi){var sl=document.getElementById('sl_'+k),inp=document.getElementById('in_'+k);if(fi)sl.value=inp.value;else inp.value=sl.value;calc();}
+function fmt(n){return Math.round(n).toLocaleString('es-ES')+'E'}
+function calc(){
+  var rev=parseFloat(document.getElementById('in_rev').value)||0;
+  var margin=parseFloat(document.getElementById('in_margin').value)||0;
+  var ads=parseFloat(document.getElementById('in_ads').value)||0;
+  var roas=parseFloat(document.getElementById('in_roas').value)||1;
+  document.getElementById('lbl_rev').textContent=fmt(rev).replace('E','');
+  document.getElementById('lbl_margin').textContent=margin+'%';
+  document.getElementById('lbl_ads').textContent=fmt(ads).replace('E','');
+  document.getElementById('lbl_roas').textContent=roas.toFixed(1)+'x';
+
+  var profit=rev*margin/100;
+  var scenarios=[
+    {name:'Conservador',color:'conservative',ads_mult:1.2,roas_drop:0.95,margin_drop:0.98},
+    {name:'Realista',color:'realistic',ads_mult:1.5,roas_drop:0.88,margin_drop:0.95},
+    {name:'Agresivo',color:'aggressive',ads_mult:2.0,roas_drop:0.78,margin_drop:0.90},
+  ];
+  var html='';
+  scenarios.forEach(function(sc){
+    var new_ads=ads*sc.ads_mult;
+    var new_roas=roas*sc.roas_drop;
+    var new_rev_from_ads=new_ads*new_roas;
+    var organic_rev=rev-(ads*roas);
+    var new_rev=organic_rev+new_rev_from_ads;
+    var new_margin=margin*sc.margin_drop;
+    var new_profit=new_rev*new_margin/100;
+    var profit_change=((new_profit/profit)-1)*100;
+    var safe=new_profit>profit&&new_margin>10;
+    var risky=new_profit>profit&&new_margin<=10;
+
+    html+='<div class="scenario '+sc.color+'">';
+    html+='<h3>'+sc.name+' (ads x'+sc.ads_mult+')</h3>';
+    html+='<div class="metric-grid">';
+    html+='<div class="metric"><div class="num" style="color:'+(new_rev>rev?'#2D8C4E':'#C45830')+'">'+fmt(new_rev)+'</div><div class="desc">Facturación</div></div>';
+    html+='<div class="metric"><div class="num" style="color:'+(new_profit>profit?'#2D8C4E':'#C45830')+'">'+fmt(new_profit)+'</div><div class="desc">Profit</div></div>';
+    html+='<div class="metric"><div class="num">'+fmt(new_ads)+'</div><div class="desc">Gasto ads</div></div>';
+    html+='<div class="metric"><div class="num">'+new_roas.toFixed(1)+'x</div><div class="desc">ROAS</div></div>';
+    html+='</div>';
+
+    if(safe){
+      html+='<div class="verdict-box verdict-safe"><strong>Puedes escalar.</strong> El profit sube un '+Math.round(profit_change)+'% y el margen aguanta en '+new_margin.toFixed(1)+'%. Los números cuadran.</div>';
+    }else if(risky){
+      html+='<div class="verdict-box verdict-risky"><strong>Cuidado.</strong> El profit sube pero el margen baja a '+new_margin.toFixed(1)+'%. Un mal mes te pone en negativo. Arregla antes de escalar.</div>';
+    }else{
+      html+='<div class="verdict-box verdict-danger"><strong>No escales.</strong> El profit baja un '+Math.abs(Math.round(profit_change))+'%. Necesitas mejorar conversión o bajar CPA antes.</div>';
+    }
+
+    // Timeline
+    html+='<div class="timeline">';
+    html+='<div class="tl-item"><div class="tl-month">Mes 1</div><div class="tl-text">Sube ads un '+(Math.round((sc.ads_mult-1)*50))+'%. Monitorea CPA diario.</div></div>';
+    html+='<div class="tl-item"><div class="tl-month">Mes 2</div><div class="tl-text">Si CPA se mantiene, sube otro '+(Math.round((sc.ads_mult-1)*50))+'%. <strong>Si sube, para.</strong></div></div>';
+    html+='<div class="tl-item"><div class="tl-month">Mes 3</div><div class="tl-text">Objetivo: <strong>'+fmt(new_rev)+'/mes</strong> con <strong>'+new_margin.toFixed(0)+'%</strong> de margen.</div></div>';
+    html+='</div>';
+    html+='</div>';
+  });
+
+  document.getElementById('scenarios').innerHTML=html;
+}
+calc();
+</script>
+</body>
+</html>

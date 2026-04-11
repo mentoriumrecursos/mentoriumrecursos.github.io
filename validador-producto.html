@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validador de Producto — ¿Tu producto es rentable? — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+  .container { max-width: 480px; margin: 0 auto; padding: 30px 20px; }
+
+  .header { text-align: center; margin-bottom: 40px; }
+  .header .brand { font-size: 12px; font-weight: 700; letter-spacing: 4px; color: #C45830; text-transform: uppercase; margin-bottom: 12px; }
+  .header h1 { font-size: 26px; font-weight: 900; line-height: 1.2; margin-bottom: 8px; }
+  .header p { font-size: 14px; color: #666; line-height: 1.5; }
+
+  .criteria { margin-bottom: 30px; }
+  .criteria-title { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830; margin-bottom: 16px; }
+
+  .criteria-item {
+    background: #111; border: 1px solid #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 10px;
+  }
+  .criteria-q { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.4; }
+  .criteria-hint { font-size: 12px; color: #555; margin-bottom: 12px; line-height: 1.4; }
+  .options { display: flex; gap: 8px; }
+  .opt-btn {
+    flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #222; background: transparent;
+    color: #888; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s;
+    text-align: center;
+  }
+  .opt-btn:hover { border-color: #444; color: #ccc; }
+  .opt-btn.selected-good { background: rgba(45,140,78,0.15); border-color: #2D8C4E; color: #2D8C4E; }
+  .opt-btn.selected-ok { background: rgba(200,170,40,0.1); border-color: #C8AA28; color: #C8AA28; }
+  .opt-btn.selected-bad { background: rgba(196,88,48,0.15); border-color: #C45830; color: #C45830; }
+
+  .result-panel {
+    background: #111; border: 1px solid #1a1a1a; border-radius: 16px; padding: 30px; text-align: center;
+    margin-top: 30px; display: none;
+  }
+  .result-panel h2 { font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830; margin-bottom: 20px; }
+  .score-circle {
+    width: 140px; height: 140px; border-radius: 50%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; margin: 0 auto 20px;
+  }
+  .score-circle .num { font-size: 48px; font-weight: 900; }
+  .score-circle .of { font-size: 14px; color: #888; }
+  .circle-red { border: 4px solid #C45830; }
+  .circle-yellow { border: 4px solid #C8AA28; }
+  .circle-green { border: 4px solid #2D8C4E; }
+
+  .verdict { font-size: 20px; font-weight: 900; margin-bottom: 16px; }
+  .verdict-text { font-size: 14px; color: #888; line-height: 1.6; text-align: left; margin-top: 16px; }
+  .verdict-text strong { color: #fff; }
+
+  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #1a1a1a; }
+  .footer p { font-size: 12px; color: #444; margin-bottom: 4px; }
+  .footer .handle { font-size: 14px; font-weight: 700; color: #C45830; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="brand">Mentorium</div>
+    <h1>¿Tu producto es rentable?</h1>
+    <p>10 criterios que determinan si vale la pena antes de gastar un euro en ads.</p>
+  </div>
+
+  <div class="criteria">
+    <div class="criteria-title">Márgenes</div>
+    <div class="criteria-item" data-category="margin">
+      <div class="criteria-q">¿El margen bruto (precio - coste - envío) es superior al 60%?</div>
+      <div class="criteria-hint">Si vendes a 40€ y te cuesta 12€ (producto + envío), el margen bruto es 70%. Necesitas mínimo 60% para que quede algo después de ads.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">Sí, +60%</button>
+        <button class="opt-btn" onclick="pick(this,2,'ok')">40-60%</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">Menos del 40%</button>
+      </div>
+    </div>
+    <div class="criteria-item">
+      <div class="criteria-q">¿El precio de venta está entre 25€ y 80€?</div>
+      <div class="criteria-hint">Por debajo de 25€ el CPA se come todo el margen. Por encima de 80€ la decisión de compra es más larga y el CAC sube.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">Sí, en rango</button>
+        <button class="opt-btn" onclick="pick(this,1,'ok')">Cerca</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">Fuera de rango</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria">
+    <div class="criteria-title">Demanda</div>
+    <div class="criteria-item">
+      <div class="criteria-q">¿Hay vídeos de TikTok del producto con +500K views?</div>
+      <div class="criteria-hint">Si el producto ya tiene tracción orgánica en TikTok, la demanda está validada. No necesitas inventarla.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">Sí, varios</button>
+        <button class="opt-btn" onclick="pick(this,1,'ok')">Alguno</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">No encuentro</button>
+      </div>
+    </div>
+    <div class="criteria-item">
+      <div class="criteria-q">¿Hay competidores vendiendo este producto con ads activos?</div>
+      <div class="criteria-hint">Si nadie lo vende con ads puede ser que no funcione. Si hay 2-5 competidores es perfecto: demanda confirmada pero no saturado.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">2-5 competidores</button>
+        <button class="opt-btn" onclick="pick(this,1,'ok')">1 o más de 10</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">Ninguno</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria">
+    <div class="criteria-title">Diferenciación</div>
+    <div class="criteria-item">
+      <div class="criteria-q">¿Puedes crear un ángulo de venta único (no solo "más barato")?</div>
+      <div class="criteria-hint">Resolver un problema, un uso inesperado, un beneficio que otros no comunican.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">Sí, claro</button>
+        <button class="opt-btn" onclick="pick(this,1,'ok')">Tal vez</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">No</button>
+      </div>
+    </div>
+    <div class="criteria-item">
+      <div class="criteria-q">¿El producto se puede demostrar visualmente en 5 segundos?</div>
+      <div class="criteria-hint">Los productos que se ven funcionando en vídeo convierten 3x más en ads que los que necesitan explicación.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">Sí, es visual</button>
+        <button class="opt-btn" onclick="pick(this,1,'ok')">Con esfuerzo</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">No es visual</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria">
+    <div class="criteria-title">Logística</div>
+    <div class="criteria-item">
+      <div class="criteria-q">¿El tiempo de envío es inferior a 10 días?</div>
+      <div class="criteria-hint">Con envío desde China +20 días la tasa de devolución se dispara. Agente o almacén en Europa = ventaja.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">Menos de 7 días</button>
+        <button class="opt-btn" onclick="pick(this,1,'ok')">7-14 días</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">Más de 14 días</button>
+      </div>
+    </div>
+    <div class="criteria-item">
+      <div class="criteria-q">¿El producto es ligero y fácil de enviar (menos de 1kg)?</div>
+      <div class="criteria-hint">Productos pesados o voluminosos multiplican el coste de envío y devolución.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">Sí, ligero</button>
+        <button class="opt-btn" onclick="pick(this,1,'ok')">Medio</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">Pesado/grande</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria">
+    <div class="criteria-title">Escalabilidad</div>
+    <div class="criteria-item">
+      <div class="criteria-q">¿Puedes hacer upsell o bundle con productos complementarios?</div>
+      <div class="criteria-hint">Si puedes subir el ticket medio con un bundle o upsell, el CPA se diluye y el margen sube.</div>
+      <div class="options">
+        <button class="opt-btn" onclick="pick(this,3,'good')">Sí, fácil</button>
+        <button class="opt-btn" onclick="pick(this,1,'ok')">Con esfuerzo</button>
+        <button class="opt-btn" onclick="pick(this,0,'bad')">No aplica</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-panel" id="resultPanel">
+    <h2>Resultado</h2>
+    <div class="score-circle" id="scoreCircle">
+      <div class="num" id="scoreNum">0</div>
+      <div class="of">de 30</div>
+    </div>
+    <div class="verdict" id="verdict"></div>
+    <div class="verdict-text" id="verdictText"></div>
+  </div>
+
+  <div class="footer">
+    <p>Herramienta gratuita de</p>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+let scores = {};
+function pick(btn, score, level) {
+  const item = btn.closest('.criteria-item');
+  const idx = Array.from(document.querySelectorAll('.criteria-item')).indexOf(item);
+  scores[idx] = score;
+
+  item.querySelectorAll('.opt-btn').forEach(b => b.className = 'opt-btn');
+  btn.classList.add('selected-' + level);
+
+  const total = Object.values(scores).reduce((a,b) => a + b, 0);
+  const answered = Object.keys(scores).length;
+
+  if (answered >= 5) {
+    const panel = document.getElementById('resultPanel');
+    panel.style.display = 'block';
+    document.getElementById('scoreNum').textContent = total;
+
+    const circle = document.getElementById('scoreCircle');
+    const v = document.getElementById('verdict');
+    const vt = document.getElementById('verdictText');
+
+    if (total <= 10) {
+      circle.className = 'score-circle circle-red';
+      v.style.color = '#C45830';
+      v.textContent = 'NO LANZAR';
+      vt.innerHTML = '<strong>Este producto tiene demasiados riesgos.</strong> Los márgenes, la demanda o la logística no están a favor. Busca otro producto antes de gastar dinero en ads. Es más barato cambiar de producto ahora que perder 2.000€ descubriéndolo después.';
+    } else if (total <= 18) {
+      circle.className = 'score-circle circle-yellow';
+      v.style.color = '#C8AA28';
+      v.textContent = 'MEJORABLE — TESTEAR CON POCO';
+      vt.innerHTML = '<strong>Tiene potencial pero hay puntos débiles.</strong> Antes de escalar, resuelve los criterios en rojo. Puedes testear con 100-200€ para validar la demanda, pero no subas presupuesto hasta arreglar los fundamentales.';
+    } else {
+      circle.className = 'score-circle circle-green';
+      v.style.color = '#2D8C4E';
+      v.textContent = 'LANZAR';
+      vt.innerHTML = '<strong>Este producto tiene los fundamentales cubiertos.</strong> Márgenes sanos, demanda validada, logística viable. Puedes lanzar con confianza. Empieza con 30-50€/día, mide los primeros 100 clics, y escala si el CPA está por debajo del 30% de tu ticket medio.';
+    }
+  }
+}
+</script>
+</body>
+</html>

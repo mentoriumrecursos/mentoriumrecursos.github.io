@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Precio vs Competencia — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field input,.field select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none}
+  .field input:focus{border-color:#00C853}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .input-row{display:flex;gap:10px}
+  .input-row .field{flex:1}
+  .competitors-list{margin-top:12px}
+  .comp-entry{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .comp-entry input{flex:1;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:14px;font-weight:600;padding:10px 12px;font-family:inherit;outline:none}
+  .comp-entry input:focus{border-color:#00C853}
+  .comp-entry .comp-label{font-size:12px;color:#555;font-weight:600;min-width:80px}
+  .comp-remove{width:32px;height:32px;background:transparent;border:1px solid #2a2a2e;border-radius:8px;color:#555;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+  .comp-remove:hover{border-color:#ff4444;color:#ff4444}
+  .add-comp{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:transparent;border:1px dashed #2a2a2e;border-radius:8px;color:#555;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+  .add-comp:hover{border-color:#00C853;color:#00C853}
+  .btn{width:100%;padding:16px;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px;transition:background 0.2s}
+  .btn:hover{background:#00b348}
+  .position-visual{position:relative;height:80px;background:#0c0c0e;border-radius:12px;margin:20px 0;overflow:hidden}
+  .price-line{position:absolute;height:100%;width:2px;top:0}
+  .price-dot{position:absolute;width:12px;height:12px;border-radius:50%;top:50%;transform:translate(-50%,-50%)}
+  .price-label{position:absolute;font-size:9px;font-weight:800;top:8px;transform:translateX(-50%);white-space:nowrap}
+  .price-val-label{position:absolute;font-size:10px;font-weight:700;bottom:8px;transform:translateX(-50%);white-space:nowrap}
+  .your-marker{background:#00C853}
+  .comp-marker{background:#555}
+  .avg-marker{background:#C8AA28}
+  .position-legend{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#666}
+  .legend-dot{width:8px;height:8px;border-radius:50%}
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
+  .metric-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:14px;text-align:center}
+  .metric-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-bottom:4px}
+  .metric-value{font-size:20px;font-weight:900;letter-spacing:-0.5px}
+  .metric-sub{font-size:10px;color:#444;margin-top:2px}
+  .scenario{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;margin-bottom:10px}
+  .scenario-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .scenario-name{font-size:14px;font-weight:800}
+  .scenario-price{font-size:16px;font-weight:900;color:#00C853}
+  .scenario-details{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .scenario-detail{text-align:center}
+  .scenario-detail .sd-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#555}
+  .scenario-detail .sd-value{font-size:14px;font-weight:800;margin-top:2px}
+  .scenario-tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;display:inline-block;margin-top:8px}
+  .tag-best{background:rgba(0,200,83,0.12);color:#00C853}
+  .tag-risky{background:rgba(255,68,68,0.12);color:#ff6b6b}
+  .tag-safe{background:rgba(200,170,40,0.1);color:#C8AA28}
+  .insight-box{background:#0d1a0f;border:1px solid #1a3a20;border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#5a9a65;line-height:1.7}
+  .insight-box strong{color:#fff}
+  .hidden{display:none}
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Simulador Precio vs Competencia</h1>
+    <p>Tu precio, los de tu competencia, tus margenes. Descubre donde te posicionas y que ajustar.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu producto</div>
+    <div class="field">
+      <label>Nombre del producto</label>
+      <input type="text" id="prodName" placeholder="Ej: Cojin ergonomico, serum facial, camiseta oversize...">
+    </div>
+    <div class="input-row">
+      <div class="field">
+        <label>Tu precio de venta</label>
+        <input type="number" id="myPrice" placeholder="39.90" step="0.01">
+      </div>
+      <div class="field">
+        <label>Tu coste unitario</label>
+        <input type="number" id="myCost" placeholder="12.50" step="0.01">
+      </div>
+    </div>
+    <div class="field">
+      <label>Costes extra por unidad (envio, fees, etc)</label>
+      <input type="number" id="myExtra" placeholder="3.50" step="0.01" value="0">
+      <div class="hint">Envio proveedor + packaging + comision plataforma</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Precios de la competencia</div>
+    <p style="font-size:12px;color:#555;margin-bottom:14px">Anade los precios de al menos 3 competidores para un analisis fiable.</p>
+    <div class="competitors-list" id="compList">
+      <div class="comp-entry">
+        <span class="comp-label">Comp. 1</span>
+        <input type="number" placeholder="34.90" step="0.01" class="comp-price">
+        <button class="comp-remove" onclick="removeComp(this)">x</button>
+      </div>
+      <div class="comp-entry">
+        <span class="comp-label">Comp. 2</span>
+        <input type="number" placeholder="42.00" step="0.01" class="comp-price">
+        <button class="comp-remove" onclick="removeComp(this)">x</button>
+      </div>
+      <div class="comp-entry">
+        <span class="comp-label">Comp. 3</span>
+        <input type="number" placeholder="37.50" step="0.01" class="comp-price">
+        <button class="comp-remove" onclick="removeComp(this)">x</button>
+      </div>
+    </div>
+    <button class="add-comp" onclick="addComp()">+ Anadir competidor</button>
+  </div>
+
+  <button class="btn" onclick="analyze()">Analizar posicionamiento</button>
+
+  <div id="results" class="hidden">
+    <div class="card">
+      <div class="card-title">Tu posicion en el mercado</div>
+      <div class="position-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#00C853"></div> Tu precio</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#555"></div> Competidores</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#C8AA28"></div> Media</div>
+      </div>
+      <div class="position-visual" id="positionChart"></div>
+
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Tu precio</div>
+          <div class="metric-value" id="m_price" style="color:#00C853">--</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Media mercado</div>
+          <div class="metric-value" id="m_avg" style="color:#C8AA28">--</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Tu posicion</div>
+          <div class="metric-value" id="m_position">--</div>
+          <div class="metric-sub" id="m_pos_sub"></div>
+        </div>
+      </div>
+
+      <div class="metric-grid" style="grid-template-columns:1fr 1fr;margin-top:10px">
+        <div class="metric-card">
+          <div class="metric-label">Tu margen unitario</div>
+          <div class="metric-value" id="m_margin">--</div>
+          <div class="metric-sub" id="m_margin_pct"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Diferencia vs media</div>
+          <div class="metric-value" id="m_diff">--</div>
+          <div class="metric-sub" id="m_diff_pct"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Escenarios de precio</div>
+      <div id="scenarios"></div>
+    </div>
+
+    <div class="insight-box" id="insightBox"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+<script>
+var compCount = 3;
+
+function addComp(){
+  compCount++;
+  var div = document.createElement('div');
+  div.className = 'comp-entry';
+  div.innerHTML = '<span class="comp-label">Comp. '+compCount+'</span><input type="number" placeholder="0.00" step="0.01" class="comp-price"><button class="comp-remove" onclick="removeComp(this)">x</button>';
+  document.getElementById('compList').appendChild(div);
+}
+
+function removeComp(btn){
+  var entries = document.querySelectorAll('.comp-entry');
+  if(entries.length <= 1) return;
+  btn.parentElement.remove();
+}
+
+function fmt(n){return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+function analyze(){
+  var myPrice = parseFloat(document.getElementById('myPrice').value);
+  var myCost = parseFloat(document.getElementById('myCost').value) || 0;
+  var myExtra = parseFloat(document.getElementById('myExtra').value) || 0;
+
+  if(!myPrice || myPrice <= 0){
+    document.getElementById('myPrice').style.borderColor='#ff4444';
+    setTimeout(function(){document.getElementById('myPrice').style.borderColor='#1c1c20'},1500);
+    return;
+  }
+
+  var compPrices = [];
+  document.querySelectorAll('.comp-price').forEach(function(inp){
+    var v = parseFloat(inp.value);
+    if(v && v > 0) compPrices.push(v);
+  });
+
+  if(compPrices.length < 1){
+    alert('Anade al menos 1 precio de competidor');
+    return;
+  }
+
+  var totalCost = myCost + myExtra;
+  var margin = myPrice - totalCost;
+  var marginPct = (margin / myPrice) * 100;
+
+  var allPrices = compPrices.slice().sort(function(a,b){return a-b});
+  var avg = compPrices.reduce(function(s,p){return s+p},0) / compPrices.length;
+  var minComp = Math.min.apply(null, compPrices);
+  var maxComp = Math.max.apply(null, compPrices);
+  var diff = myPrice - avg;
+  var diffPct = (diff / avg) * 100;
+
+  var allWithMine = allPrices.concat([myPrice]).sort(function(a,b){return a-b});
+  var myRank = allWithMine.indexOf(myPrice) + 1;
+  var totalEntries = allWithMine.length;
+
+  document.getElementById('m_price').textContent = fmt(myPrice) + ' EUR';
+  document.getElementById('m_avg').textContent = fmt(avg) + ' EUR';
+
+  var posEl = document.getElementById('m_position');
+  var posSubEl = document.getElementById('m_pos_sub');
+  if(myPrice < avg * 0.9){
+    posEl.textContent = 'Bajo';
+    posEl.style.color = '#C8AA28';
+    posSubEl.textContent = myRank + '/' + totalEntries + ' (mas barato)';
+  } else if(myPrice > avg * 1.1){
+    posEl.textContent = 'Alto';
+    posEl.style.color = '#ff6b6b';
+    posSubEl.textContent = myRank + '/' + totalEntries + ' (mas caro)';
+  } else {
+    posEl.textContent = 'Medio';
+    posEl.style.color = '#00C853';
+    posSubEl.textContent = myRank + '/' + totalEntries + ' (en rango)';
+  }
+
+  document.getElementById('m_margin').textContent = fmt(margin) + ' EUR';
+  document.getElementById('m_margin').style.color = margin > 0 ? '#00C853' : '#ff4444';
+  document.getElementById('m_margin_pct').textContent = margin > 0 ? marginPct.toFixed(1) + '% margen' : 'Pierdes dinero';
+
+  document.getElementById('m_diff').textContent = (diff >= 0 ? '+' : '') + fmt(diff) + ' EUR';
+  document.getElementById('m_diff').style.color = Math.abs(diffPct) < 10 ? '#00C853' : diffPct > 0 ? '#C8AA28' : '#4a9eff';
+  document.getElementById('m_diff_pct').textContent = (diffPct >= 0 ? '+' : '') + diffPct.toFixed(1) + '% vs media';
+
+  // Position chart
+  var chartMin = Math.min(minComp, myPrice) * 0.85;
+  var chartMax = Math.max(maxComp, myPrice) * 1.15;
+  var range = chartMax - chartMin;
+  var chartHtml = '';
+
+  compPrices.forEach(function(p, i){
+    var left = ((p - chartMin) / range) * 100;
+    left = Math.max(5, Math.min(95, left));
+    chartHtml += '<div class="price-dot comp-marker" style="left:'+left+'%"></div>';
+    chartHtml += '<div class="price-label" style="left:'+left+'%;color:#555">C'+(i+1)+'</div>';
+    chartHtml += '<div class="price-val-label" style="left:'+left+'%;color:#666">'+fmt(p)+'</div>';
+  });
+
+  var myLeft = ((myPrice - chartMin) / range) * 100;
+  myLeft = Math.max(5, Math.min(95, myLeft));
+  chartHtml += '<div class="price-dot your-marker" style="left:'+myLeft+'%;width:16px;height:16px;z-index:2;box-shadow:0 0 10px rgba(0,200,83,0.4)"></div>';
+  chartHtml += '<div class="price-label" style="left:'+myLeft+'%;color:#00C853;font-size:10px">TU</div>';
+  chartHtml += '<div class="price-val-label" style="left:'+myLeft+'%;color:#00C853;font-weight:900">'+fmt(myPrice)+'</div>';
+
+  var avgLeft = ((avg - chartMin) / range) * 100;
+  avgLeft = Math.max(5, Math.min(95, avgLeft));
+  chartHtml += '<div style="position:absolute;left:'+avgLeft+'%;top:15%;height:70%;width:1px;background:#C8AA28;opacity:0.5"></div>';
+  chartHtml += '<div class="price-dot avg-marker" style="left:'+avgLeft+'%;width:8px;height:8px"></div>';
+
+  document.getElementById('positionChart').innerHTML = chartHtml;
+
+  // Scenarios
+  var scenarios = [
+    {
+      name: 'Precio agresivo (bajo)',
+      price: Math.round(minComp * 0.95 * 100) / 100,
+      desc: 'Justo por debajo del competidor mas barato'
+    },
+    {
+      name: 'Precio medio del mercado',
+      price: Math.round(avg * 100) / 100,
+      desc: 'Alineado con la media de competidores'
+    },
+    {
+      name: 'Precio premium (+15%)',
+      price: Math.round(avg * 1.15 * 100) / 100,
+      desc: 'Por encima de la media — requiere diferenciacion'
+    },
+    {
+      name: 'Tu precio actual',
+      price: myPrice,
+      desc: 'Lo que cobras ahora mismo'
+    }
+  ];
+
+  var scenHtml = '';
+  scenarios.forEach(function(sc){
+    var scMargin = sc.price - totalCost;
+    var scMarginPct = sc.price > 0 ? (scMargin / sc.price) * 100 : 0;
+    var scDiff = ((sc.price - avg) / avg) * 100;
+    var tag = '';
+    if(scMarginPct >= 40) tag = '<div class="scenario-tag tag-best">Margen saludable</div>';
+    else if(scMarginPct >= 20) tag = '<div class="scenario-tag tag-safe">Margen aceptable</div>';
+    else if(scMarginPct > 0) tag = '<div class="scenario-tag tag-risky">Margen ajustado</div>';
+    else tag = '<div class="scenario-tag tag-risky">Sin margen</div>';
+
+    scenHtml += '<div class="scenario">';
+    scenHtml += '<div class="scenario-header"><div class="scenario-name">'+sc.name+'</div><div class="scenario-price">'+fmt(sc.price)+' EUR</div></div>';
+    scenHtml += '<div class="scenario-details">';
+    scenHtml += '<div class="scenario-detail"><div class="sd-label">Margen</div><div class="sd-value" style="color:'+(scMargin>0?'#00C853':'#ff4444')+'">'+fmt(scMargin)+' EUR</div></div>';
+    scenHtml += '<div class="scenario-detail"><div class="sd-label">% Margen</div><div class="sd-value" style="color:'+(scMarginPct>25?'#00C853':scMarginPct>0?'#C8AA28':'#ff4444')+'">'+scMarginPct.toFixed(1)+'%</div></div>';
+    scenHtml += '<div class="scenario-detail"><div class="sd-label">vs Media</div><div class="sd-value" style="color:'+(Math.abs(scDiff)<10?'#00C853':'#C8AA28')+'">'+(scDiff>=0?'+':'')+scDiff.toFixed(1)+'%</div></div>';
+    scenHtml += '</div>'+tag+'</div>';
+  });
+  document.getElementById('scenarios').innerHTML = scenHtml;
+
+  // Insight
+  var ins = '';
+  if(marginPct < 15){
+    ins = '<strong>Margen peligroso.</strong> Con un '+marginPct.toFixed(1)+'% de margen, cualquier subida de costes, devolucion o descuento te deja en negativo. Revisa tu coste de producto o sube precio — competir solo en precio es una carrera a perder.';
+  } else if(myPrice < avg * 0.85){
+    ins = '<strong>Estas vendiendo demasiado barato.</strong> Tu precio esta un '+Math.abs(diffPct).toFixed(0)+'% por debajo de la media. Si tu producto es similar a la competencia, estas dejando dinero en la mesa. Sube gradualmente y testea — muchas veces el cliente paga mas sin problema.';
+  } else if(myPrice > avg * 1.2){
+    ins = '<strong>Precio premium.</strong> Estas un '+diffPct.toFixed(0)+'% por encima de la media. Eso esta bien SI tienes mejor branding, reviews, unboxing o propuesta de valor clara. Si no, el cliente se va al competidor mas barato.';
+  } else {
+    ins = '<strong>Bien posicionado.</strong> Tu precio esta en rango con el mercado ('+diffPct.toFixed(1)+'% vs media) y tu margen de '+marginPct.toFixed(1)+'% es trabajable. Ahora la guerra se gana con mejor pagina, mejores reviews y mejor experiencia post-compra.';
+  }
+  document.getElementById('insightBox').innerHTML = ins;
+
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

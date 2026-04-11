@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scorecard de Madurez Ecommerce — ¿En qué nivel está tu tienda? — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,#0a0a12 0%,#12121e 100%);color:#fff;min-height:100vh}
+  .container{max-width:460px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .badge{display:inline-block;background:linear-gradient(135deg,#C45830,#e86830);color:#fff;font-size:10px;font-weight:800;padding:6px 16px;border-radius:100px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .header h1{font-size:24px;font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,#fff,#ccc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .header p{font-size:13px;color:#666;line-height:1.5}
+  .level-indicator{display:flex;gap:4px;margin:20px 0;padding:0 4px}
+  .level-dot{flex:1;height:6px;border-radius:3px;background:#1a1a24;transition:background 0.3s}
+  .level-dot.active-1{background:#C45830}
+  .level-dot.active-2{background:#e8a030}
+  .level-dot.active-3{background:#C8AA28}
+  .level-dot.active-4{background:#2D8C4E}
+  .q-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:20px;margin-bottom:12px}
+  .q-num{font-size:10px;font-weight:800;color:#C45830;letter-spacing:2px;margin-bottom:8px}
+  .q-text{font-size:15px;font-weight:700;color:#eee;line-height:1.4;margin-bottom:14px}
+  .q-options{display:flex;gap:6px}
+  .q-opt{flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#888;font-size:12px;font-weight:700;text-align:center;cursor:pointer;transition:all 0.2s;font-family:inherit}
+  .q-opt:hover{border-color:rgba(255,255,255,0.15);color:#ccc}
+  .q-opt.selected{border-color:#C45830;background:rgba(196,88,48,0.1);color:#C45830}
+  .result-panel{display:none;margin-top:24px}
+  .level-card{background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:30px;text-align:center}
+  .level-card .level-name{font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+  .level-card .level-score{font-size:56px;font-weight:900;line-height:1}
+  .level-card .level-of{font-size:14px;color:#666;margin-bottom:16px}
+  .level-card .level-title{font-size:20px;font-weight:900;margin-bottom:6px}
+  .level-card .level-desc{font-size:13px;color:#888;line-height:1.6}
+  .roadmap{margin-top:20px}
+  .roadmap-title{font-size:11px;font-weight:800;color:#C45830;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .roadmap-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+  .roadmap-item .month{font-size:12px;font-weight:800;color:#C45830;width:50px;flex-shrink:0}
+  .roadmap-item .action{font-size:13px;color:#aaa;line-height:1.5}
+  .roadmap-item .action strong{color:#fff}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#C45830;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">Test gratuito</div>
+    <h1>¿En qué nivel está tu tienda?</h1>
+    <p>15 preguntas. 2 minutos. Tu nivel exacto + plan de acción.</p>
+  </div>
+
+  <div class="level-indicator" id="levels">
+    <div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div>
+    <div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div>
+    <div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div><div class="level-dot"></div>
+  </div>
+
+  <div id="questions"></div>
+  <div class="result-panel" id="resultPanel">
+    <div class="level-card" id="levelCard"></div>
+    <div class="roadmap" id="roadmap"></div>
+  </div>
+
+  <div class="footer">Herramienta gratuita de <span>MENTORIUM</span></div>
+</div>
+<script>
+var qs=[
+  {q:"¿Cuánto facturas al mes?",opts:["< 5K€","5-20K€","20-50K€","50K+€"],scores:[1,2,3,4]},
+  {q:"¿Sabes tu margen neto REAL por producto?",opts:["No","Más o menos","Sí, aproximado","Sí, al céntimo"],scores:[1,2,3,4]},
+  {q:"¿Tienes email flows activos en Klaviyo?",opts:["No","Solo bienvenida","3-4 flows","5+ flows"],scores:[1,2,3,4]},
+  {q:"¿Cuál es tu tasa de conversión?",opts:["No lo sé","< 1%","1-2%","2%+"],scores:[1,2,3,4]},
+  {q:"¿Cada cuánto revisas tu dashboard de KPIs?",opts:["No tengo","Cuando me acuerdo","Semanal","Diario"],scores:[1,2,3,4]},
+  {q:"¿Cómo decides qué producto testear?",opts:["Intuición","Copio lo que veo","Busco datos","Sistema validado"],scores:[1,2,3,4]},
+  {q:"¿Cuántas fuentes de tráfico tienes?",opts:["Solo 1","2 canales","3 canales","4+ canales"],scores:[1,2,3,4]},
+  {q:"¿Tienes retargeting activo?",opts:["No","Solo Meta","Meta + email","Multi-canal"],scores:[1,2,3,4]},
+  {q:"¿Tu checkout está optimizado?",opts:["Ni idea","Básico","Mejorado","A/B testeado"],scores:[1,2,3,4]},
+  {q:"¿Tienes upsells/cross-sells?",opts:["No","En la página","En checkout","Post-compra"],scores:[1,2,3,4]},
+  {q:"¿Cuántas horas trabajas en tu tienda?",opts:["60+/sem","40-60","20-40","< 20 (sistema)"],scores:[1,2,3,4]},
+  {q:"¿Tienes equipo o todo lo haces tú?",opts:["Todo yo","1 freelance","Equipo pequeño","Equipo + sistemas"],scores:[1,2,3,4]},
+  {q:"¿Cuál es tu LTV (valor del cliente)?",opts:["No lo sé","1 compra","2-3 compras","4+ compras"],scores:[1,2,3,4]},
+  {q:"¿Cuánto tiempo llevas con la tienda?",opts:["< 3 meses","3-12 meses","1-2 años","2+ años"],scores:[1,2,3,4]},
+  {q:"¿Puedes irte de vacaciones 2 semanas sin que caiga?",opts:["Imposible","Caería mucho","Bajaría algo","Sigue igual"],scores:[1,2,3,4]}
+];
+var answers={};
+function render(){
+  var html='';
+  qs.forEach(function(q,i){
+    html+='<div class="q-card"><div class="q-num">PREGUNTA '+(i+1)+'/15</div><div class="q-text">'+q.q+'</div><div class="q-options">';
+    q.opts.forEach(function(opt,j){
+      var sel=answers[i]===j?' selected':'';
+      html+='<div class="q-opt'+sel+'" onclick="pick('+i+','+j+')">'+opt+'</div>';
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('questions').innerHTML=html;
+  // Update level dots
+  var dots=document.querySelectorAll('.level-dot');
+  var answered=Object.keys(answers).length;
+  dots.forEach(function(d,i){d.className='level-dot'+(i<answered?' active-'+(getLevel()):'')});
+  if(answered>=10)showResult();
+}
+function pick(qi,oi){answers[qi]=oi;render()}
+function getLevel(){
+  var total=0,count=0;
+  for(var k in answers){total+=qs[k].scores[answers[k]];count++}
+  if(count===0)return 1;
+  var avg=total/count;
+  if(avg<1.5)return 1;if(avg<2.5)return 2;if(avg<3.2)return 3;return 4;
+}
+function showResult(){
+  var total=0,count=0;
+  for(var k in answers){total+=qs[k].scores[answers[k]];count++}
+  var score=total;var max=count*4;var pct=Math.round(score/max*100);
+  var level=getLevel();
+  var levels=[
+    {name:'Principiante',color:'#C45830',title:'Estás empezando',desc:'Tu tienda tiene potencial pero le faltan los fundamentales. Sin datos, sin sistema, sin flows. Cada venta te cuesta más de lo que debería.',road:[{m:'Mes 1',a:'<strong>Datos limpios.</strong> Calcula márgenes reales por producto. Monta dashboard de KPIs.'},{m:'Mes 2',a:'<strong>Checkout + flows.</strong> Optimiza checkout. Activa carrito abandonado + bienvenida.'},{m:'Mes 3',a:'<strong>Primera estructura.</strong> Define 1 canal de tráfico. Mide CAC vs margen.'}]},
+    {name:'Intermedio',color:'#e8a030',title:'Base correcta, falta sistema',desc:'Facturas pero no de forma predecible. Algunos meses bien, otros mal. No sabes exactamente por qué. Te falta el sistema que conecta todo.',road:[{m:'Mes 1',a:'<strong>Medir todo.</strong> CAC por canal, LTV, margen por SKU. Dashboard diario.'},{m:'Mes 2',a:'<strong>Email marketing.</strong> 5 flows activos. Objetivo: 20-30% de revenue por email.'},{m:'Mes 3',a:'<strong>Escalar con datos.</strong> Sube ads un 20% semanal. Para si CPA sube.'}]},
+    {name:'Avanzado',color:'#C8AA28',title:'Listo para escalar',desc:'Tienes datos, tienes sistema, tienes flows. El siguiente paso es escalar sin que el margen se desplome. Necesitas más eficiencia y delegación.',road:[{m:'Mes 1',a:'<strong>Optimizar conversión.</strong> A/B test checkout, landing, creativos.'},{m:'Mes 2',a:'<strong>Diversificar tráfico.</strong> Si solo usas Meta, añade TikTok o Google.'},{m:'Mes 3',a:'<strong>Equipo.</strong> Primer hire o freelance para liberar tu tiempo.'}]},
+    {name:'Experto',color:'#2D8C4E',title:'Operando como CEO',desc:'Tu tienda funciona con sistema. Los datos están limpios. El equipo opera. Tu siguiente paso es multiplicar: más tiendas, más canales, más delegación.',road:[{m:'Mes 1',a:'<strong>Automatizar.</strong> Todo lo repetitivo debe funcionar sin ti.'},{m:'Mes 2',a:'<strong>Expandir.</strong> Nuevo mercado, nueva tienda o nueva línea de producto.'},{m:'Mes 3',a:'<strong>Proteger.</strong> Márgenes, cashflow, y contingencia ante cambios de plataforma.'}]}
+  ];
+  var l=levels[level-1];
+  var card=document.getElementById('levelCard');
+  card.innerHTML='<div class="level-name" style="color:'+l.color+'">NIVEL '+level+' DE 4</div><div class="level-score" style="color:'+l.color+'">'+score+'</div><div class="level-of">de '+max+' puntos ('+pct+'%)</div><div class="level-title">'+l.title+'</div><div class="level-desc">'+l.desc+'</div>';
+  var rhtml='<div class="roadmap-title">Tu plan de acción (próximos 90 días)</div>';
+  l.road.forEach(function(r){rhtml+='<div class="roadmap-item"><div class="month">'+r.m+'</div><div class="action">'+r.a+'</div></div>'});
+  document.getElementById('roadmap').innerHTML=rhtml;
+  document.getElementById('resultPanel').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

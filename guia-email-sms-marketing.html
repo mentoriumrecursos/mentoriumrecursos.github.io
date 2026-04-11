@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia de Email Marketing y SMS para Ecommerce — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:480px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:21px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px;line-height:1.3}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .card-subtitle{font-size:12px;color:#555;margin-top:-12px;margin-bottom:16px;line-height:1.5}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:#777;margin-bottom:8px}
+  .field label .val{color:#00C853;font-weight:800;font-size:14px}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a;box-shadow:0 0 10px rgba(0,200,83,0.3)}
+  .row input[type=range]::-moz-range-thumb{width:22px;height:22px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .row .num-input{width:100px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px 12px;text-align:right;font-family:inherit;outline:none;transition:border-color 0.2s}
+  .row .num-input:focus{border-color:#00C853}
+  .row .unit{color:#555;font-size:13px;font-weight:600;width:20px;flex-shrink:0}
+
+  /* Progress section */
+  .progress-section{margin-bottom:20px}
+  .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .progress-label{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px}
+  .progress-value{font-size:14px;font-weight:800;color:#00C853}
+  .progress-bar{height:8px;background:#1c1c20;border-radius:100px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#00C853,#00E676);border-radius:100px;transition:width 0.6s cubic-bezier(0.22,1,0.36,1);position:relative}
+  .progress-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:20px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2));border-radius:0 100px 100px 0}
+
+  /* Flow checkboxes */
+  .flow-item{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all 0.25s ease;position:relative;overflow:hidden}
+  .flow-item:hover{border-color:#222;background:#0f0f11}
+  .flow-item.active{border-color:#00C853;background:linear-gradient(135deg,#0a1a0f,#0c0c0e)}
+  .flow-item.active .flow-check{background:#00C853;border-color:#00C853}
+  .flow-item.active .flow-check::after{opacity:1;transform:rotate(-45deg) scale(1)}
+  .flow-top{display:flex;align-items:center;gap:12px}
+  .flow-check{width:22px;height:22px;border-radius:6px;border:2px solid #333;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+  .flow-check::after{content:'';width:10px;height:6px;border-left:2.5px solid #0a0a0a;border-bottom:2.5px solid #0a0a0a;transform:rotate(-45deg) scale(0);opacity:0;transition:all 0.2s;margin-top:-2px}
+  .flow-info{flex:1;min-width:0}
+  .flow-name{font-size:14px;font-weight:700;color:#ddd;margin-bottom:2px}
+  .flow-name-sub{font-size:11px;color:#555;font-weight:500}
+  .flow-impact{text-align:right;flex-shrink:0}
+  .flow-impact-value{font-size:16px;font-weight:800;color:#00C853}
+  .flow-impact-label{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.5px}
+  .flow-desc{font-size:12px;color:#666;line-height:1.5;margin-top:10px;padding-top:10px;border-top:1px solid #1a1a1d;display:none}
+  .flow-item.active .flow-desc{display:block}
+  .flow-missing-tag{position:absolute;top:0;right:0;background:#2a1a08;color:#C45830;font-size:9px;font-weight:800;padding:4px 10px;border-radius:0 12px 0 8px;letter-spacing:1px}
+  .flow-item.active .flow-missing-tag{display:none}
+
+  /* Score gauge */
+  .gauge-container{text-align:center;padding:10px 0 20px}
+  .gauge-ring{width:160px;height:160px;margin:0 auto 16px;position:relative}
+  .gauge-ring svg{transform:rotate(-90deg)}
+  .gauge-bg{fill:none;stroke:#1c1c20;stroke-width:10}
+  .gauge-fill{fill:none;stroke:#00C853;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 0.8s cubic-bezier(0.22,1,0.36,1),stroke 0.3s}
+  .gauge-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .gauge-number{font-size:38px;font-weight:900;letter-spacing:-2px;color:#00C853;line-height:1}
+  .gauge-label{font-size:10px;color:#666;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+
+  /* Results */
+  .result-box{text-align:center;padding:28px 20px;border-radius:16px;margin-top:16px;transition:all 0.3s}
+  .result-box.level-low{background:linear-gradient(135deg,#1a0a08,#0c0c0e);border:2px solid #3a1a15}
+  .result-box.level-mid{background:linear-gradient(135deg,#1a1500,#0c0c0e);border:2px solid #3a3000}
+  .result-box.level-high{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:2px solid #1a3a25}
+  .result-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:8px}
+  .result-amount{font-size:44px;font-weight:900;letter-spacing:-2px;line-height:1;transition:color 0.3s}
+  .result-amount.green{color:#00C853}
+  .result-amount.yellow{color:#C8AA28}
+  .result-amount.red{color:#C45830}
+  .result-pct{font-size:14px;color:#666;margin-top:8px;font-weight:600}
+  .result-verdict{margin-top:14px;font-size:12px;font-weight:700;padding:8px 18px;border-radius:8px;display:inline-block}
+  .v-danger{background:rgba(196,88,48,0.15);color:#C45830}
+  .v-warning{background:rgba(200,170,40,0.12);color:#C8AA28}
+  .v-good{background:rgba(0,200,83,0.12);color:#00C853}
+
+  /* Metric grid */
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .metric-box{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center}
+  .metric-value{font-size:22px;font-weight:900;color:#00C853;letter-spacing:-1px}
+  .metric-value.accent-yellow{color:#C8AA28}
+  .metric-value.accent-red{color:#C45830}
+  .metric-label{font-size:10px;color:#666;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+  /* Detail rows */
+  .details{margin-top:10px}
+  .detail-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #141416;font-size:13px}
+  .detail-row .lab{color:#666;font-weight:500}
+  .detail-row .val{font-weight:700}
+  .detail-row .val.green{color:#00C853}
+  .detail-row .val.red{color:#C45830}
+  .detail-row .val.yellow{color:#C8AA28}
+  .detail-row.total{border-top:2px solid #222;border-bottom:none;padding-top:14px;margin-top:4px}
+  .detail-row.total .lab{font-weight:800;color:#fff}
+  .detail-row.total .val{font-size:16px}
+
+  /* Steps */
+  .step-list{counter-reset:steps}
+  .step-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #141416;align-items:flex-start}
+  .step-item:last-child{border-bottom:none}
+  .step-num{width:28px;height:28px;background:#00C853;color:#0a0a0a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+  .step-content{flex:1}
+  .step-title{font-size:13px;font-weight:700;color:#ddd;margin-bottom:2px}
+  .step-desc{font-size:12px;color:#555;line-height:1.5}
+
+  /* Insight box */
+  .insight-box{background:#0a1a0f;border:1px solid #1a3a25;border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#4CAF50;line-height:1.6}
+  .insight-box strong{color:#fff}
+  .insight-box.warning{background:#1a1500;border-color:#3a3000;color:#C8AA28}
+  .insight-box.danger{background:#1a0a08;border-color:#3a1a15;color:#C45830}
+
+  /* CTA section */
+  .cta-section{text-align:center;padding:28px 20px;background:linear-gradient(135deg,#0a1a0f,#111113);border:1px solid #1a3a25;border-radius:16px;margin-top:16px}
+  .cta-title{font-size:17px;font-weight:800;margin-bottom:6px}
+  .cta-sub{font-size:13px;color:#666;margin-bottom:18px;line-height:1.5}
+  .cta-button{display:inline-block;background:#00C853;color:#0a0a0a;font-size:14px;font-weight:800;padding:14px 32px;border-radius:10px;text-decoration:none;letter-spacing:-0.3px;transition:all 0.2s}
+  .cta-button:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,200,83,0.3)}
+  .cta-keyword{font-size:11px;color:#555;margin-top:12px;letter-spacing:1px}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .sub{font-size:12px;color:#444;margin-top:4px}
+
+  /* Animations */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .card{animation:fadeUp 0.4s ease both}
+  .card:nth-child(2){animation-delay:0.05s}
+  .card:nth-child(3){animation-delay:0.1s}
+  .card:nth-child(4){animation-delay:0.15s}
+
+  /* Summary bar chart */
+  .summary-bars{margin-top:14px}
+  .summary-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .summary-bar-label{font-size:11px;color:#888;font-weight:600;width:100px;flex-shrink:0;text-align:right}
+  .summary-bar-track{flex:1;height:24px;background:#1c1c20;border-radius:6px;overflow:hidden;position:relative}
+  .summary-bar-fill{height:100%;border-radius:6px;transition:width 0.6s cubic-bezier(0.22,1,0.36,1);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:10px;font-weight:800;color:rgba(255,255,255,0.9);min-width:fit-content}
+  .summary-bar-fill.current{background:linear-gradient(90deg,#333,#555)}
+  .summary-bar-fill.potential{background:linear-gradient(90deg,#00693a,#00C853)}
+
+  /* Toggle section */
+  .section-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0}
+  .section-toggle .arrow{color:#555;font-size:14px;transition:transform 0.2s}
+  .section-toggle.open .arrow{transform:rotate(180deg)}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Gu&iacute;a de Email Marketing y SMS para Ecommerce</h1>
+    <p>Analiza tu potencial de ingresos con email y SMS. Descubre cu&aacute;nto dinero dejas en la mesa.</p>
+  </div>
+
+  <!-- SECTION 1: INPUTS -->
+  <div class="card" id="inputCard">
+    <div class="card-title">Tus n&uacute;meros actuales</div>
+    <div class="card-subtitle">Mete datos reales. Cuanto m&aacute;s preciso, mejor el diagn&oacute;stico.</div>
+
+    <div class="field">
+      <label>Facturaci&oacute;n mensual <span class="val" id="lbl_rev">20.000&euro;</span></label>
+      <div class="row">
+        <input type="range" min="1000" max="300000" step="500" value="20000" id="sl_rev" oninput="sync('rev')">
+        <input type="number" class="num-input" id="in_rev" value="20000" oninput="sync('rev',true)">
+        <span class="unit">&euro;</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Suscriptores email <span class="val" id="lbl_subs">5.000</span></label>
+      <div class="row">
+        <input type="range" min="100" max="200000" step="100" value="5000" id="sl_subs" oninput="sync('subs')">
+        <input type="number" class="num-input" id="in_subs" value="5000" oninput="sync('subs',true)">
+        <span class="unit"></span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Ingresos actuales por email <span class="val" id="lbl_emailpct">5%</span></label>
+      <div class="row">
+        <input type="range" min="0" max="40" step="1" value="5" id="sl_emailpct" oninput="sync('emailpct')">
+        <input type="number" class="num-input" id="in_emailpct" value="5" oninput="sync('emailpct',true)">
+        <span class="unit">%</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Flows activos ahora <span class="val" id="lbl_flows">1</span></label>
+      <div class="row">
+        <input type="range" min="0" max="7" step="1" value="1" id="sl_flows" oninput="sync('flows')">
+        <input type="number" class="num-input" id="in_flows" value="1" min="0" max="7" oninput="sync('flows',true)">
+        <span class="unit">/7</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: QUICK SCORE -->
+  <div class="card" id="scoreCard">
+    <div class="card-title">Tu puntuaci&oacute;n email</div>
+
+    <div class="gauge-container">
+      <div class="gauge-ring">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle class="gauge-bg" cx="80" cy="80" r="68"/>
+          <circle class="gauge-fill" id="gaugeArc" cx="80" cy="80" r="68" stroke-dasharray="427.26" stroke-dashoffset="427.26"/>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-number" id="gaugeNum">0</div>
+          <div class="gauge-label">de 100</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric-box">
+        <div class="metric-value" id="metricRevPerSub">0,00&euro;</div>
+        <div class="metric-label">Ingreso/suscriptor</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-value" id="metricEmailRev">0&euro;</div>
+        <div class="metric-label">Ingresos email actual</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-value" id="metricROI">0x</div>
+        <div class="metric-label">ROI email estimado</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-value" id="metricMissing">0</div>
+        <div class="metric-label">Flows que te faltan</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: 7 FLOWS -->
+  <div class="card" id="flowsCard">
+    <div class="card-title">Los 7 flows esenciales</div>
+    <div class="card-subtitle">Marca los que ya tienes activos. Los que faltan son dinero perdido.</div>
+
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="progress-label">Completado</span>
+        <span class="progress-value" id="flowProgress">0/7</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="flowBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="flowList"></div>
+  </div>
+
+  <!-- SECTION 4: REVENUE IMPACT -->
+  <div class="card" id="impactCard">
+    <div class="card-title">Impacto en ingresos</div>
+
+    <div class="summary-bars">
+      <div class="summary-bar-row">
+        <span class="summary-bar-label">Ahora</span>
+        <div class="summary-bar-track">
+          <div class="summary-bar-fill current" id="barCurrent" style="width:20%">5%</div>
+        </div>
+      </div>
+      <div class="summary-bar-row">
+        <span class="summary-bar-label">Potencial</span>
+        <div class="summary-bar-track">
+          <div class="summary-bar-fill potential" id="barPotential" style="width:60%">25%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-box level-mid" id="resultBox">
+      <div class="result-label">Ingresos adicionales estimados</div>
+      <div class="result-amount green" id="resultAmt">+0&euro;</div>
+      <div class="result-pct" id="resultPct">al mes por email y SMS</div>
+      <div class="result-verdict v-good" id="resultVerdict">---</div>
+    </div>
+
+    <div class="details" id="impactDetails"></div>
+
+    <div class="insight-box" id="insightBox">
+      Introduce tus datos para ver el an&aacute;lisis.
+    </div>
+  </div>
+
+  <!-- SECTION 5: MISSING FLOWS DETAIL -->
+  <div class="card" id="missingCard">
+    <div class="card-title">Qu&eacute; te falta y cu&aacute;nto pierdes</div>
+    <div class="details" id="missingDetails"></div>
+  </div>
+
+  <!-- SECTION 6: NEXT STEPS -->
+  <div class="card" id="stepsCard">
+    <div class="card-title">Pr&oacute;ximos pasos</div>
+    <div id="stepsList" class="step-list"></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div class="cta-title">&iquest;Quieres ayuda para montarlo?</div>
+    <div class="cta-sub">Montamos tu sistema de email y SMS completo para que factures m&aacute;s sin gastar m&aacute;s en ads.</div>
+    <a class="cta-button" href="https://mentoriumacademy.com" target="_blank">Escr&iacute;benos</a>
+    <div class="cta-keyword">Escribe <strong>EMAIL</strong> en nuestro DM de Instagram</div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="sub">mentoriumacademy.com</div>
+  </div>
+
+</div>
+
+<script>
+/* ── DATA ── */
+var flows = [
+  {id:'welcome', name:'Welcome Series', sub:'Bienvenida', impact:5, desc:'Secuencia autom\u00e1tica cuando alguien se suscribe. Primera impresi\u00f3n = primera venta. Open rate 50%+. Genera entre 3-7% de los ingresos por email.'},
+  {id:'cart', name:'Carrito Abandonado', sub:'Abandoned Cart', impact:8, desc:'El flow m\u00e1s rentable. Recupera 5-15% de carritos abandonados. Secuencia de 3 emails en 24h. Solo este flow puede pagar toda tu herramienta de email.'},
+  {id:'browse', name:'Navegaci\u00f3n Abandonada', sub:'Browse Abandonment', impact:4, desc:'Cuando alguien mira productos pero no a\u00f1ade al carrito. Menos agresivo que carrito abandonado pero con volumen alto. Recupera 1-3% en ventas extra.'},
+  {id:'postpurchase', name:'Post-Compra', sub:'Post-Purchase', impact:5, desc:'Cross-sell, upsell, y educaci\u00f3n despu\u00e9s de comprar. Sube el LTV un 20-30%. Reduce devoluciones. Crea clientes recurrentes.'},
+  {id:'winback', name:'Reactivaci\u00f3n', sub:'Win-Back', impact:4, desc:'Recupera clientes inactivos (60-120 d\u00edas sin comprar). Un cliente recuperado cuesta 5x menos que uno nuevo. Oferta irresistible + urgencia.'},
+  {id:'vip', name:'Fidelizaci\u00f3n VIP', sub:'VIP / Loyalty', impact:3, desc:'Trato especial para tu top 10% de clientes. Acceso anticipado, descuentos exclusivos. Estos clientes generan 40% de tus ingresos.'},
+  {id:'review', name:'Pedir Rese\u00f1as', sub:'Review Request', impact:2, desc:'Automatiza pedir rese\u00f1as 7-14 d\u00edas despu\u00e9s de la entrega. M\u00e1s rese\u00f1as = m\u00e1s conversi\u00f3n = m\u00e1s ventas org\u00e1nicas. Impacto indirecto enorme.'}
+];
+
+var flowStates = {};
+flows.forEach(function(f){flowStates[f.id] = false;});
+
+/* ── FORMAT ── */
+function fmt(n){return Math.round(n).toLocaleString('es-ES')+'\u20AC';}
+function fmtN(n){return Math.round(n).toLocaleString('es-ES');}
+
+/* ── SYNC SLIDERS ── */
+function sync(key, fromInput){
+  var sl = document.getElementById('sl_'+key);
+  var inp = document.getElementById('in_'+key);
+  if(fromInput){
+    var v = parseFloat(inp.value)||0;
+    if(v > parseFloat(sl.max)) v = parseFloat(sl.max);
+    if(v < parseFloat(sl.min)) v = parseFloat(sl.min);
+    sl.value = v;
+  } else {
+    inp.value = sl.value;
+  }
+  calc();
+}
+
+/* ── TOGGLE FLOW ── */
+function toggleFlow(id){
+  flowStates[id] = !flowStates[id];
+  calc();
+}
+
+/* ── RENDER FLOWS ── */
+function renderFlows(){
+  var rev = parseFloat(document.getElementById('in_rev').value)||0;
+  var html = '';
+  flows.forEach(function(f){
+    var active = flowStates[f.id];
+    var impactEur = rev * f.impact / 100;
+    html += '<div class="flow-item '+(active?'active':'')+'" onclick="toggleFlow(\''+f.id+'\')">';
+    if(!active) html += '<div class="flow-missing-tag">FALTA</div>';
+    html += '<div class="flow-top">';
+    html += '<div class="flow-check"></div>';
+    html += '<div class="flow-info"><div class="flow-name">'+f.name+'</div><div class="flow-name-sub">'+f.sub+'</div></div>';
+    html += '<div class="flow-impact"><div class="flow-impact-value">'+(active?'\u2713':'+'+fmt(impactEur))+'</div>';
+    if(!active) html += '<div class="flow-impact-label">potencial/mes</div>';
+    html += '</div></div>';
+    html += '<div class="flow-desc">'+f.desc+'</div>';
+    html += '</div>';
+  });
+  document.getElementById('flowList').innerHTML = html;
+}
+
+/* ── MAIN CALCULATION ── */
+function calc(){
+  var rev = parseFloat(document.getElementById('in_rev').value)||0;
+  var subs = parseFloat(document.getElementById('in_subs').value)||0;
+  var emailPct = parseFloat(document.getElementById('in_emailpct').value)||0;
+  var activeFlows = parseFloat(document.getElementById('in_flows').value)||0;
+
+  /* Labels */
+  document.getElementById('lbl_rev').textContent = fmtN(rev)+'\u20AC';
+  document.getElementById('lbl_subs').textContent = fmtN(subs);
+  document.getElementById('lbl_emailpct').textContent = emailPct+'%';
+  document.getElementById('lbl_flows').textContent = activeFlows;
+
+  /* Current email revenue */
+  var currentEmailRev = rev * emailPct / 100;
+
+  /* Count checked flows */
+  var checkedCount = 0;
+  var missingImpactTotal = 0;
+  var checkedImpactTotal = 0;
+  flows.forEach(function(f){
+    if(flowStates[f.id]){
+      checkedCount++;
+      checkedImpactTotal += f.impact;
+    } else {
+      missingImpactTotal += f.impact;
+    }
+  });
+
+  /* Potential email % (target: 25-30% of revenue) */
+  var targetPct = 25;
+  var potentialPctFromFlows = checkedCount>=7 ? targetPct : Math.min(targetPct, emailPct + missingImpactTotal * 0.65);
+  var additionalRevenue = Math.max(0, rev * (potentialPctFromFlows - emailPct) / 100);
+
+  /* Revenue per subscriber */
+  var revPerSub = subs > 0 ? (currentEmailRev / subs) : 0;
+  var potentialRevPerSub = subs > 0 ? ((currentEmailRev + additionalRevenue) / subs) : 0;
+
+  /* ROI estimate (email tool ~100-300/mo) */
+  var emailToolCost = subs <= 1000 ? 30 : (subs <= 5000 ? 60 : (subs <= 10000 ? 100 : (subs <= 50000 ? 200 : 350)));
+  var roi = emailToolCost > 0 ? ((currentEmailRev + additionalRevenue) / emailToolCost) : 0;
+
+  /* Score (0-100) */
+  var score = 0;
+  score += Math.min(30, emailPct * 1.2);          /* up to 30 pts for current email % */
+  score += checkedCount * 8;                        /* up to 56 pts for flows */
+  score += Math.min(14, revPerSub * 7);            /* up to 14 pts for rev/sub */
+  score = Math.round(Math.min(100, Math.max(0, score)));
+
+  /* Missing flows count */
+  var missingCount = 7 - checkedCount;
+
+  /* ── UPDATE UI ── */
+
+  /* Score gauge */
+  var circumference = 427.26;
+  var offset = circumference - (score / 100) * circumference;
+  var arc = document.getElementById('gaugeArc');
+  arc.style.strokeDashoffset = offset;
+  arc.style.stroke = score >= 70 ? '#00C853' : (score >= 40 ? '#C8AA28' : '#C45830');
+  var gn = document.getElementById('gaugeNum');
+  gn.textContent = score;
+  gn.style.color = score >= 70 ? '#00C853' : (score >= 40 ? '#C8AA28' : '#C45830');
+
+  /* Metrics */
+  document.getElementById('metricRevPerSub').textContent = revPerSub.toFixed(2)+'\u20AC';
+  document.getElementById('metricRevPerSub').className = 'metric-value'+(revPerSub >= 2 ? '' : (revPerSub >= 1 ? ' accent-yellow' : ' accent-red'));
+  document.getElementById('metricEmailRev').textContent = fmt(currentEmailRev);
+  document.getElementById('metricROI').textContent = roi.toFixed(0)+'x';
+  document.getElementById('metricROI').className = 'metric-value'+(roi >= 30 ? '' : (roi >= 10 ? ' accent-yellow' : ' accent-red'));
+  document.getElementById('metricMissing').textContent = missingCount;
+  document.getElementById('metricMissing').className = 'metric-value'+(missingCount <= 2 ? '' : (missingCount <= 4 ? ' accent-yellow' : ' accent-red'));
+
+  /* Flow progress */
+  document.getElementById('flowProgress').textContent = checkedCount+'/7';
+  document.getElementById('flowBar').style.width = (checkedCount/7*100)+'%';
+
+  /* Summary bars */
+  var maxBarPct = Math.max(potentialPctFromFlows, emailPct, 5);
+  document.getElementById('barCurrent').style.width = Math.max(5, emailPct/maxBarPct*100)+'%';
+  document.getElementById('barCurrent').textContent = emailPct+'%';
+  document.getElementById('barPotential').style.width = Math.max(8, potentialPctFromFlows/maxBarPct*100)+'%';
+  document.getElementById('barPotential').textContent = Math.round(potentialPctFromFlows)+'%';
+
+  /* Result box */
+  var rBox = document.getElementById('resultBox');
+  var rAmt = document.getElementById('resultAmt');
+  var rVerdict = document.getElementById('resultVerdict');
+
+  rAmt.textContent = '+'+fmt(additionalRevenue);
+
+  if(missingCount <= 1){
+    rBox.className = 'result-box level-high';
+    rAmt.className = 'result-amount green';
+    rVerdict.className = 'result-verdict v-good';
+    rVerdict.textContent = 'SISTEMA CASI COMPLETO';
+  } else if(missingCount <= 3){
+    rBox.className = 'result-box level-mid';
+    rAmt.className = 'result-amount yellow';
+    rVerdict.className = 'result-verdict v-warning';
+    rVerdict.textContent = 'POTENCIAL SIN EXPLOTAR';
+  } else {
+    rBox.className = 'result-box level-low';
+    rAmt.className = 'result-amount red';
+    rVerdict.className = 'result-verdict v-danger';
+    rVerdict.textContent = 'DEJAS MUCHO DINERO EN LA MESA';
+  }
+
+  /* Impact details */
+  var dHTML = '';
+  dHTML += '<div class="detail-row"><span class="lab">Facturaci\u00f3n mensual</span><span class="val">'+fmt(rev)+'</span></div>';
+  dHTML += '<div class="detail-row"><span class="lab">Ingresos email actual ('+emailPct+'%)</span><span class="val">'+fmt(currentEmailRev)+'</span></div>';
+  dHTML += '<div class="detail-row"><span class="lab">Objetivo email ('+Math.round(potentialPctFromFlows)+'%)</span><span class="val green">'+fmt(rev*potentialPctFromFlows/100)+'</span></div>';
+  dHTML += '<div class="detail-row"><span class="lab">Coste herramienta email (~)</span><span class="val red">-'+fmt(emailToolCost)+'</span></div>';
+  dHTML += '<div class="detail-row total"><span class="lab">INGRESO ADICIONAL NETO</span><span class="val green" style="font-size:16px">+'+fmt(additionalRevenue - emailToolCost)+'</span></div>';
+  document.getElementById('impactDetails').innerHTML = dHTML;
+
+  /* Insight */
+  var insBox = document.getElementById('insightBox');
+  if(missingCount >= 5){
+    insBox.className = 'insight-box danger';
+    insBox.innerHTML = '<strong>Tienes '+missingCount+' flows sin montar.</strong> Eso significa que cada visitante que no compra a la primera se pierde para siempre. Solo con carrito abandonado y bienvenida puedes recuperar '+fmt(rev*0.08)+' al mes.';
+  } else if(missingCount >= 3){
+    insBox.className = 'insight-box warning';
+    insBox.innerHTML = '<strong>Te faltan '+missingCount+' flows clave.</strong> Tu email genera '+emailPct+'% de los ingresos cuando deber\u00eda estar entre 25-30%. Cada punto porcentual que subas son '+fmt(rev*0.01)+' m\u00e1s al mes sin gastar en ads.';
+  } else if(missingCount >= 1){
+    insBox.className = 'insight-box';
+    insBox.innerHTML = '<strong>Vas por buen camino.</strong> Te '+(missingCount===1?'falta 1 flow':'faltan '+missingCount+' flows')+' para tener el sistema completo. Con todos activos puedes alcanzar '+Math.round(potentialPctFromFlows)+'% de ingresos por email = '+fmt(rev*potentialPctFromFlows/100)+'/mes.';
+  } else {
+    insBox.className = 'insight-box';
+    insBox.innerHTML = '<strong>Sistema completo.</strong> Tienes los 7 flows esenciales. Ahora toca optimizar: A/B tests en asuntos, segmentaci\u00f3n por comportamiento, y campa\u00f1as SMS para picos de venta. Objetivo: llegar al 30%+ de ingresos por email.';
+  }
+
+  /* Missing flows detail */
+  var mHTML = '';
+  var missingFlows = flows.filter(function(f){return !flowStates[f.id];});
+  if(missingFlows.length === 0){
+    mHTML = '<div style="text-align:center;padding:20px;color:#00C853;font-weight:700;font-size:14px">Tienes todos los flows activos</div>';
+  } else {
+    missingFlows.sort(function(a,b){return b.impact - a.impact;});
+    missingFlows.forEach(function(f){
+      var impactEur = rev * f.impact / 100;
+      mHTML += '<div class="detail-row"><span class="lab" style="color:#aaa;font-weight:600">'+f.name+'</span><span class="val green">+'+fmt(impactEur)+'/mes</span></div>';
+    });
+    mHTML += '<div class="detail-row total"><span class="lab">TOTAL POTENCIAL</span><span class="val green">+'+fmt(rev * missingImpactTotal / 100 * 0.65)+'/mes</span></div>';
+  }
+  document.getElementById('missingDetails').innerHTML = mHTML;
+
+  /* Next steps */
+  var steps = [];
+  if(!flowStates.cart) steps.push({title:'Monta el flow de Carrito Abandonado', desc:'Es el de mayor impacto. 3 emails: 1h, 12h, 24h despu\u00e9s del abandono. Recuperar\u00e1s entre el 5 y 15% de carritos.'});
+  if(!flowStates.welcome) steps.push({title:'Crea la secuencia de Bienvenida', desc:'4-5 emails en 7 d\u00edas. Presenta la marca, ofrece un incentivo, y cierra la primera venta. Open rate 50%+.'});
+  if(!flowStates.postpurchase) steps.push({title:'Activa el flow Post-Compra', desc:'Cross-sell y educaci\u00f3n. Sube el LTV y reduce devoluciones. El cliente acaba de comprar = m\u00e1ximo engagement.'});
+  if(!flowStates.browse) steps.push({title:'A\u00f1ade Navegaci\u00f3n Abandonada', desc:'Para visitantes que ven productos sin a\u00f1adir al carrito. Menos conversi\u00f3n que carrito abandonado pero mucho m\u00e1s volumen.'});
+  if(!flowStates.winback) steps.push({title:'Monta el flow de Reactivaci\u00f3n', desc:'Segmenta inactivos 60-90-120 d\u00edas. Oferta escalonada. Un cliente recuperado es 5x m\u00e1s barato que uno nuevo.'});
+  if(!flowStates.vip) steps.push({title:'Crea el programa VIP', desc:'Tu top 10% de clientes genera el 40% de ingresos. D\u00e1les acceso anticipado y trato exclusivo.'});
+  if(!flowStates.review) steps.push({title:'Automatiza las rese\u00f1as', desc:'Email 7-14 d\u00edas despu\u00e9s de entrega. M\u00e1s rese\u00f1as = m\u00e1s conversi\u00f3n en tienda. Impacto indirecto brutal.'});
+
+  if(steps.length === 0){
+    steps.push({title:'Optimiza los flows existentes', desc:'A/B test de asuntos, mejora la segmentaci\u00f3n, personaliza contenido. Cada 1% de mejora en conversi\u00f3n suma.'});
+    steps.push({title:'A\u00f1ade SMS a los flows cr\u00edticos', desc:'SMS en carrito abandonado y ofertas flash. Open rate 98%. Ideal para urgencia y ventas r\u00e1pidas.'});
+    steps.push({title:'Analiza y escala', desc:'Revisa m\u00e9tricas cada semana. Click rate, revenue per email, unsubscribe rate. Los datos te dicen qu\u00e9 escalar.'});
+  }
+
+  var sHTML = '';
+  steps.forEach(function(s,i){
+    if(i < 4){
+      sHTML += '<div class="step-item"><div class="step-num">'+(i+1)+'</div><div class="step-content"><div class="step-title">'+s.title+'</div><div class="step-desc">'+s.desc+'</div></div></div>';
+    }
+  });
+  document.getElementById('stepsList').innerHTML = sHTML;
+
+  /* Render flows list */
+  renderFlows();
+}
+
+/* ── INIT ── */
+calc();
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Descripción de Producto — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#08080a;color:#fff;min-height:100vh}
+  .container{max-width:480px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#C45830;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#C45830}
+  .field select option{background:#111;color:#fff}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .btn{width:100%;padding:16px;background:#C45830;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px}
+  .result{display:none;margin-top:20px}
+  .section{background:#111113;border:1px solid #1c1c20;border-radius:14px;padding:20px;margin-bottom:12px}
+  .section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C45830;margin-bottom:12px}
+  .section-content{font-size:15px;color:#ccc;line-height:1.7;white-space:pre-wrap}
+  .section-content strong{color:#fff}
+  .copy-all{width:100%;padding:14px;background:#1c1c20;color:#888;border:1px solid #333;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px;text-align:center}
+  .copy-all:active{background:#C45830;color:#fff;border-color:#C45830}
+  .preview{background:#fff;border-radius:12px;padding:24px;margin-top:16px;color:#1a1a1a}
+  .preview h2{font-size:20px;font-weight:800;margin-bottom:12px;color:#1a1a1a}
+  .preview .benefits{margin:16px 0}
+  .preview .benefit{display:flex;gap:10px;margin-bottom:10px;font-size:14px;line-height:1.5}
+  .preview .benefit .icon{color:#C45830;font-weight:900;flex-shrink:0}
+  .preview .objection{background:#f8f6f2;padding:16px;border-radius:8px;margin:12px 0;font-size:14px;line-height:1.5}
+  .preview .cta-btn{display:block;width:100%;padding:14px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:800;text-align:center;margin-top:16px;cursor:default}
+  .footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #1a1a1a}
+  .footer .brand{font-size:12px;font-weight:800;color:#C45830;letter-spacing:3px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Descripción de Producto</h1>
+    <p>Copy que convierte para tu ficha de Shopify. Sin adjetivos vacios.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu producto</div>
+    <div class="field"><label>Nombre del producto</label><input type="text" id="nombre" placeholder="Ej: Masajeador cervical, Lampara LED, Funda iPhone..."></div>
+    <div class="field"><label>Problema que resuelve</label><input type="text" id="problema" placeholder="Ej: Dolor de cuello despues de trabajar 8 horas"></div>
+    <div class="field"><label>Beneficio principal</label><input type="text" id="beneficio1" placeholder="Ej: Alivia el dolor en 10 minutos"></div>
+    <div class="field"><label>Segundo beneficio</label><input type="text" id="beneficio2" placeholder="Ej: Portatil, lo usas en cualquier sitio"></div>
+    <div class="field"><label>Tercer beneficio</label><input type="text" id="beneficio3" placeholder="Ej: Recargable por USB, sin cables"></div>
+    <div class="field"><label>Precio</label><input type="text" id="precio" placeholder="Ej: 39,99"></div>
+    <div class="field"><label>Objecion principal del cliente</label>
+      <select id="objecion">
+        <option value="precio">Es caro</option>
+        <option value="funciona">No se si funciona</option>
+        <option value="envio">El envio tarda mucho</option>
+        <option value="calidad">No se si es de calidad</option>
+        <option value="devolución">Y si no me gusta?</option>
+      </select>
+    </div>
+    <div class="field"><label>Tono</label>
+      <select id="tono">
+        <option value="directo" selected>Directo y sin rodeos</option>
+        <option value="premium">Premium y exclusivo</option>
+        <option value="cercano">Cercano y humano</option>
+      </select>
+    </div>
+    <button class="btn" onclick="generar()">Generar descripción</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="section">
+      <div class="section-title">Headline</div>
+      <div class="section-content" id="out_headline"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Descripción completa</div>
+      <div class="section-content" id="out_desc"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Preview (asi se veria en tu tienda)</div>
+      <div class="preview" id="out_preview"></div>
+    </div>
+    <button class="copy-all" onclick="copyAll()">Copiar toda la descripción</button>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+  </div>
+</div>
+<script>
+function generar(){
+  var n=document.getElementById('nombre').value||'Tu producto';
+  var prob=document.getElementById('problema').value||'el problema de tu cliente';
+  var b1=document.getElementById('beneficio1').value||'Beneficio principal';
+  var b2=document.getElementById('beneficio2').value||'Segundo beneficio';
+  var b3=document.getElementById('beneficio3').value||'Tercer beneficio';
+  var precio=document.getElementById('precio').value||'29,99';
+  var obj=document.getElementById('objecion').value;
+  var tono=document.getElementById('tono').value;
+
+  var respuestas_obj={
+    precio:'Piensa en cuanto gastas cada mes intentando solucionar '+prob+' con soluciones que no funcionan. '+n+' lo resuelve una vez.',
+    funciona:'Mas de [X] clientes ya lo usan. Y si no te convence, tienes 30 dias para devolverlo. Sin preguntas.',
+    envio:'Envio en 24-48h desde nuestro almacen. Lo tienes en casa antes de que te des cuenta.',
+    calidad:'Fabricado con [material]. Testado [X] veces antes de llegar a ti. No vendemos nada que no usariamos nosotros.',
+    devolución:'30 dias de devolución sin preguntas. Si no te gusta, te devolvemos el dinero. Asi de simple.'
+  };
+
+  var headlines={
+    directo:'Di adios a '+prob+'.',
+    premium:n+'. Diseñado para quienes no se conforman.',
+    cercano:'Por fin algo que funciona para '+prob+'.'
+  };
+
+  var headline=headlines[tono];
+
+  var desc=headline+'\n\n';
+  desc+='¿'+prob.charAt(0).toUpperCase()+prob.slice(1)+'?\n\n';
+  desc+='No eres el único. Pero la mayoria sigue gastando dinero en soluciones que no funcionan.\n\n';
+  desc+='Con '+n+':\n\n';
+  desc+='✓ '+b1+'\n';
+  desc+='✓ '+b2+'\n';
+  desc+='✓ '+b3+'\n\n';
+  desc+='¿Por que es diferente?\n\n';
+  desc+=respuestas_obj[obj]+'\n\n';
+  desc+='Por '+precio+'€, dejas de buscar. Y empiezas a resolver.\n\n';
+  desc+='Envio rápido. Devolución 30 dias. Sin riesgo.';
+
+  document.getElementById('out_headline').textContent=headline;
+  document.getElementById('out_desc').textContent=desc;
+
+  var prev='<h2>'+headline+'</h2>';
+  prev+='<p style="color:#888;margin-bottom:16px">'+prob.charAt(0).toUpperCase()+prob.slice(1)+'? No eres el único.</p>';
+  prev+='<div class="benefits">';
+  prev+='<div class="benefit"><span class="icon">✓</span><span>'+b1+'</span></div>';
+  prev+='<div class="benefit"><span class="icon">✓</span><span>'+b2+'</span></div>';
+  prev+='<div class="benefit"><span class="icon">✓</span><span>'+b3+'</span></div>';
+  prev+='</div>';
+  prev+='<div class="objection"><strong>¿'+(['Es caro','Funciona?','El envio?','Calidad?','Si no me gusta?'][['precio','funciona','envio','calidad','devolución'].indexOf(obj)])+']</strong><br>'+respuestas_obj[obj]+'</div>';
+  prev+='<div class="cta-btn">Añadir al carrito — '+precio+'€</div>';
+  document.getElementById('out_preview').innerHTML=prev;
+
+  document.getElementById('result').style.display='block';
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+function copyAll(){
+  var text=document.getElementById('out_desc').textContent;
+  navigator.clipboard.writeText(text);
+  document.querySelector('.copy-all').textContent='Copiado!';
+  setTimeout(function(){document.querySelector('.copy-all').textContent='Copiar toda la descripción'},2000);
+}
+</script>
+</body>
+</html>

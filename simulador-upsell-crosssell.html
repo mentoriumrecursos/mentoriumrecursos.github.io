@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Upsell y Cross-Sell — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh}
+  .container{max-width:500px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+  .header h1{font-size:21px;font-weight:900;margin-bottom:6px;line-height:1.3}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field label .val{color:#00C853;font-weight:800}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .row .num{width:80px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#00C853}
+  .row .u{color:#555;font-size:13px;font-weight:600;width:20px}
+  .section-label{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#555;margin:20px 0 14px;padding-top:16px;border-top:1px solid #1c1c20}
+  .big-result{text-align:center;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:16px;padding:28px;margin-bottom:16px}
+  .big-result .big{font-size:42px;font-weight:900;color:#00C853;margin-bottom:4px}
+  .big-result .pct{font-size:18px;font-weight:800;color:#00C853;margin-bottom:8px}
+  .big-result .desc{font-size:14px;color:#888;line-height:1.6}
+  .big-result .desc strong{color:#fff}
+  .result-card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .result-card .title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .boxes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+  .box{padding:16px 10px;border-radius:14px;text-align:center}
+  .box .label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+  .box .amount{font-size:22px;font-weight:900}
+  .box .sub{font-size:10px;color:#888;margin-top:4px}
+  .box-green{background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2)}
+  .box-green .label{color:#00C853}
+  .box-green .amount{color:#00C853}
+  .box-blue{background:rgba(33,150,243,0.08);border:1px solid rgba(33,150,243,0.2)}
+  .box-blue .label{color:#2196F3}
+  .box-blue .amount{color:#2196F3}
+  .box-purple{background:rgba(156,39,176,0.08);border:1px solid rgba(156,39,176,0.2)}
+  .box-purple .label{color:#9C27B0}
+  .box-purple .amount{color:#9C27B0}
+  .breakdown{margin-top:12px}
+  .break-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c1c20;font-size:13px}
+  .break-row:last-child{border-bottom:none}
+  .break-row .lbl{color:#888}
+  .break-row .val{font-weight:700;color:#fff}
+  .break-row .val.green{color:#00C853}
+  .break-row .val.blue{color:#2196F3}
+  .break-row .val.purple{color:#9C27B0}
+  .bar-container{margin-top:16px}
+  .bar-label{display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:6px}
+  .bar-label .l{color:#888}
+  .bar-label .r{color:#00C853}
+  .bar-track{height:32px;background:#1c1c20;border-radius:8px;overflow:hidden;display:flex}
+  .bar-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;transition:width .4s}
+  .tip{background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#00C853;line-height:1.6}
+  .tip strong{color:#fff}
+  .yearly{background:rgba(156,39,176,0.06);border:1px solid rgba(156,39,176,0.15);border-radius:12px;padding:16px;margin-top:12px;text-align:center}
+  .yearly .big{font-size:28px;font-weight:900;color:#9C27B0;margin-bottom:4px}
+  .yearly .desc{font-size:12px;color:#888}
+  .yearly .desc strong{color:#fff}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#00C853;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Simulador de Upsell y Cross-Sell</h1>
+    <p>Calcula cuanto puedes ganar implementando upselling y cross-selling en tu tienda.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu situacion actual</div>
+    <div class="field">
+      <label>Pedidos mensuales <span class="val" id="lbl_orders">300</span></label>
+      <div class="row"><input type="range" min="10" max="5000" step="10" value="300" id="sl_orders" oninput="sync('orders')"><input type="number" class="num" id="in_orders" value="300" oninput="sync('orders',1)"><span class="u">uds</span></div>
+    </div>
+    <div class="field">
+      <label>AOV actual (valor medio pedido) <span class="val" id="lbl_aov">45€</span></label>
+      <div class="row"><input type="range" min="10" max="300" value="45" id="sl_aov" oninput="sync('aov')"><input type="number" class="num" id="in_aov" value="45" oninput="sync('aov',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Margen actual <span class="val" id="lbl_margin">35%</span></label>
+      <div class="row"><input type="range" min="5" max="80" value="35" id="sl_margin" oninput="sync('margin')"><input type="number" class="num" id="in_margin" value="35" oninput="sync('margin',1)"><span class="u">%</span></div>
+    </div>
+
+    <div class="section-label">Upsell (producto superior)</div>
+    <div class="field">
+      <label>Tasa de aceptacion upsell <span class="val" id="lbl_urate">15%</span></label>
+      <div class="row"><input type="range" min="0" max="40" value="15" id="sl_urate" oninput="sync('urate')"><input type="number" class="num" id="in_urate" value="15" oninput="sync('urate',1)"><span class="u">%</span></div>
+    </div>
+    <div class="field">
+      <label>Incremento medio del upsell <span class="val" id="lbl_uvalue">18€</span></label>
+      <div class="row"><input type="range" min="1" max="100" value="18" id="sl_uvalue" oninput="sync('uvalue')"><input type="number" class="num" id="in_uvalue" value="18" oninput="sync('uvalue',1)"><span class="u">€</span></div>
+    </div>
+
+    <div class="section-label">Cross-sell (producto complementario)</div>
+    <div class="field">
+      <label>Tasa de aceptacion cross-sell <span class="val" id="lbl_xrate">20%</span></label>
+      <div class="row"><input type="range" min="0" max="50" value="20" id="sl_xrate" oninput="sync('xrate')"><input type="number" class="num" id="in_xrate" value="20" oninput="sync('xrate',1)"><span class="u">%</span></div>
+    </div>
+    <div class="field">
+      <label>Valor medio del cross-sell <span class="val" id="lbl_xvalue">12€</span></label>
+      <div class="row"><input type="range" min="1" max="80" value="12" id="sl_xvalue" oninput="sync('xvalue')"><input type="number" class="num" id="in_xvalue" value="12" oninput="sync('xvalue',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Margen cross-sell <span class="val" id="lbl_xmargin">50%</span></label>
+      <div class="row"><input type="range" min="10" max="90" value="50" id="sl_xmargin" oninput="sync('xmargin')"><input type="number" class="num" id="in_xmargin" value="50" oninput="sync('xmargin',1)"><span class="u">%</span></div>
+    </div>
+  </div>
+
+  <div class="big-result">
+    <div class="big" id="extra_rev">0€</div>
+    <div class="pct" id="extra_pct">+0% facturacion</div>
+    <div class="desc">Ingresos extra mensuales con<br><strong>upsell + cross-sell combinados</strong></div>
+  </div>
+
+  <div class="result-card">
+    <div class="title">Desglose mensual</div>
+    <div class="boxes">
+      <div class="box box-green">
+        <div class="label">Base actual</div>
+        <div class="amount" id="base_rev">0€</div>
+        <div class="sub">facturacion/mes</div>
+      </div>
+      <div class="box box-blue">
+        <div class="label">Con upsell</div>
+        <div class="amount" id="up_rev">0€</div>
+        <div class="sub">extra/mes</div>
+      </div>
+      <div class="box box-purple">
+        <div class="label">Con cross-sell</div>
+        <div class="amount" id="x_rev">0€</div>
+        <div class="sub">extra/mes</div>
+      </div>
+    </div>
+
+    <div class="bar-container">
+      <div class="bar-label"><span class="l">Composicion de la facturacion</span><span class="r" id="total_rev">0€</span></div>
+      <div class="bar-track" id="bar"></div>
+    </div>
+
+    <div class="breakdown" style="margin-top:20px">
+      <div class="break-row"><span class="lbl">AOV sin estrategia</span><span class="val" id="aov_before">0€</span></div>
+      <div class="break-row"><span class="lbl">AOV con upsell + cross-sell</span><span class="val green" id="aov_after">0€</span></div>
+      <div class="break-row"><span class="lbl">Beneficio extra por upsell/mes</span><span class="val blue" id="profit_up">0€</span></div>
+      <div class="break-row"><span class="lbl">Beneficio extra por cross-sell/mes</span><span class="val purple" id="profit_x">0€</span></div>
+      <div class="break-row"><span class="lbl">Beneficio extra total/mes</span><span class="val green" id="profit_total">0€</span></div>
+    </div>
+  </div>
+
+  <div class="yearly">
+    <div class="big" id="yearly_extra">0€</div>
+    <div class="desc">Beneficio extra anual estimado con <strong>upsell + cross-sell</strong></div>
+  </div>
+
+  <div id="tips"></div>
+
+  <div class="footer">Herramienta interna <span>Mentorium</span></div>
+</div>
+
+<script>
+function sync(f, fromInput) {
+  const sl = document.getElementById('sl_' + f);
+  const inp = document.getElementById('in_' + f);
+  if (fromInput) sl.value = inp.value; else inp.value = sl.value;
+  const v = parseFloat(inp.value) || 0;
+  const units = {orders:'',aov:'€',margin:'%',urate:'%',uvalue:'€',xrate:'%',xvalue:'€',xmargin:'%'};
+  document.getElementById('lbl_' + f).textContent = v + (units[f] || '');
+  calc();
+}
+
+function fmt(n) { return n >= 1000 ? (n/1000).toFixed(1).replace('.0','') + 'K' : Math.round(n); }
+
+function calc() {
+  const orders = parseFloat(document.getElementById('in_orders').value) || 0;
+  const aov = parseFloat(document.getElementById('in_aov').value) || 0;
+  const margin = (parseFloat(document.getElementById('in_margin').value) || 0) / 100;
+  const urate = (parseFloat(document.getElementById('in_urate').value) || 0) / 100;
+  const uvalue = parseFloat(document.getElementById('in_uvalue').value) || 0;
+  const xrate = (parseFloat(document.getElementById('in_xrate').value) || 0) / 100;
+  const xvalue = parseFloat(document.getElementById('in_xvalue').value) || 0;
+  const xmargin = (parseFloat(document.getElementById('in_xmargin').value) || 0) / 100;
+
+  const baseRev = orders * aov;
+  const upRev = orders * urate * uvalue;
+  const xRev = orders * xrate * xvalue;
+  const totalExtra = upRev + xRev;
+  const totalRev = baseRev + totalExtra;
+
+  const upProfit = upRev * margin;
+  const xProfit = xRev * xmargin;
+  const totalProfit = upProfit + xProfit;
+
+  const newAov = orders > 0 ? totalRev / orders : 0;
+  const pctIncrease = baseRev > 0 ? (totalExtra / baseRev) * 100 : 0;
+
+  document.getElementById('extra_rev').textContent = '+' + fmt(totalExtra) + '€';
+  document.getElementById('extra_pct').textContent = '+' + pctIncrease.toFixed(1) + '% facturacion';
+  document.getElementById('base_rev').textContent = fmt(baseRev) + '€';
+  document.getElementById('up_rev').textContent = '+' + fmt(upRev) + '€';
+  document.getElementById('x_rev').textContent = '+' + fmt(xRev) + '€';
+  document.getElementById('total_rev').textContent = fmt(totalRev) + '€/mes';
+  document.getElementById('aov_before').textContent = aov.toFixed(0) + '€';
+  document.getElementById('aov_after').textContent = newAov.toFixed(0) + '€ (+' + (newAov - aov).toFixed(0) + '€)';
+  document.getElementById('profit_up').textContent = '+' + fmt(upProfit) + '€';
+  document.getElementById('profit_x').textContent = '+' + fmt(xProfit) + '€';
+  document.getElementById('profit_total').textContent = '+' + fmt(totalProfit) + '€';
+  document.getElementById('yearly_extra').textContent = '+' + fmt(totalProfit * 12) + '€';
+
+  // Bar
+  const bP = totalRev > 0 ? (baseRev / totalRev * 100) : 100;
+  const uP = totalRev > 0 ? (upRev / totalRev * 100) : 0;
+  const xP = totalRev > 0 ? (xRev / totalRev * 100) : 0;
+  document.getElementById('bar').innerHTML =
+    `<div class="bar-seg" style="width:${bP}%;background:#1a3d24;color:#00C853">${bP > 10 ? 'Base' : ''}</div>` +
+    `<div class="bar-seg" style="width:${uP}%;background:#0d2a4a;color:#2196F3">${uP > 8 ? 'Up' : ''}</div>` +
+    `<div class="bar-seg" style="width:${xP}%;background:#2a0d3a;color:#9C27B0">${xP > 8 ? 'Cross' : ''}</div>`;
+
+  // Tips
+  let tips = '';
+  if (urate === 0 && xrate === 0) {
+    tips = '<div class="tip"><strong>Sin upsell ni cross-sell estas dejando dinero en la mesa.</strong> El 10-30% de los clientes aceptan una oferta adicional si se presenta en el momento correcto (post add-to-cart o thank you page).</div>';
+  } else {
+    if (urate < 0.10) tips += '<div class="tip" style="margin-top:12px"><strong>Tu tasa de upsell esta por debajo del 10%.</strong> Mejora: muestra el upsell en la pagina de producto con un comparador visual (producto actual vs premium). Benchmark del sector: 10-20%.</div>';
+    if (xrate < 0.15) tips += '<div class="tip" style="margin-top:12px"><strong>Tu cross-sell esta por debajo del 15%.</strong> Anade un bloque "Clientes tambien compraron" debajo del boton de compra y otro en el carrito. Benchmark: 15-30%.</div>';
+    if (pctIncrease > 20) tips += '<div class="tip" style="margin-top:12px"><strong>+' + pctIncrease.toFixed(0) + '% de facturacion extra</strong> sin gastar un euro mas en ads. Esto es dinero que ya esta en tu tienda y solo necesitas capturarlo.</div>';
+  }
+  document.getElementById('tips').innerHTML = tips;
+}
+
+calc();
+</script>
+</body>
+</html>

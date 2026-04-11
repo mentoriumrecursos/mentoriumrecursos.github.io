@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora ROI de Landing Page — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:380px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .input-wrap{position:relative}
+  .input-wrap .prefix,.input-wrap .suffix{position:absolute;top:50%;transform:translateY(-50%);font-size:14px;font-weight:700;color:#444;pointer-events:none}
+  .input-wrap .prefix{left:14px}
+  .input-wrap .suffix{right:14px}
+  input[type=number]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:16px;font-weight:700;padding:14px 50px 14px 14px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input[type=number]:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  input[type=number].has-prefix{padding-left:36px}
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .metric{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:18px 16px;text-align:center;transition:all 0.3s}
+  .metric:hover{border-color:#00C853;transform:translateY(-2px)}
+  .metric .label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  .metric .value{font-size:26px;font-weight:900;letter-spacing:-1px;line-height:1}
+  .metric .value.green{color:#00C853}
+  .metric .value.white{color:#fff}
+  .metric .sub{font-size:11px;color:#555;margin-top:6px;font-weight:600}
+
+  .metric-full{grid-column:1/-1}
+
+  .comparison{background:#0c0c0e;border:1px solid #1c1c20;border-radius:14px;padding:20px;margin-bottom:16px}
+  .comparison h3{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:16px}
+  .comp-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #141416}
+  .comp-row:last-child{border:none}
+  .comp-row .lab{font-size:13px;color:#666;font-weight:500}
+  .comp-row .val{font-size:14px;font-weight:700}
+  .comp-row .val.old{color:#555;text-decoration:line-through}
+  .comp-row .val.new{color:#00C853}
+  .comp-row .val.diff{color:#00E676}
+
+  .bar-comparison{margin:16px 0}
+  .bar-label{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#666;margin-bottom:6px}
+  .bar-track{height:28px;background:#1c1c20;border-radius:8px;overflow:hidden;position:relative;margin-bottom:12px}
+  .bar-fill{height:100%;border-radius:8px;transition:width 0.8s ease;display:flex;align-items:center;padding:0 12px;font-size:11px;font-weight:800;color:#0a0a0a}
+  .bar-fill.old{background:#333}
+  .bar-fill.new{background:linear-gradient(90deg,#00C853,#00E676)}
+
+  .insight{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:1px solid #1a3a25;border-radius:14px;padding:18px;margin-top:16px}
+  .insight .tag{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#00C853;margin-bottom:8px}
+  .insight p{font-size:13px;color:#999;line-height:1.7;font-weight:500}
+  .insight strong{color:#fff}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora ROI de Landing Page</h1>
+    <p>Descubre cuánto dinero estás perdiendo con tu landing actual y cuánto ganarías mejorándola.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos actuales</div>
+    <div class="field">
+      <label>Visitas diarias a tu landing</label>
+      <div class="input-wrap">
+        <input type="number" id="visits" value="500" min="1" placeholder="500">
+        <span class="suffix">/ día</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Conversión actual (%)</label>
+      <div class="input-wrap">
+        <input type="number" id="currentConv" value="1.5" min="0.01" max="100" step="0.1" placeholder="1.5">
+        <span class="suffix">%</span>
+      </div>
+      <div class="hint">Media ecommerce: 1-3%. Si no lo sabes, pon 1.5%</div>
+    </div>
+    <div class="field">
+      <label>Ticket medio (valor medio del pedido)</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" class="has-prefix" id="aov" value="45" min="1" step="1" placeholder="45">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Objetivo</div>
+    <div class="field">
+      <label>Conversión objetivo (%)</label>
+      <div class="input-wrap">
+        <input type="number" id="targetConv" value="3.0" min="0.01" max="100" step="0.1" placeholder="3.0">
+        <span class="suffix">%</span>
+      </div>
+      <div class="hint">Top tiendas: 3-5%. Duplicar es realista con buena landing.</div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="calculate()">CALCULAR MI ROI</button>
+
+  <div class="results" id="results">
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Impacto mensual</div>
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="label">Ventas ahora</div>
+          <div class="value white" id="r_salesNow">0</div>
+          <div class="sub">pedidos / mes</div>
+        </div>
+        <div class="metric">
+          <div class="label">Ventas objetivo</div>
+          <div class="value green" id="r_salesTarget">0</div>
+          <div class="sub">pedidos / mes</div>
+        </div>
+        <div class="metric">
+          <div class="label">Revenue actual</div>
+          <div class="value white" id="r_revNow">0</div>
+          <div class="sub">por mes</div>
+        </div>
+        <div class="metric">
+          <div class="label">Revenue objetivo</div>
+          <div class="value green" id="r_revTarget">0</div>
+          <div class="sub">por mes</div>
+        </div>
+        <div class="metric metric-full">
+          <div class="label">Incremento de facturación mensual</div>
+          <div class="value green" id="r_increase" style="font-size:36px">0</div>
+          <div class="sub" id="r_pct">+0%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Comparativa visual</div>
+      <div class="bar-comparison">
+        <div class="bar-label">
+          <span>Revenue ACTUAL</span>
+          <span id="bar_now_val">&euro;0</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill old" id="bar_now" style="width:0%"></div>
+        </div>
+        <div class="bar-label">
+          <span>Revenue OBJETIVO</span>
+          <span id="bar_target_val">&euro;0</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill new" id="bar_target" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison">
+      <h3>Desglose completo</h3>
+      <div class="comp-row">
+        <span class="lab">Visitas mensuales</span>
+        <span class="val" id="r_monthVisits">0</span>
+      </div>
+      <div class="comp-row">
+        <span class="lab">Conversión actual</span>
+        <span class="val old" id="r_convOld">0%</span>
+      </div>
+      <div class="comp-row">
+        <span class="lab">Conversión objetivo</span>
+        <span class="val new" id="r_convNew">0%</span>
+      </div>
+      <div class="comp-row">
+        <span class="lab">Pedidos extra al mes</span>
+        <span class="val new" id="r_extraOrders">+0</span>
+      </div>
+      <div class="comp-row">
+        <span class="lab">Revenue extra anual</span>
+        <span class="val diff" id="r_annualExtra">&euro;0</span>
+      </div>
+    </div>
+
+    <div class="insight" id="insight">
+      <div class="tag">Diagnóstico</div>
+      <p id="insightText"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+function fmt(n){return n.toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0})}
+function fmtD(n){return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+function calculate(){
+  const visits = parseFloat(document.getElementById('visits').value)||0;
+  const currentConv = parseFloat(document.getElementById('currentConv').value)||0;
+  const targetConv = parseFloat(document.getElementById('targetConv').value)||0;
+  const aov = parseFloat(document.getElementById('aov').value)||0;
+
+  if(visits<=0||currentConv<=0||targetConv<=0||aov<=0){alert('Rellena todos los campos con valores mayores que 0.');return}
+  if(targetConv<=currentConv){alert('La conversión objetivo debe ser mayor que la actual.');return}
+
+  const monthVisits = Math.round(visits*30);
+  const salesNow = Math.round(monthVisits*(currentConv/100));
+  const salesTarget = Math.round(monthVisits*(targetConv/100));
+  const revNow = salesNow*aov;
+  const revTarget = salesTarget*aov;
+  const increase = revTarget-revNow;
+  const pct = ((increase/revNow)*100);
+  const extraOrders = salesTarget-salesNow;
+  const annualExtra = increase*12;
+
+  document.getElementById('r_salesNow').textContent=fmt(salesNow);
+  document.getElementById('r_salesTarget').textContent=fmt(salesTarget);
+  document.getElementById('r_revNow').textContent='\u20AC'+fmt(revNow);
+  document.getElementById('r_revTarget').textContent='\u20AC'+fmt(revTarget);
+  document.getElementById('r_increase').textContent='+\u20AC'+fmt(increase);
+  document.getElementById('r_pct').textContent='+'+fmt(pct)+'% de incremento';
+  document.getElementById('r_monthVisits').textContent=fmt(monthVisits);
+  document.getElementById('r_convOld').textContent=fmtD(currentConv)+'%';
+  document.getElementById('r_convNew').textContent=fmtD(targetConv)+'%';
+  document.getElementById('r_extraOrders').textContent='+'+fmt(extraOrders);
+  document.getElementById('r_annualExtra').textContent='\u20AC'+fmt(annualExtra);
+
+  document.getElementById('bar_now_val').textContent='\u20AC'+fmt(revNow);
+  document.getElementById('bar_target_val').textContent='\u20AC'+fmt(revTarget);
+
+  const maxRev = revTarget;
+  setTimeout(()=>{
+    document.getElementById('bar_now').style.width=Math.max(5,(revNow/maxRev)*100)+'%';
+    document.getElementById('bar_target').style.width='100%';
+  },100);
+
+  let insightHTML='';
+  if(increase>5000){
+    insightHTML='Estás dejando <strong>\u20AC'+fmt(increase)+'/mes</strong> sobre la mesa. Eso son <strong>\u20AC'+fmt(annualExtra)+' al año</strong>. No necesitas más tráfico — necesitas que tu landing convierta. Una mejora de <strong>'+fmtD(targetConv-currentConv)+' puntos</strong> en conversión te cambia el negocio.';
+  }else if(increase>1000){
+    insightHTML='Con el mismo tráfico que ya tienes, podrías facturar <strong>\u20AC'+fmt(increase)+' más al mes</strong>. El problema no es el tráfico. Es la landing. Cada día que no la optimizas estás perdiendo <strong>\u20AC'+fmt(Math.round(increase/30))+' diarios</strong>.';
+  }else{
+    insightHTML='Mejorar tu conversión de '+fmtD(currentConv)+'% a '+fmtD(targetConv)+'% te daría <strong>'+fmt(extraOrders)+' pedidos extra al mes</strong>. Parece poco, pero multiplicado por 12 meses son <strong>\u20AC'+fmt(annualExtra)+' más</strong>. Cada punto de conversión cuenta.';
+  }
+  document.getElementById('insightText').innerHTML=insightHTML;
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+document.querySelectorAll('input').forEach(el=>{el.addEventListener('keypress',e=>{if(e.key==='Enter')calculate()})});
+</script>
+</body>
+</html>

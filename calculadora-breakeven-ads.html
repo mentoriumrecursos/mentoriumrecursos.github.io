@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Break-Even de Ads — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+  .container { max-width: 480px; margin: 0 auto; padding: 30px 20px; }
+
+  .header { text-align: center; margin-bottom: 40px; }
+  .header .brand { font-size: 12px; font-weight: 700; letter-spacing: 4px; color: #C45830; text-transform: uppercase; margin-bottom: 12px; }
+  .header h1 { font-size: 26px; font-weight: 900; line-height: 1.2; margin-bottom: 8px; }
+  .header p { font-size: 14px; color: #666; line-height: 1.5; }
+
+  .section { margin-bottom: 30px; }
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830; margin-bottom: 16px; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 14px; font-weight: 600; color: #aaa; margin-bottom: 6px; }
+  .field .input-wrap {
+    display: flex; align-items: center; background: #151515; border: 1px solid #222; border-radius: 10px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .field .input-wrap:focus-within { border-color: #C45830; }
+  .field .input-wrap .prefix { padding: 0 14px; color: #555; font-weight: 700; font-size: 16px; }
+  .field .input-wrap .suffix { padding: 0 14px; color: #555; font-weight: 600; font-size: 14px; }
+  .field input {
+    flex: 1; background: transparent; border: none; color: #fff; font-size: 18px; font-weight: 700;
+    padding: 14px 0; outline: none; font-family: inherit; width: 100%;
+  }
+  .field input::placeholder { color: #333; }
+  .field .hint { font-size: 12px; color: #444; margin-top: 4px; }
+
+  .results { background: #111; border: 1px solid #1a1a1a; border-radius: 16px; padding: 24px; margin-top: 30px; }
+  .results h2 { font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830; margin-bottom: 20px; }
+
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1a1a1a; }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .label { font-size: 14px; color: #888; font-weight: 500; }
+  .result-row .value { font-size: 16px; font-weight: 800; }
+  .neg { color: #C45830; }
+  .pos { color: #2D8C4E; }
+  .neutral { color: #fff; }
+  .warn { color: #C8AA28; }
+
+  .big-result {
+    border-radius: 14px; padding: 24px; margin-top: 20px; text-align: center;
+  }
+  .big-green { background: rgba(45,140,78,0.08); border: 2px solid #2D8C4E; }
+  .big-red { background: rgba(196,88,48,0.08); border: 2px solid #C45830; }
+  .big-result .label { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .big-result .amount { font-size: 42px; font-weight: 900; line-height: 1; }
+  .big-result .sub { font-size: 14px; color: #888; margin-top: 8px; }
+
+  .scale-meter { margin-top: 20px; }
+  .scale-meter .bar-bg { background: #1a1a1a; height: 12px; border-radius: 100px; overflow: hidden; position: relative; }
+  .scale-meter .bar-fill { height: 100%; border-radius: 100px; transition: width 0.5s; }
+  .scale-meter .bar-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: #555; }
+
+  .tip {
+    background: #0d0d00; border: 1px solid #332200; border-radius: 10px; padding: 16px;
+    margin-top: 20px; font-size: 13px; color: #C8AA28; line-height: 1.6;
+  }
+  .tip strong { color: #fff; }
+
+  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #1a1a1a; }
+  .footer p { font-size: 12px; color: #444; margin-bottom: 4px; }
+  .footer .handle { font-size: 14px; font-weight: 700; color: #C45830; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="brand">Mentorium</div>
+    <h1>¿Cuánto puedes gastar en ads sin perder dinero?</h1>
+    <p>Calcula tu break-even real. El número que tu agencia no te dice.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Tu producto</div>
+    <div class="field">
+      <label>Precio de venta</label>
+      <div class="input-wrap"><div class="prefix">€</div><input type="number" id="price" placeholder="45" oninput="calc()"></div>
+    </div>
+    <div class="field">
+      <label>Coste total del producto (producto + envío proveedor)</label>
+      <div class="input-wrap"><div class="prefix">€</div><input type="number" id="cost" placeholder="12" oninput="calc()"></div>
+    </div>
+    <div class="field">
+      <label>Coste de envío al cliente</label>
+      <div class="input-wrap"><div class="prefix">€</div><input type="number" id="shipcost" placeholder="4" oninput="calc()"></div>
+    </div>
+    <div class="field">
+      <label>Comisiones (Shopify + pasarela, % del precio)</label>
+      <div class="input-wrap"><input type="number" id="fees" placeholder="2.5" value="2.5" oninput="calc()"><div class="suffix">%</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Tus ads</div>
+    <div class="field">
+      <label>Presupuesto diario en ads</label>
+      <div class="input-wrap"><div class="prefix">€</div><input type="number" id="daily_ads" placeholder="50" oninput="calc()"></div>
+    </div>
+    <div class="field">
+      <label>Tasa de conversión de tu tienda</label>
+      <div class="input-wrap"><input type="number" id="cvr" placeholder="2" oninput="calc()"><div class="suffix">%</div></div>
+      <div class="hint">Media ecommerce: 1,5-3%. Si no lo sabes, pon 2%.</div>
+    </div>
+    <div class="field">
+      <label>CPC medio (coste por clic)</label>
+      <div class="input-wrap"><div class="prefix">€</div><input type="number" id="cpc" placeholder="0.80" step="0.01" oninput="calc()"></div>
+      <div class="hint">Media Meta Ads España: 0,50-1,50€</div>
+    </div>
+  </div>
+
+  <div class="results" id="results" style="display:none;">
+    <h2>Tu realidad</h2>
+    <div class="result-row"><span class="label">Margen bruto por venta</span><span class="value neutral" id="r_margin">—</span></div>
+    <div class="result-row"><span class="label">CPA (coste por adquisición)</span><span class="value" id="r_cpa">—</span></div>
+    <div class="result-row"><span class="label">Profit por venta (después de ads)</span><span class="value" id="r_profit_per_sale">—</span></div>
+    <div class="result-row"><span class="label">Ventas diarias estimadas</span><span class="value neutral" id="r_daily_sales">—</span></div>
+    <div class="result-row"><span class="label">Facturación diaria estimada</span><span class="value neutral" id="r_daily_rev">—</span></div>
+    <div class="result-row"><span class="label">ROAS</span><span class="value" id="r_roas">—</span></div>
+
+    <div class="big-result" id="big_box">
+      <div class="label">Profit diario real</div>
+      <div class="amount" id="r_daily_profit">—</div>
+      <div class="sub" id="r_monthly">—</div>
+    </div>
+
+    <div class="scale-meter">
+      <div class="bar-bg"><div class="bar-fill" id="roas_bar" style="width:0%; background: #C45830;"></div></div>
+      <div class="bar-labels"><span>ROAS 1x (break-even)</span><span>ROAS 3x (saludable)</span><span>ROAS 5x+</span></div>
+    </div>
+
+    <div class="tip" id="tip"></div>
+  </div>
+
+  <div class="footer">
+    <p>Herramienta gratuita de</p>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+function fmt(n) { return n.toLocaleString('es-ES', {maximumFractionDigits: 2}) + '€'; }
+
+function calc() {
+  const price = parseFloat(document.getElementById('price').value) || 0;
+  const cost = parseFloat(document.getElementById('cost').value) || 0;
+  const ship = parseFloat(document.getElementById('shipcost').value) || 0;
+  const fees_pct = parseFloat(document.getElementById('fees').value) || 0;
+  const daily_ads = parseFloat(document.getElementById('daily_ads').value) || 0;
+  const cvr = parseFloat(document.getElementById('cvr').value) || 0;
+  const cpc = parseFloat(document.getElementById('cpc').value) || 0;
+
+  if (price === 0 || cpc === 0 || cvr === 0) { document.getElementById('results').style.display = 'none'; return; }
+
+  const fees = price * fees_pct / 100;
+  const margin = price - cost - ship - fees;
+  const cpa = cpc / (cvr / 100);
+  const profit_per_sale = margin - cpa;
+  const daily_clicks = daily_ads / cpc;
+  const daily_sales = daily_clicks * (cvr / 100);
+  const daily_rev = daily_sales * price;
+  const roas = daily_ads > 0 ? daily_rev / daily_ads : 0;
+  const daily_profit = (profit_per_sale * daily_sales);
+  const monthly_profit = daily_profit * 30;
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('r_margin').textContent = fmt(margin);
+  document.getElementById('r_cpa').textContent = fmt(cpa);
+  document.getElementById('r_cpa').className = 'value ' + (cpa > margin ? 'neg' : 'pos');
+  document.getElementById('r_profit_per_sale').textContent = fmt(profit_per_sale);
+  document.getElementById('r_profit_per_sale').className = 'value ' + (profit_per_sale < 0 ? 'neg' : 'pos');
+  document.getElementById('r_daily_sales').textContent = daily_sales.toFixed(1) + ' ventas/día';
+  document.getElementById('r_daily_rev').textContent = fmt(daily_rev);
+  document.getElementById('r_roas').textContent = roas.toFixed(2) + 'x';
+  document.getElementById('r_roas').className = 'value ' + (roas < 1 ? 'neg' : roas < 2 ? 'warn' : 'pos');
+
+  const box = document.getElementById('big_box');
+  document.getElementById('r_daily_profit').textContent = fmt(daily_profit);
+  document.getElementById('r_daily_profit').className = 'amount ' + (daily_profit < 0 ? 'neg' : 'pos');
+  document.getElementById('r_monthly').textContent = fmt(monthly_profit) + '/mes estimado';
+  box.className = 'big-result ' + (daily_profit < 0 ? 'big-red' : 'big-green');
+
+  // ROAS bar
+  const bar = document.getElementById('roas_bar');
+  const bar_pct = Math.min(roas / 5 * 100, 100);
+  bar.style.width = bar_pct + '%';
+  bar.style.background = roas < 1 ? '#C45830' : roas < 2 ? '#C8AA28' : '#2D8C4E';
+
+  // Tip
+  const tip = document.getElementById('tip');
+  if (profit_per_sale < 0) {
+    tip.innerHTML = '<strong>Problema:</strong> Cada venta te cuesta más en ads de lo que ganas. Tu CPA (' + fmt(cpa) + ') es mayor que tu margen (' + fmt(margin) + '). Opciones: subir precio, bajar CPC con mejores creativos, o mejorar conversión de la tienda.';
+  } else if (roas < 2) {
+    tip.innerHTML = '<strong>Cuidado:</strong> Estás en positivo pero muy justo. Cualquier bajón en rendimiento de ads te pone en negativo. Mejora la conversión de tu tienda antes de subir presupuesto.';
+  } else if (roas < 3) {
+    tip.innerHTML = '<strong>Bien:</strong> Números sanos. Puedes escalar progresivamente. Sube presupuesto un 20% cada 3-5 días y vigila que el CPA se mantenga.';
+  } else {
+    tip.innerHTML = '<strong>Excelente:</strong> Tu tienda está preparada para escalar agresivamente. Estos números aguantan un aumento significativo de presupuesto sin perder rentabilidad.';
+  }
+}
+</script>
+</body>
+</html>

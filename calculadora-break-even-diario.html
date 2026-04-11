@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Break-Even Diario &mdash; Mentorium</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+.container{max-width:480px;margin:0 auto;padding:24px 16px 60px}
+
+.header{text-align:center;padding:30px 0 20px}
+.logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+.header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+.header p{font-size:13px;color:#555;line-height:1.5}
+
+.card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+
+.field{margin-bottom:16px}
+.field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+.field label .val{color:#00C853;font-weight:800;font-size:14px}
+.row{display:flex;align-items:center;gap:10px}
+.row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+.row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+.num-input{width:100px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px 12px;text-align:right;font-family:inherit;outline:none}
+.num-input:focus{border-color:#00C853}
+.unit{color:#555;font-size:13px;font-weight:600;width:20px;text-align:left}
+
+.cost-list{margin-top:10px}
+.cost-item{display:flex;align-items:center;gap:10px;margin-bottom:10px;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.cost-item input[type=text]{flex:1;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:13px;padding:10px 12px;font-family:inherit;outline:none}
+.cost-item input[type=text]:focus{border-color:#00C853}
+.cost-item input[type=number]{width:100px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:10px 12px;text-align:right;font-family:inherit;outline:none}
+.cost-item input[type=number]:focus{border-color:#00C853}
+.cost-item .remove{width:32px;height:32px;background:none;border:1px solid #2a1515;color:#c44;font-size:16px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.cost-item .remove:hover{background:#2a1515;color:#ff6b6b}
+
+.add-btn{background:none;border:1px dashed #2a2a2e;color:#555;font-size:13px;font-weight:600;padding:10px;width:100%;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s;margin-top:4px}
+.add-btn:hover{border-color:#00C853;color:#00C853}
+
+.btn{width:100%;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.5px;transition:all 0.2s;margin-top:8px}
+.btn:hover{background:#00E676;transform:translateY(-1px)}
+
+.results{display:none;margin-top:16px}
+
+.big-result{text-align:center;padding:30px 20px;border-radius:16px;margin-bottom:16px;background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:2px solid #1a3a25}
+.big-result .label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:8px}
+.big-result .number{font-size:56px;font-weight:900;letter-spacing:-3px;color:#00C853;line-height:1}
+.big-result .sub{font-size:14px;color:#555;margin-top:8px;font-weight:600}
+.big-result .sub span{color:#00C853;font-weight:800}
+
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric{background:#111113;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center}
+.metric .num{font-size:22px;font-weight:900;color:#fff}
+.metric .num.green{color:#00C853}
+.metric .num.amber{color:#f0a030}
+.metric .num.red{color:#e04040}
+.metric .lab{font-size:10px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+.detail-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #141416;font-size:13px}
+.detail-row .lab{color:#666;font-weight:500}
+.detail-row .val{font-weight:700}
+
+.bar-visual{margin:16px 0}
+.bar-label{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:6px;font-weight:600}
+.bar-track{height:24px;background:#1c1c20;border-radius:8px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:8px;transition:width 0.6s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:10px;font-weight:800;color:rgba(0,0,0,0.8)}
+.bar-marker{position:absolute;top:-6px;bottom:-6px;width:2px;background:#fff;border-radius:2px;transition:left 0.6s ease}
+
+.insight{background:#0a1a0f;border:1px solid #1a3a25;border-radius:12px;padding:16px;font-size:13px;color:#6ab880;line-height:1.6;margin-top:16px}
+.insight strong{color:#fff}
+.insight.warning{background:#1a1500;border-color:#3a3000;color:#b8a040}
+.insight.danger{background:#1a0a08;border-color:#3a1a15;color:#b86060}
+
+.footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+.footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+.footer .sub{font-size:12px;color:#333;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora Break-Even Diario</h1>
+    <p>Descubre cu&aacute;ntas ventas necesitas al d&iacute;a para cubrir todos tus gastos.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Costes fijos mensuales</div>
+    <div class="cost-list" id="costList">
+      <div class="cost-item">
+        <input type="text" value="Plataforma (Shopify, etc.)" class="cost-name">
+        <input type="number" value="30" class="cost-val" min="0">
+        <button class="remove" onclick="removeCost(this)" title="Eliminar">&times;</button>
+      </div>
+      <div class="cost-item">
+        <input type="text" value="Herramientas y apps" class="cost-name">
+        <input type="number" value="50" class="cost-val" min="0">
+        <button class="remove" onclick="removeCost(this)" title="Eliminar">&times;</button>
+      </div>
+      <div class="cost-item">
+        <input type="text" value="Aut&oacute;nomo / impuestos fijos" class="cost-name">
+        <input type="number" value="300" class="cost-val" min="0">
+        <button class="remove" onclick="removeCost(this)" title="Eliminar">&times;</button>
+      </div>
+      <div class="cost-item">
+        <input type="text" value="Alquiler / oficina" class="cost-name">
+        <input type="number" value="0" class="cost-val" min="0">
+        <button class="remove" onclick="removeCost(this)" title="Eliminar">&times;</button>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addCost()">+ A&ntilde;adir coste fijo</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de venta</div>
+    <div class="field">
+      <label>Precio medio de venta <span class="val" id="lblPrice">40 &euro;</span></label>
+      <div class="row">
+        <input type="range" min="5" max="500" value="40" id="slPrice" oninput="syncPrice()">
+        <input type="number" class="num-input" value="40" id="numPrice" min="1" oninput="syncPriceNum()">
+        <span class="unit">&euro;</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Coste del producto (proveedor) <span class="val" id="lblCost">12 &euro;</span></label>
+      <div class="row">
+        <input type="range" min="0" max="300" value="12" id="slCost" oninput="syncCost()">
+        <input type="number" class="num-input" value="12" id="numCost" min="0" oninput="syncCostNum()">
+        <span class="unit">&euro;</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Coste de env&iacute;o por pedido <span class="val" id="lblShip">5 &euro;</span></label>
+      <div class="row">
+        <input type="range" min="0" max="30" value="5" id="slShip" oninput="syncShip()">
+        <input type="number" class="num-input" value="5" id="numShip" min="0" oninput="syncShipNum()">
+        <span class="unit">&euro;</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Comisi&oacute;n pasarela de pago <span class="val" id="lblFee">3%</span></label>
+      <div class="row">
+        <input type="range" min="0" max="10" step="0.5" value="3" id="slFee" oninput="syncFee()">
+        <input type="number" class="num-input" value="3" id="numFee" min="0" max="100" step="0.1" oninput="syncFeeNum()">
+        <span class="unit">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>D&iacute;as operativos al mes <span class="val" id="lblDays">30</span></label>
+      <div class="row">
+        <input type="range" min="20" max="31" value="30" id="slDays" oninput="syncDays()">
+        <input type="number" class="num-input" value="30" id="numDays" min="1" max="31" oninput="syncDaysNum()">
+        <span class="unit">d</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="calculate()">Calcular break-even diario</button>
+
+  <div class="results" id="results">
+    <div class="big-result">
+      <div class="label">Ventas necesarias al d&iacute;a</div>
+      <div class="number" id="resDailySales">0</div>
+      <div class="sub">para llegar a <span id="resBreakLabel">0 &euro;/mes</span> de break-even</div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric"><div class="num green" id="resMarginUnit">0 &euro;</div><div class="lab">Margen por venta</div></div>
+      <div class="metric"><div class="num" id="resMarginPct">0%</div><div class="lab">Margen %</div></div>
+      <div class="metric"><div class="num" id="resMonthlySales">0</div><div class="lab">Ventas / mes</div></div>
+      <div class="metric"><div class="num" id="resMonthlyRev">0 &euro;</div><div class="lab">Facturaci&oacute;n BE</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Desglose por venta</div>
+      <div class="bar-visual">
+        <div class="bar-label"><span>Distribuci&oacute;n del precio de venta</span></div>
+        <div class="bar-track" id="barTrack"></div>
+      </div>
+      <div id="detailRows"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Escenarios de beneficio</div>
+      <div id="scenarios"></div>
+    </div>
+
+    <div id="insightBox"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="sub">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+function syncPrice(){const v=document.getElementById('slPrice').value;document.getElementById('numPrice').value=v;document.getElementById('lblPrice').textContent=v+' \u20ac';}
+function syncPriceNum(){const v=document.getElementById('numPrice').value;document.getElementById('slPrice').value=v;document.getElementById('lblPrice').textContent=v+' \u20ac';}
+function syncCost(){const v=document.getElementById('slCost').value;document.getElementById('numCost').value=v;document.getElementById('lblCost').textContent=v+' \u20ac';}
+function syncCostNum(){const v=document.getElementById('numCost').value;document.getElementById('slCost').value=v;document.getElementById('lblCost').textContent=v+' \u20ac';}
+function syncShip(){const v=document.getElementById('slShip').value;document.getElementById('numShip').value=v;document.getElementById('lblShip').textContent=v+' \u20ac';}
+function syncShipNum(){const v=document.getElementById('numShip').value;document.getElementById('slShip').value=v;document.getElementById('lblShip').textContent=v+' \u20ac';}
+function syncFee(){const v=document.getElementById('slFee').value;document.getElementById('numFee').value=v;document.getElementById('lblFee').textContent=v+'%';}
+function syncFeeNum(){const v=document.getElementById('numFee').value;document.getElementById('slFee').value=v;document.getElementById('lblFee').textContent=v+'%';}
+function syncDays(){const v=document.getElementById('slDays').value;document.getElementById('numDays').value=v;document.getElementById('lblDays').textContent=v;}
+function syncDaysNum(){const v=document.getElementById('numDays').value;document.getElementById('slDays').value=v;document.getElementById('lblDays').textContent=v;}
+
+function addCost(){
+  const list=document.getElementById('costList');
+  const item=document.createElement('div');
+  item.className='cost-item';
+  item.innerHTML='<input type="text" placeholder="Nombre del coste" class="cost-name"><input type="number" value="0" class="cost-val" min="0"><button class="remove" onclick="removeCost(this)" title="Eliminar">&times;</button>';
+  list.appendChild(item);
+}
+function removeCost(btn){btn.closest('.cost-item').remove();}
+
+function calculate(){
+  const costs=document.querySelectorAll('.cost-item');
+  let totalFixed=0;
+  costs.forEach(c=>{totalFixed+=parseFloat(c.querySelector('.cost-val').value)||0;});
+
+  const price=parseFloat(document.getElementById('numPrice').value)||0;
+  const prodCost=parseFloat(document.getElementById('numCost').value)||0;
+  const shipCost=parseFloat(document.getElementById('numShip').value)||0;
+  const feePct=parseFloat(document.getElementById('numFee').value)||0;
+  const days=parseInt(document.getElementById('numDays').value)||30;
+
+  const feePerSale=price*(feePct/100);
+  const varCostPerSale=prodCost+shipCost+feePerSale;
+  const marginPerSale=price-varCostPerSale;
+
+  if(marginPerSale<=0){
+    document.getElementById('results').style.display='block';
+    document.getElementById('resDailySales').textContent='\u221e';
+    document.getElementById('resDailySales').style.color='#e04040';
+    document.getElementById('resBreakLabel').textContent='IMPOSIBLE';
+    document.getElementById('resMarginUnit').textContent=(marginPerSale.toFixed(2))+' \u20ac';
+    document.getElementById('resMarginUnit').className='num red';
+    document.getElementById('resMarginPct').textContent='0%';
+    document.getElementById('resMonthlySales').textContent='\u221e';
+    document.getElementById('resMonthlyRev').textContent='-';
+    document.getElementById('barTrack').innerHTML='';
+    document.getElementById('detailRows').innerHTML='';
+    document.getElementById('scenarios').innerHTML='';
+    document.getElementById('insightBox').innerHTML='<div class="insight danger"><strong>Margen negativo.</strong> Pierdes dinero con cada venta. Sube el precio o reduce costes variables antes de vender nada.</div>';
+    document.getElementById('results').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+
+  const monthlySales=Math.ceil(totalFixed/marginPerSale);
+  const dailySales=Math.ceil(monthlySales/days);
+  const marginPct=((marginPerSale/price)*100);
+  const monthlyRevBE=monthlySales*price;
+  const fixedPerSale=monthlySales>0?totalFixed/monthlySales:0;
+
+  document.getElementById('resDailySales').textContent=dailySales;
+  document.getElementById('resDailySales').style.color='#00C853';
+  document.getElementById('resBreakLabel').innerHTML=totalFixed.toLocaleString('es-ES')+' &euro;/mes';
+  document.getElementById('resMarginUnit').textContent=marginPerSale.toFixed(2)+' \u20ac';
+  document.getElementById('resMarginUnit').className='num '+(marginPct>=40?'green':marginPct>=20?'amber':'red');
+  document.getElementById('resMarginPct').textContent=marginPct.toFixed(1)+'%';
+  document.getElementById('resMarginPct').className='num '+(marginPct>=40?'green':marginPct>=20?'amber':'red');
+  document.getElementById('resMonthlySales').textContent=monthlySales.toLocaleString('es-ES');
+  document.getElementById('resMonthlyRev').textContent=monthlyRevBE.toLocaleString('es-ES')+' \u20ac';
+
+  // Bar
+  const pProd=(prodCost/price*100).toFixed(1);
+  const pShip=(shipCost/price*100).toFixed(1);
+  const pFee=(feePerSale/price*100).toFixed(1);
+  const pFixed=(fixedPerSale/price*100).toFixed(1);
+  const pMargin=Math.max(0,(marginPerSale-fixedPerSale)/price*100).toFixed(1);
+  document.getElementById('barTrack').innerHTML=`
+    <div class="bar-fill" style="width:${pProd}%;background:#e04040" title="Producto">${pProd>8?pProd+'%':''}</div>
+    <div class="bar-fill" style="width:${pShip}%;background:#e08040" title="Env\u00edo">${pShip>8?pShip+'%':''}</div>
+    <div class="bar-fill" style="width:${pFee}%;background:#c0a030" title="Comisi\u00f3n">${pFee>8?pFee+'%':''}</div>
+    <div class="bar-fill" style="width:${pFixed}%;background:#6060a0" title="Fijos">${pFixed>8?pFixed+'%':''}</div>
+    <div class="bar-fill" style="width:${pMargin}%;background:#00C853" title="Beneficio">${pMargin>8?pMargin+'%':''}</div>`;
+
+  document.getElementById('detailRows').innerHTML=`
+    <div class="detail-row"><span class="lab">\u25cf Coste producto</span><span class="val">${prodCost.toFixed(2)} \u20ac (${pProd}%)</span></div>
+    <div class="detail-row"><span class="lab">\u25cf Env\u00edo</span><span class="val">${shipCost.toFixed(2)} \u20ac (${pShip}%)</span></div>
+    <div class="detail-row"><span class="lab">\u25cf Comisi\u00f3n pasarela</span><span class="val">${feePerSale.toFixed(2)} \u20ac (${pFee}%)</span></div>
+    <div class="detail-row"><span class="lab">\u25cf Fijos prorrateados</span><span class="val">${fixedPerSale.toFixed(2)} \u20ac (${pFixed}%)</span></div>
+    <div class="detail-row"><span class="lab" style="color:#00C853;font-weight:700">\u25cf Beneficio neto</span><span class="val" style="color:#00C853;font-weight:800">${(marginPerSale-fixedPerSale).toFixed(2)} \u20ac (${pMargin}%)</span></div>`;
+
+  // Scenarios
+  const scenarios=[
+    {label:'Break-even', multi:1},
+    {label:'1.000 \u20ac beneficio', multi:null, target:1000},
+    {label:'2.000 \u20ac beneficio', multi:null, target:2000},
+    {label:'5.000 \u20ac beneficio', multi:null, target:5000}
+  ];
+  let scenHTML='';
+  scenarios.forEach(s=>{
+    let needMonthly, needDaily, profit;
+    if(s.multi){
+      needMonthly=monthlySales*s.multi;
+      needDaily=Math.ceil(needMonthly/days);
+      profit=0;
+    } else {
+      needMonthly=Math.ceil((totalFixed+s.target)/marginPerSale);
+      needDaily=Math.ceil(needMonthly/days);
+      profit=s.target;
+    }
+    const rev=needMonthly*price;
+    scenHTML+=`<div class="detail-row"><span class="lab">${s.label}</span><span class="val">${needDaily} ventas/d\u00eda <span style="color:#555">(${rev.toLocaleString('es-ES')} \u20ac fac.)</span></span></div>`;
+  });
+  document.getElementById('scenarios').innerHTML=scenHTML;
+
+  // Insight
+  let insightClass='insight';
+  let insightText='';
+  if(dailySales<=3){
+    insightText=`<strong>Muy alcanzable.</strong> Con solo ${dailySales} venta${dailySales>1?'s':''} al d\u00eda cubres todos tus gastos fijos. Tu margen de ${marginPct.toFixed(1)}% te da un buen colch\u00f3n. Cada venta extra a partir de aqu\u00ed es beneficio puro.`;
+  } else if(dailySales<=8){
+    insightClass+=' warning';
+    insightText=`<strong>Alcanzable pero exigente.</strong> Necesitas ${dailySales} ventas diarias para no perder dinero. Con un ticket medio de ${price} \u20ac, eso son ${(dailySales*price).toFixed(0)} \u20ac de facturaci\u00f3n diaria m\u00ednima. Rev\u00edsa si puedes subir el precio o bajar costes.`;
+  } else {
+    insightClass+=' danger';
+    insightText=`<strong>Volumen muy alto.</strong> ${dailySales} ventas diarias es un ritmo agresivo. O tu margen por venta (${marginPerSale.toFixed(2)} \u20ac) es demasiado bajo, o tus fijos (${totalFixed.toLocaleString('es-ES')} \u20ac) son demasiado altos. Optimiza antes de escalar.`;
+  }
+  document.getElementById('insightBox').innerHTML=`<div class="${insightClass}">${insightText}</div>`;
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

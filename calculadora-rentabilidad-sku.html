@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Rentabilidad por SKU — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#08080a;color:#fff;min-height:100vh}
+  .container{max-width:500px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#C45830;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:20px;margin-bottom:14px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:14px}
+  .sku-form{margin-bottom:16px}
+  .sku-row{display:grid;grid-template-columns:1fr 80px 80px 80px 80px;gap:8px;align-items:center;margin-bottom:8px}
+  .sku-row.header{font-size:10px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:1px}
+  .sku-row input{background:#0c0c0e;border:1px solid #1c1c20;border-radius:6px;color:#fff;font-size:14px;font-weight:600;padding:10px 8px;font-family:inherit;outline:none;width:100%;text-align:center}
+  .sku-row input:first-child{text-align:left}
+  .sku-row input:focus{border-color:#C45830}
+  .add-btn{padding:10px 20px;background:transparent;border:1px dashed #333;border-radius:8px;color:#555;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;margin-top:8px}
+  .add-btn:hover{border-color:#C45830;color:#C45830}
+  .btn{width:100%;padding:14px;background:#C45830;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:12px}
+  .results{display:none;margin-top:20px}
+  .sku-result{background:#111113;border:1px solid #1c1c20;border-radius:14px;padding:18px;margin-bottom:12px}
+  .sku-result .name{font-size:16px;font-weight:800;margin-bottom:10px}
+  .sku-result .metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+  .sku-result .metric{text-align:center;padding:10px;background:#0c0c0e;border-radius:8px}
+  .sku-result .metric .num{font-size:18px;font-weight:900}
+  .sku-result .metric .desc{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+  .sku-result .action{font-size:13px;font-weight:700;padding:10px;border-radius:8px;text-align:center}
+  .action-scale{background:rgba(45,140,78,0.1);color:#2D8C4E}
+  .action-keep{background:rgba(200,170,40,0.1);color:#C8AA28}
+  .action-cut{background:rgba(196,88,48,0.1);color:#C45830}
+  .summary{background:#111113;border:2px solid #C45830;border-radius:16px;padding:24px;margin-top:20px;text-align:center}
+  .summary h3{font-size:14px;font-weight:800;color:#C45830;margin-bottom:16px;text-transform:uppercase;letter-spacing:2px}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .summary .big{font-size:28px;font-weight:900}
+  .summary .label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:1px}
+  .footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #1a1a1a}
+  .footer .brand{font-size:12px;font-weight:800;color:#C45830;letter-spacing:3px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Rentabilidad por SKU</h1>
+    <p>¿Qué productos te dan dinero y cuáles te lo quitan? Añade hasta 10 SKUs.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tus productos</div>
+    <div class="sku-row header">
+      <div>Producto</div>
+      <div>Precio €</div>
+      <div>Coste €</div>
+      <div>Envío €</div>
+      <div>Uds/mes</div>
+    </div>
+    <div id="skus">
+      <div class="sku-row"><input placeholder="Ej: Masajeador"><input type="number" placeholder="45"><input type="number" placeholder="12"><input type="number" placeholder="4"><input type="number" placeholder="80"></div>
+      <div class="sku-row"><input placeholder="Ej: Funda LED"><input type="number" placeholder="25"><input type="number" placeholder="6"><input type="number" placeholder="3"><input type="number" placeholder="120"></div>
+      <div class="sku-row"><input placeholder="Ej: Lámpara"><input type="number" placeholder="55"><input type="number" placeholder="18"><input type="number" placeholder="5"><input type="number" placeholder="40"></div>
+    </div>
+    <button class="add-btn" onclick="addSku()">+ Añadir producto</button>
+    <button class="btn" onclick="calc()">Analizar rentabilidad</button>
+  </div>
+
+  <div class="results" id="results"></div>
+  <div class="summary" id="summary" style="display:none"></div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+  </div>
+</div>
+<script>
+function addSku(){
+  var div=document.createElement('div');
+  div.className='sku-row';
+  div.innerHTML='<input placeholder="Producto"><input type="number" placeholder="Precio"><input type="number" placeholder="Coste"><input type="number" placeholder="Envío"><input type="number" placeholder="Uds/mes">';
+  document.getElementById('skus').appendChild(div);
+}
+function calc(){
+  var rows=document.querySelectorAll('#skus .sku-row');
+  var html='';
+  var totalRev=0,totalProfit=0,scaleCount=0,keepCount=0,cutCount=0;
+
+  var products=[];
+  rows.forEach(function(row){
+    var inputs=row.querySelectorAll('input');
+    var name=inputs[0].value||'Sin nombre';
+    var price=parseFloat(inputs[1].value)||0;
+    var cost=parseFloat(inputs[2].value)||0;
+    var ship=parseFloat(inputs[3].value)||0;
+    var units=parseFloat(inputs[4].value)||0;
+    if(price>0){
+      var margin=price-cost-ship;
+      var marginPct=(margin/price*100);
+      var revenue=price*units;
+      var profit=margin*units;
+      totalRev+=revenue;
+      totalProfit+=profit;
+      products.push({name:name,price:price,margin:margin,marginPct:marginPct,revenue:revenue,profit:profit,units:units});
+    }
+  });
+
+  products.sort(function(a,b){return b.marginPct-a.marginPct});
+
+  products.forEach(function(p){
+    var action,actionClass;
+    if(p.marginPct>=50){action='ESCALAR';actionClass='action-scale';scaleCount++}
+    else if(p.marginPct>=25){action='MANTENER';actionClass='action-keep';keepCount++}
+    else{action='CORTAR O SUBIR PRECIO';actionClass='action-cut';cutCount++}
+
+    html+='<div class="sku-result">';
+    html+='<div class="name">'+p.name+'</div>';
+    html+='<div class="metrics">';
+    html+='<div class="metric"><div class="num" style="color:'+(p.marginPct>=50?'#2D8C4E':p.marginPct>=25?'#C8AA28':'#C45830')+'">'+p.marginPct.toFixed(0)+'%</div><div class="desc">Margen</div></div>';
+    html+='<div class="metric"><div class="num">'+p.margin.toFixed(0)+'€</div><div class="desc">Profit/ud</div></div>';
+    html+='<div class="metric"><div class="num">'+p.profit.toFixed(0)+'€</div><div class="desc">Profit/mes</div></div>';
+    html+='</div>';
+    html+='<div class="action '+actionClass+'">'+action+'</div>';
+    html+='</div>';
+  });
+
+  document.getElementById('results').innerHTML=html;
+  document.getElementById('results').style.display='block';
+
+  var avgMargin=totalRev>0?(totalProfit/totalRev*100):0;
+  var sumHtml='<h3>Resumen</h3><div class="summary-grid">';
+  sumHtml+='<div><div class="big" style="color:#2D8C4E">'+scaleCount+'</div><div class="label">Escalar</div></div>';
+  sumHtml+='<div><div class="big" style="color:#C8AA28">'+keepCount+'</div><div class="label">Mantener</div></div>';
+  sumHtml+='<div><div class="big" style="color:#C45830">'+cutCount+'</div><div class="label">Cortar</div></div>';
+  sumHtml+='</div>';
+  sumHtml+='<div style="margin-top:16px;font-size:14px;color:#888;">Margen medio ponderado: <strong style="color:#fff">'+avgMargin.toFixed(1)+'%</strong></div>';
+  sumHtml+='<div style="font-size:14px;color:#888;">Profit total estimado: <strong style="color:#2D8C4E">'+totalProfit.toFixed(0)+'€/mes</strong></div>';
+  document.getElementById('summary').innerHTML=sumHtml;
+  document.getElementById('summary').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

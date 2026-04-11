@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Envío Gratis — ¿Desde qué ticket medio puedes ofrecerlo? — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#faf9f7,#f0ede8);color:#1a1a1a;min-height:100vh}
+  .container{max-width:460px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .badge{display:inline-block;background:#1a1a1a;color:#fff;font-size:10px;font-weight:800;padding:6px 16px;border-radius:100px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:8px}
+  .header p{font-size:13px;color:#888;line-height:1.5}
+  .card{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
+  .card-title{font-size:11px;font-weight:800;color:#C45830;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field label .val{color:#C45830;font-weight:800}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#e8e4de;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#C45830;border-radius:50%;cursor:pointer;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.15)}
+  .row .num{width:80px;background:#faf9f7;border:1px solid #e8e4de;border-radius:8px;color:#1a1a1a;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#C45830}
+  .row .u{color:#aaa;font-size:13px;font-weight:600;width:16px}
+  .result{background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,0.06);text-align:center;margin-top:20px}
+  .result .main-num{font-size:48px;font-weight:900;color:#2D8C4E}
+  .result .main-label{font-size:13px;color:#888;margin-top:6px;margin-bottom:16px}
+  .result .explain{font-size:13px;color:#666;line-height:1.6;text-align:left;background:#faf9f7;padding:16px;border-radius:10px}
+  .result .explain strong{color:#1a1a1a}
+  .strategies{margin-top:16px}
+  .strat{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.03)}
+  .strat h4{font-size:14px;font-weight:800;margin-bottom:6px}
+  .strat h4.good{color:#2D8C4E}
+  .strat h4.caution{color:#C8AA28}
+  .strat h4.bad{color:#C45830}
+  .strat p{font-size:13px;color:#888;line-height:1.5}
+  .strat .impact{font-size:13px;font-weight:700;color:#2D8C4E;margin-top:6px}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#ccc}
+  .footer span{color:#C45830;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">Calculadora</div>
+    <h1>¿Puedes ofrecer envío gratis?</h1>
+    <p>Calcula desde qué ticket medio puedes absorber el envío sin perder margen.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tus números</div>
+    <div class="field">
+      <label>Ticket medio actual <span class="val" id="lbl_aov">45€</span></label>
+      <div class="row"><input type="range" min="10" max="200" value="45" id="sl_aov" oninput="s('aov')"><input type="number" class="num" id="in_aov" value="45" oninput="s('aov',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Coste de envío por pedido <span class="val" id="lbl_ship">5€</span></label>
+      <div class="row"><input type="range" min="1" max="15" step="0.5" value="5" id="sl_ship" oninput="s('ship')"><input type="number" class="num" id="in_ship" value="5" step="0.5" oninput="s('ship',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Margen bruto actual <span class="val" id="lbl_margin">40%</span></label>
+      <div class="row"><input type="range" min="10" max="70" value="40" id="sl_margin" oninput="s('margin')"><input type="number" class="num" id="in_margin" value="40" oninput="s('margin',1)"><span class="u">%</span></div>
+    </div>
+    <div class="field">
+      <label>Pedidos mensuales <span class="val" id="lbl_orders">150</span></label>
+      <div class="row"><input type="range" min="10" max="1000" step="10" value="150" id="sl_orders" oninput="s('orders')"><input type="number" class="num" id="in_orders" value="150" oninput="s('orders',1)"><span class="u">ped</span></div>
+    </div>
+  </div>
+
+  <div class="result" id="result"></div>
+  <div class="strategies" id="strategies"></div>
+
+  <div class="footer">Herramienta gratuita de <span>MENTORIUM</span></div>
+</div>
+<script>
+function s(k,fi){var sl=document.getElementById('sl_'+k),inp=document.getElementById('in_'+k);if(fi)sl.value=inp.value;else inp.value=sl.value;calc();}
+function fmt(n){return Math.round(n).toLocaleString('es-ES')+'€'}
+function calc(){
+  var aov=parseFloat(document.getElementById('in_aov').value)||0;
+  var ship=parseFloat(document.getElementById('in_ship').value)||0;
+  var margin=parseFloat(document.getElementById('in_margin').value)||0;
+  var orders=parseFloat(document.getElementById('in_orders').value)||0;
+  document.getElementById('lbl_aov').textContent=aov+'€';
+  document.getElementById('lbl_ship').textContent=ship+'€';
+  document.getElementById('lbl_margin').textContent=margin+'%';
+  document.getElementById('lbl_orders').textContent=orders;
+
+  // Minimum AOV to absorb shipping while keeping 20% margin
+  var min_aov_20=ship/(margin/100-0.20);
+  var min_aov_15=ship/(margin/100-0.15);
+
+  // Cost of offering free shipping
+  var monthly_cost=ship*orders;
+  var current_margin_eur=aov*margin/100;
+  var margin_after_free=(current_margin_eur-ship)/aov*100;
+
+  // Revenue boost estimate (20% more conversions with free shipping)
+  var extra_revenue=aov*orders*0.20;
+  var extra_profit=extra_revenue*margin/100-monthly_cost;
+
+  var can_do=margin_after_free>=15;
+
+  var r=document.getElementById('result');
+  r.innerHTML='<div class="main-num">'+(can_do?fmt(Math.ceil(min_aov_20)):fmt(Math.ceil(min_aov_15)))+'</div>'+
+    '<div class="main-label">Ticket mínimo para envío gratis con '+(can_do?'20':'15')+'% de margen</div>'+
+    '<div class="explain">'+
+    '<strong>Tu situación:</strong><br>'+
+    'Ticket medio: '+aov+'€<br>'+
+    'Margen bruto: '+margin+'% ('+current_margin_eur.toFixed(0)+'€/pedido)<br>'+
+    'Coste envío: '+ship+'€/pedido<br>'+
+    'Si ofreces envío gratis a todos: margen baja a <strong>'+margin_after_free.toFixed(1)+'%</strong><br>'+
+    'Coste mensual: <strong>'+fmt(monthly_cost)+'</strong> ('+orders+' pedidos × '+ship+'€)<br><br>'+
+    (extra_profit>0?
+    '<strong style="color:#2D8C4E">PERO</strong> si el envío gratis sube conversión un 20%:<br>Revenue extra: +'+fmt(extra_revenue)+'/mes<br>Profit neto extra: <strong style="color:#2D8C4E">+'+fmt(extra_profit)+'/mes</strong>':
+    '<strong style="color:#C45830">Cuidado:</strong> Con tu margen actual, el envío gratis te come demasiado. Usa umbral.')+
+    '</div>';
+
+  var shtml='';
+  shtml+='<div class="strat"><h4 class="good">Envío gratis con umbral: '+fmt(Math.ceil(aov*1.3))+'</h4><p>Ofrece envío gratis a partir de '+fmt(Math.ceil(aov*1.3))+'. El 40% de los clientes subirá su carrito para alcanzarlo.</p><div class="impact">Ticket medio sube un 15-25%. Margen se mantiene.</div></div>';
+  shtml+='<div class="strat"><h4 class="good">Envío gratis absorbido en precio</h4><p>Sube el precio del producto un '+(ship/aov*100).toFixed(0)+'% ('+fmt(ship)+') y ofrece "envío gratis". El cliente percibe gratuidad.</p><div class="impact">Mismo margen. Mejor percepción. +20% conversión.</div></div>';
+  if(margin_after_free>=15){
+    shtml+='<div class="strat"><h4 class="caution">Envío gratis para todos</h4><p>Tu margen aguanta ('+margin_after_free.toFixed(1)+'% después de absorber). Pero vigila: si el margen baja del 15%, para.</p><div class="impact">Más conversión pero menos margen por pedido. Monitorear.</div></div>';
+  }else{
+    shtml+='<div class="strat"><h4 class="bad">Envío gratis para todos: NO VIABLE</h4><p>Tu margen bajaría a '+margin_after_free.toFixed(1)+'%. Por debajo del 15% no es sostenible. Usa umbral o absorbe en precio.</p></div>';
+  }
+  document.getElementById('strategies').innerHTML=shtml;
+}
+calc();
+</script>
+</body>
+</html>

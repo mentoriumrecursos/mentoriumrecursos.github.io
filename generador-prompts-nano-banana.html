@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Prompts para Fotos de Producto — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#08080a;color:#fff;min-height:100vh}
+  .container{max-width:480px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:linear-gradient(135deg,#C45830,#e86830);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field input,.field select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none}
+  .field input:focus,.field select:focus{border-color:#C45830}
+  .field select option{background:#111;color:#fff}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{padding:8px 14px;border-radius:100px;border:1px solid #1c1c20;color:#888;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;user-select:none}
+  .chip:hover{border-color:#444;color:#ccc}
+  .chip.active{border-color:#C45830;color:#C45830;background:rgba(196,88,48,0.1)}
+  .btn{width:100%;padding:16px;background:#C45830;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px}
+  .prompts{display:none;margin-top:20px}
+  .prompt-card{background:#111113;border:1px solid #1c1c20;border-radius:14px;padding:18px;margin-bottom:12px;position:relative}
+  .prompt-type{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+  .prompt-type.lifestyle{color:#2D8C4E}
+  .prompt-type.catalog{color:#5882C4}
+  .prompt-type.ads{color:#C45830}
+  .prompt-type.social{color:#C8AA28}
+  .prompt-type.hero{color:#B43CB4}
+  .prompt-text{font-size:14px;color:#ccc;line-height:1.5;background:#0c0c0e;padding:14px;border-radius:8px;font-family:'Courier New',monospace;white-space:pre-wrap}
+  .prompt-use{font-size:11px;color:#555;margin-top:8px}
+  .copy-btn{position:absolute;top:14px;right:14px;padding:6px 14px;background:transparent;border:1px solid #333;border-radius:6px;color:#888;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+  .copy-btn:active{background:#C45830;border-color:#C45830;color:#fff}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#C45830;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Prompts para Fotos de Producto</h1>
+    <p>10 prompts listos para Nano Banana, Midjourney o DALL-E. Copia y genera.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu producto</div>
+    <div class="field"><label>Nombre del producto</label><input type="text" id="producto" placeholder="Ej: Masajeador cervical, Sérum facial, Funda LED..."></div>
+    <div class="field"><label>Color principal</label><input type="text" id="color" placeholder="Ej: negro mate, blanco, rosa gold, transparente..."></div>
+    <div class="field"><label>Tipo de producto</label>
+      <select id="tipo">
+        <option value="tech">Tech / Gadget</option>
+        <option value="beauty">Belleza / Skincare</option>
+        <option value="home">Hogar / Decoración</option>
+        <option value="fashion">Moda / Accesorios</option>
+        <option value="fitness">Fitness / Salud</option>
+        <option value="food">Alimentación / Cocina</option>
+      </select>
+    </div>
+    <div class="field"><label>Estilo de fotos que necesitas</label>
+      <div class="chips" id="estilos">
+        <div class="chip active" onclick="toggleChip(this)" data-val="lifestyle">Lifestyle</div>
+        <div class="chip active" onclick="toggleChip(this)" data-val="catalog">Catálogo</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="ads">Para Ads</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="social">Redes Sociales</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="hero">Hero Shot</div>
+      </div>
+    </div>
+    <button class="btn" onclick="gen()">Generar 10 prompts</button>
+  </div>
+
+  <div class="prompts" id="prompts"></div>
+
+  <div class="footer">Herramienta gratuita de <span>MENTORIUM</span></div>
+</div>
+<script>
+function toggleChip(el){el.classList.toggle('active')}
+function gen(){
+  var producto=document.getElementById('producto').value||'producto';
+  var color=document.getElementById('color').value||'neutral';
+  var tipo=document.getElementById('tipo').value;
+  var estilos=[];
+  document.querySelectorAll('#estilos .chip.active').forEach(function(c){estilos.push(c.dataset.val)});
+  if(estilos.length===0)estilos=['lifestyle','catalog'];
+
+  var fondos={tech:'clean white desk with MacBook',beauty:'marble countertop with soft natural light',home:'modern minimalist living room',fashion:'urban street with warm sunlight',fitness:'gym environment with natural daylight',food:'rustic wooden table with herbs'};
+  var fondo=fondos[tipo];
+
+  var prompts=[];
+
+  if(estilos.includes('lifestyle')){
+    prompts.push({type:'lifestyle',text:'Product photo of a '+color+' '+producto+' on a '+fondo+'. Natural lighting from the left. Shallow depth of field. Shot on Canon R5, 85mm f/1.4. Editorial style. No text.',use:'Para la ficha de producto principal — la que ve el cliente primero.'});
+    prompts.push({type:'lifestyle',text:'Overhead flat lay of '+producto+' ('+color+') surrounded by complementary lifestyle items on a clean surface. Soft shadows. Warm color temperature. Minimalist composition. 4K resolution.',use:'Para Instagram feed o story de producto.'});
+  }
+  if(estilos.includes('catalog')){
+    prompts.push({type:'catalog',text:producto+' ('+color+') centered on pure white background. Studio lighting, no shadows. Product fills 70% of frame. Sharp focus. Clean e-commerce product photo. PNG ready for background removal.',use:'Para la galería de producto en Shopify — fondo blanco limpio.'});
+    prompts.push({type:'catalog',text:'Three-quarter angle view of '+producto+' ('+color+') on white background. Professional product photography. Even lighting. High detail. Multiple angles showing features.',use:'Para la segunda foto de la galería — vista 3/4.'});
+  }
+  if(estilos.includes('ads')){
+    prompts.push({type:'ads',text:'Eye-catching advertisement photo of '+producto+' ('+color+') with dramatic lighting. Dark background with spotlight on product. Luxury feel. Bold and clean. Ready for ad overlay text.',use:'Para creativos de Meta Ads o TikTok Ads.'});
+    prompts.push({type:'ads',text:'Before and after split image. Left side: person frustrated with the problem. Right side: person happily using '+producto+'. Bright, positive lighting on the right side. Social media ad format.',use:'Para ads de conversión con formato antes/después.'});
+  }
+  if(estilos.includes('social')){
+    prompts.push({type:'social',text:'Instagram-ready lifestyle shot of '+producto+' ('+color+') being used in real context. Person holding/using the product. Natural environment. Candid feel. Warm tones. Vertical 9:16 format.',use:'Para reels o stories mostrando el producto en uso.'});
+    prompts.push({type:'social',text:'Aesthetic flat lay of '+producto+' with seasonal elements (plants, coffee, notebook). Top-down view. Instagram grid-worthy. Soft pastel tones. Square 1:1 format.',use:'Para post de Instagram feed — estética grid.'});
+  }
+  if(estilos.includes('hero')){
+    prompts.push({type:'hero',text:'Cinematic hero shot of '+producto+' ('+color+') floating with dynamic lighting and subtle particle effects. Dark moody background. Product is the star. Hyper-realistic 3D render style. 4K.',use:'Para la portada de la landing page o el banner principal.'});
+    prompts.push({type:'hero',text:'Close-up macro shot of '+producto+' showing texture and material quality. Shallow depth of field. Studio lighting revealing premium finish. Detail shot that builds trust.',use:'Para la sección de "calidad" en la landing — el detalle que genera confianza.'});
+  }
+
+  // Siempre añadir un prompt universal
+  prompts.push({type:'lifestyle',text:'Realistic product photography of '+producto+' ('+color+') in a clean, modern setting. The product is the focal point. Professional lighting. No text, no watermarks. High resolution commercial photography style.',use:'Prompt universal — funciona en cualquier generador de imágenes.'});
+
+  var html='<div style="font-size:13px;color:#555;margin-bottom:16px;text-align:center;">'+prompts.length+' prompts para: <strong style="color:#fff">'+producto+'</strong></div>';
+  prompts.forEach(function(p,i){
+    html+='<div class="prompt-card">';
+    html+='<button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector(\'.prompt-text\').textContent);this.textContent=\'Copiado!\';setTimeout(()=>this.textContent=\'Copiar\',1500)">Copiar</button>';
+    html+='<div class="prompt-type '+p.type+'">'+(i+1)+'. '+p.type.toUpperCase()+'</div>';
+    html+='<div class="prompt-text">'+p.text+'</div>';
+    html+='<div class="prompt-use">'+p.use+'</div>';
+    html+='</div>';
+  });
+
+  document.getElementById('prompts').innerHTML=html;
+  document.getElementById('prompts').style.display='block';
+  document.getElementById('prompts').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

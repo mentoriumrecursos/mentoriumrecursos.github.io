@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Titulos de Producto SEO — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field input[type=text],.field textarea,.field select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:14px;font-weight:500;padding:12px 14px;font-family:inherit;outline:none;transition:border-color 0.2s}
+  .field input[type=text]:focus,.field textarea:focus,.field select:focus{border-color:#00C853}
+  .field textarea{resize:vertical;min-height:70px}
+  .field select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23555' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+  .field select option{background:#111113;color:#fff}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+
+  .tags-container{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .tag{display:inline-flex;align-items:center;gap:4px;background:#1c1c20;border:1px solid #2a2a30;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:#aaa;cursor:pointer;transition:all 0.2s}
+  .tag:hover{border-color:#00C853;color:#fff}
+  .tag.active{background:#00C853;border-color:#00C853;color:#0a0a0a}
+
+  .btn{width:100%;padding:14px;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.2s;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+
+  .title-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;position:relative}
+  .title-card:hover{border-color:#00C853;background:#111113}
+  .title-card .num{position:absolute;top:12px;left:14px;font-size:10px;font-weight:800;color:#00C853;background:#0a1a0f;border:1px solid #1a3a25;border-radius:4px;padding:2px 6px}
+  .title-card .title-text{font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;padding-left:30px;line-height:1.4}
+  .title-card .meta{display:flex;gap:12px;flex-wrap:wrap;padding-left:30px}
+  .title-card .meta span{font-size:11px;color:#555;font-weight:600}
+  .title-card .meta span b{color:#888}
+  .title-card .badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;margin-left:8px}
+  .badge-seo{background:#0a1a0f;color:#00C853;border:1px solid #1a3a25}
+  .badge-emo{background:#1a1500;color:#FFB300;border:1px solid #3a3010}
+  .badge-power{background:#150a1a;color:#AB47BC;border:1px solid #2a1a35}
+  .badge-specific{background:#0a141a;color:#42A5F5;border:1px solid #1a2a3a}
+
+  .score-bar{display:flex;align-items:center;gap:8px;margin-top:10px;padding-left:30px}
+  .score-track{flex:1;height:4px;background:#1c1c20;border-radius:10px;overflow:hidden}
+  .score-fill{height:100%;border-radius:10px;transition:width 0.3s}
+  .score-label{font-size:11px;font-weight:700;min-width:28px}
+
+  .copied-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(60px);background:#00C853;color:#0a0a0a;font-size:13px;font-weight:800;padding:10px 24px;border-radius:10px;opacity:0;transition:all 0.3s;z-index:99;pointer-events:none}
+  .copied-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+  .empty-state{text-align:center;padding:40px 20px;color:#333}
+  .empty-state .icon{font-size:32px;margin-bottom:12px}
+  .empty-state p{font-size:13px;color:#444}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Titulos de Producto</h1>
+    <p>10 titulos SEO optimizados listos para copiar. Haz clic en cualquier titulo para copiarlo.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Informacion del producto</div>
+    <div class="field">
+      <label>Tipo de producto</label>
+      <input type="text" id="inp_tipo" placeholder="Ej: zapatillas deportivas, serum facial, mochila...">
+    </div>
+    <div class="field">
+      <label>Caracteristicas clave (separadas por comas)</label>
+      <textarea id="inp_features" placeholder="Ej: impermeable, ligero, con cierre magnetico, 100% algodon..."></textarea>
+      <div class="hint">Escribe las 3-5 caracteristicas que diferencian tu producto</div>
+    </div>
+    <div class="field">
+      <label>Publico objetivo</label>
+      <select id="sel_audiencia">
+        <option value="general">General</option>
+        <option value="mujeres">Mujeres 25-45</option>
+        <option value="hombres">Hombres 25-45</option>
+        <option value="jovenes">Jovenes 18-25</option>
+        <option value="premium">Comprador premium</option>
+        <option value="deportistas">Deportistas</option>
+        <option value="madres">Madres/padres</option>
+        <option value="profesionales">Profesionales</option>
+        <option value="tech">Amantes de la tecnologia</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Plataforma de venta</label>
+      <div class="tags-container" id="platforms">
+        <div class="tag active" data-val="shopify">Shopify</div>
+        <div class="tag" data-val="amazon">Amazon</div>
+        <div class="tag" data-val="etsy">Etsy</div>
+        <div class="tag" data-val="woocommerce">WooCommerce</div>
+        <div class="tag" data-val="ebay">eBay</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Estilo de titulo</label>
+      <div class="tags-container" id="estilos">
+        <div class="tag active" data-val="seo">SEO descriptivo</div>
+        <div class="tag" data-val="emocional">Emocional</div>
+        <div class="tag" data-val="power">Palabras de poder</div>
+        <div class="tag" data-val="especifico">Ultra especifico</div>
+      </div>
+    </div>
+    <button class="btn" onclick="generar()">Generar 10 titulos</button>
+  </div>
+
+  <div class="card" id="resultados_card" style="display:none">
+    <div class="card-title">Titulos generados</div>
+    <div id="resultados"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<div class="copied-toast" id="toast">Titulo copiado al portapapeles</div>
+
+<script>
+document.querySelectorAll('.tags-container').forEach(container=>{
+  container.querySelectorAll('.tag').forEach(tag=>{
+    tag.addEventListener('click',()=>{
+      container.querySelectorAll('.tag').forEach(t=>t.classList.remove('active'));
+      tag.classList.add('active');
+    });
+  });
+});
+
+function getActive(containerId){
+  const el=document.querySelector(`#${containerId} .tag.active`);
+  return el?el.dataset.val:'';
+}
+
+function showToast(){
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+const powerWords=['Premium','Profesional','Exclusivo','Original','Avanzado','Ultra','Elite','Pro','Nuevo','Mejorado','Potente','Superior','Autentico','Innovador','Definitivo'];
+const emoWords=['Irresistible','Increible','Perfecto','Ideal','Favorito','Imprescindible','Esencial','Unico','Sorprendente','Inigualable'];
+const seoConnectors=['para','con','de','en','y'];
+const benefitMap={
+  'mujeres':['Elegante','Estiloso','Versatil','Comodo','Favorecedor'],
+  'hombres':['Resistente','Robusto','Funcional','Duradero','Practico'],
+  'jovenes':['Trending','Cool','Viral','Aesthetic','Must-Have'],
+  'premium':['Luxury','Selecto','Artesanal','De Autor','Edicion Limitada'],
+  'deportistas':['Alto Rendimiento','Transpirable','Ergonomico','Tecnico','Competicion'],
+  'madres':['Seguro','Practico','Facil de Limpiar','Resistente','Multifuncional'],
+  'profesionales':['Ejecutivo','Corporativo','Formal','Sofisticado','Business'],
+  'tech':['Smart','High-Tech','Ultima Generacion','Inteligente','Digital'],
+  'general':['Versatil','Practico','Moderno','Funcional','De Calidad']
+};
+
+const platformRules={
+  shopify:{maxLen:70,tip:'Titulo corto + descriptivo'},
+  amazon:{maxLen:200,tip:'Keywords largas + beneficio'},
+  etsy:{maxLen:140,tip:'Long-tail + artesanal'},
+  woocommerce:{maxLen:70,tip:'SEO directo'},
+  ebay:{maxLen:80,tip:'Especificaciones + marca'}
+};
+
+function generar(){
+  const tipo=document.getElementById('inp_tipo').value.trim();
+  const featRaw=document.getElementById('inp_features').value.trim();
+  const audiencia=document.getElementById('sel_audiencia').value;
+  const plataforma=getActive('platforms');
+  const estilo=getActive('estilos');
+
+  if(!tipo){alert('Escribe el tipo de producto');return}
+
+  const features=featRaw?featRaw.split(',').map(s=>s.trim()).filter(Boolean):[];
+  const audBenefits=benefitMap[audiencia]||benefitMap['general'];
+  const rule=platformRules[plataforma]||platformRules['shopify'];
+  const tipoCapital=tipo.charAt(0).toUpperCase()+tipo.slice(1);
+
+  const titles=[];
+  const usedSet=new Set();
+
+  function addUnique(t){
+    const clean=t.replace(/\s+/g,' ').trim();
+    if(clean.length>5&&!usedSet.has(clean.toLowerCase())){
+      usedSet.add(clean.toLowerCase());
+      titles.push(clean);
+    }
+  }
+
+  // Pattern 1: Feature-led SEO
+  if(features.length>=2) addUnique(`${tipoCapital} ${features[0]} y ${features[1]} — ${audBenefits[0]} y ${audBenefits[1]}`);
+  else addUnique(`${tipoCapital} ${audBenefits[0]} — Calidad ${powerWords[0]}`);
+
+  // Pattern 2: Benefit-first
+  addUnique(`${audBenefits[0]} ${tipoCapital}${features.length?' con '+features[0]:''} | ${powerWords[2]}`);
+
+  // Pattern 3: Power word lead
+  addUnique(`${powerWords[0]} ${tipoCapital}${features.length>1?' '+features.slice(0,2).join(' + '):''} para ${audiencia==='general'?'Todos los Dias':audiencia.charAt(0).toUpperCase()+audiencia.slice(1)}`);
+
+  // Pattern 4: Emotional
+  addUnique(`${emoWords[Math.floor(Math.random()*emoWords.length)]} ${tipoCapital} — ${features.length?features[0]:'Maxima Calidad'} | Envio Rapido`);
+
+  // Pattern 5: Question/Problem
+  if(features.length) addUnique(`${tipoCapital} ${features[0]}${features.length>1?' y '+features[1]:''} — Lo que Estabas Buscando`);
+  else addUnique(`${tipoCapital} ${audBenefits[2]} — Lo que Estabas Buscando`);
+
+  // Pattern 6: Specificity
+  addUnique(`${tipoCapital}${features.length?' '+features[0]:''} | ${audBenefits[1]} + ${audBenefits[2]} | ${new Date().getFullYear()}`);
+
+  // Pattern 7: Social proof angle
+  addUnique(`${tipoCapital} Mas Vendido — ${features.length?features[0]:'Alta Calidad'} | ${powerWords[7]} ${audiencia!=='general'?'para '+audiencia.charAt(0).toUpperCase()+audiencia.slice(1):''}`);
+
+  // Pattern 8: Urgency lite
+  addUnique(`Nuevo: ${tipoCapital}${features.length>1?' '+features[1]:''} ${audBenefits[3]} — Stock Limitado`);
+
+  // Pattern 9: Comparison killer
+  addUnique(`${tipoCapital} ${powerWords[6]}${features.length?' — '+features[0]:''} | ${audBenefits[0]} y ${audBenefits[4]}`);
+
+  // Pattern 10: Long-tail SEO
+  const longTail=[tipoCapital];
+  features.forEach((f,i)=>{if(i<3)longTail.push(f)});
+  longTail.push(audiencia!=='general'?'para '+audiencia:'de Calidad');
+  addUnique(longTail.join(' | '));
+
+  // Fill to 10 if needed
+  while(titles.length<10){
+    const pw=powerWords[Math.floor(Math.random()*powerWords.length)];
+    const ew=emoWords[Math.floor(Math.random()*emoWords.length)];
+    const feat=features.length?features[Math.floor(Math.random()*features.length)]:'';
+    addUnique(`${pw} ${tipoCapital}${feat?' — '+feat:''} | ${ew}`);
+    if(titles.length>=10) break;
+    addUnique(`${tipoCapital} ${ew}${feat?' + '+feat:''} — ${pw}`);
+  }
+
+  // Score and render
+  const container=document.getElementById('resultados');
+  container.innerHTML='';
+  document.getElementById('resultados_card').style.display='';
+
+  titles.slice(0,10).forEach((title,i)=>{
+    const score=scoreTitle(title,features,estilo,plataforma);
+    const scoreColor=score>=80?'#00C853':score>=60?'#FFB300':'#E53935';
+    const badgeType=estilo==='seo'?'badge-seo':estilo==='emocional'?'badge-emo':estilo==='power'?'badge-power':'badge-specific';
+    const badgeLabel=estilo==='seo'?'SEO':estilo==='emocional'?'EMO':estilo==='power'?'POWER':'SPEC';
+    const charCount=title.length;
+    const charColor=charCount<=rule.maxLen?'#888':'#E53935';
+
+    const div=document.createElement('div');
+    div.className='title-card';
+    div.innerHTML=`
+      <div class="num">#${i+1}</div>
+      <div class="title-text">${title}<span class="badge ${badgeType}">${badgeLabel}</span></div>
+      <div class="meta">
+        <span><b>${charCount}</b> caracteres</span>
+        <span style="color:${charColor}">Max: ${rule.maxLen}</span>
+        <span><b>${title.split(' ').length}</b> palabras</span>
+      </div>
+      <div class="score-bar">
+        <div class="score-track"><div class="score-fill" style="width:${score}%;background:${scoreColor}"></div></div>
+        <div class="score-label" style="color:${scoreColor}">${score}%</div>
+      </div>
+    `;
+    div.addEventListener('click',()=>{
+      navigator.clipboard.writeText(title).then(()=>showToast());
+    });
+    container.appendChild(div);
+  });
+}
+
+function scoreTitle(title,features,estilo,plat){
+  let score=50;
+  const rule=platformRules[plat]||platformRules['shopify'];
+  if(title.length<=rule.maxLen) score+=15; else score-=10;
+  if(title.length>=20) score+=5;
+  features.forEach(f=>{if(title.toLowerCase().includes(f.toLowerCase())) score+=5});
+  if(title.includes('|')||title.includes('—')) score+=5;
+  powerWords.forEach(w=>{if(title.includes(w)) score+=3});
+  if(estilo==='emocional'){emoWords.forEach(w=>{if(title.includes(w)) score+=4})}
+  const words=title.split(' ').length;
+  if(words>=4&&words<=12) score+=5;
+  return Math.min(98,Math.max(20,score));
+}
+</script>
+</body>
+</html>

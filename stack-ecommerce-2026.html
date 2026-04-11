@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack Ecommerce 2026 — Las Herramientas que Usamos — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+  .container { max-width: 520px; margin: 0 auto; padding: 30px 20px; }
+
+  .header { text-align: center; margin-bottom: 40px; }
+  .header .brand { font-size: 12px; font-weight: 700; letter-spacing: 4px; color: #C45830; text-transform: uppercase; margin-bottom: 12px; }
+  .header h1 { font-size: 26px; font-weight: 900; line-height: 1.2; margin-bottom: 8px; }
+  .header p { font-size: 14px; color: #666; line-height: 1.5; }
+
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
+  .filter-btn {
+    padding: 8px 16px; border-radius: 100px; border: 1px solid #222; background: transparent;
+    color: #888; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: #444; color: #fff; }
+  .filter-btn.active { background: #C45830; border-color: #C45830; color: #fff; }
+
+  .category { margin-bottom: 30px; }
+  .cat-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830;
+    margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #1a1a1a;
+  }
+
+  .tool-card {
+    background: #111; border: 1px solid #1a1a1a; border-radius: 12px; padding: 18px; margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+  .tool-card:hover { border-color: #333; }
+  .tool-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .tool-name { font-size: 16px; font-weight: 800; color: #fff; }
+  .tool-badge {
+    font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 100px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .badge-free { background: rgba(45,140,78,0.15); color: #2D8C4E; }
+  .badge-paid { background: rgba(200,170,40,0.1); color: #C8AA28; }
+  .badge-essential { background: rgba(196,88,48,0.15); color: #C45830; }
+  .tool-desc { font-size: 13px; color: #888; line-height: 1.5; margin-bottom: 10px; }
+  .tool-why { font-size: 13px; color: #aaa; line-height: 1.5; }
+  .tool-why strong { color: #C45830; font-weight: 700; }
+  .tool-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tool-tag { font-size: 10px; color: #555; background: #0a0a0a; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+
+  .prompt-section { margin-top: 40px; }
+  .prompt-card {
+    background: #111; border: 1px solid #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 12px;
+  }
+  .prompt-title { font-size: 14px; font-weight: 800; color: #C45830; margin-bottom: 10px; }
+  .prompt-code {
+    background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 14px; font-size: 13px;
+    color: #888; line-height: 1.6; font-family: 'Courier New', monospace; white-space: pre-wrap; word-break: break-word;
+  }
+  .copy-btn {
+    margin-top: 10px; padding: 8px 16px; background: #C45830; color: #fff; border: none; border-radius: 6px;
+    font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .copy-btn:active { background: #a33d20; }
+
+  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #1a1a1a; }
+  .footer p { font-size: 12px; color: #444; margin-bottom: 4px; }
+  .footer .handle { font-size: 14px; font-weight: 700; color: #C45830; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="brand">Mentorium</div>
+    <h1>Stack Ecommerce 2026</h1>
+    <p>Las herramientas exactas que usamos para operar tiendas de 6 y 7 cifras. Sin afiliados. Solo lo que funciona.</p>
+  </div>
+
+  <div class="category">
+    <div class="cat-title">Tienda y conversión</div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">Shopify</div><div class="tool-badge badge-essential">Esencial</div></div>
+      <div class="tool-desc">La plataforma. Sin discusión en 2026.</div>
+      <div class="tool-why"><strong>Por qué:</strong> Checkout nativo con Shop Pay convierte un 15% más que cualquier alternativa. La infraestructura aguanta escalar sin problemas técnicos.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">GemPages</div><div class="tool-badge badge-paid">Desde 29$/mes</div></div>
+      <div class="tool-desc">Constructor de landing pages para Shopify.</div>
+      <div class="tool-why"><strong>Por qué:</strong> Las páginas de producto por defecto de Shopify no convierten. Con GemPages creas landings optimizadas para cada producto sin tocar código.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">PagePilot AI</div><div class="tool-badge badge-paid">Desde 29$/mes</div></div>
+      <div class="tool-desc">IA que genera páginas de producto optimizadas automáticamente.</div>
+      <div class="tool-why"><strong>Por qué:</strong> Analizas un producto → genera la landing con copy, estructura y diseño optimizado para conversión. Ahorra horas de trabajo por producto.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">Vitals</div><div class="tool-badge badge-paid">29,99$/mes</div></div>
+      <div class="tool-desc">40+ apps en una: reviews, upsells, urgencia, bundles.</div>
+      <div class="tool-why"><strong>Por qué:</strong> En vez de pagar 10 apps diferentes que ralentizan la tienda, Vitals lo tiene todo en una sola app optimizada.</div>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="cat-title">Publicidad</div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">Meta Ads</div><div class="tool-badge badge-essential">Esencial</div></div>
+      <div class="tool-desc">Facebook + Instagram. Sigue siendo el canal principal.</div>
+      <div class="tool-why"><strong>Por qué:</strong> El mejor sistema de machine learning para encontrar compradores. Advantage+ shopping en 2026 hace gran parte del trabajo.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">TikTok Ads</div><div class="tool-badge badge-paid">Variable</div></div>
+      <div class="tool-desc">Segundo canal de adquisición más potente.</div>
+      <div class="tool-why"><strong>Por qué:</strong> CPC más barato que Meta. Funciona especialmente bien para productos visuales y demos. Smart+ Campaign simplifica el setup.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">Triple Whale</div><div class="tool-badge badge-paid">Desde 100$/mes</div></div>
+      <div class="tool-desc">Dashboard de atribución multi-canal.</div>
+      <div class="tool-why"><strong>Por qué:</strong> Meta te miente sobre las conversiones. Triple Whale te dice la verdad: qué canal te da dinero de verdad y cuál se lo come.</div>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="cat-title">Email y retención</div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">Klaviyo</div><div class="tool-badge badge-essential">Esencial</div></div>
+      <div class="tool-desc">Email + SMS marketing para ecommerce.</div>
+      <div class="tool-why"><strong>Por qué:</strong> La integración con Shopify es nativa. Los flows automáticos (carrito abandonado, post-compra, winback) generan entre el 20-40% de la facturación si están bien configurados.</div>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="cat-title">IA y productividad</div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">tu IA Code</div><div class="tool-badge badge-paid">Desde 20$/mes</div></div>
+      <div class="tool-desc">IA que automatiza tareas de tu negocio.</div>
+      <div class="tool-why"><strong>Por qué:</strong> Genera descripciónes de producto, analiza datos, crea email flows, audita tu tienda. Un asistente que trabaja 24/7 por el precio de un café al día.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">Highfield (creación contenido)</div><div class="tool-badge badge-paid">Pro</div></div>
+      <div class="tool-desc">Suite de IA para generar contenido visual y escrito.</div>
+      <div class="tool-why"><strong>Por qué:</strong> Genera creativos para ads, copy para landings, ideas de contenido. Reduce el tiempo de creación un 80%.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-top"><div class="tool-name">Captions AI</div><div class="tool-badge badge-free">Plan gratis</div></div>
+      <div class="tool-desc">Subtítulos automáticos para reels y vídeos.</div>
+      <div class="tool-why"><strong>Por qué:</strong> El 80% de Instagram se consume sin sonido. Sin subtítulos pierdes la mayoría de tu audiencia.</div>
+    </div>
+  </div>
+
+  <div class="prompt-section">
+    <div class="cat-title">Prompts que usamos (copia y pega en tu IA)</div>
+
+    <div class="prompt-card">
+      <div class="prompt-title">Auditar una página de producto</div>
+      <div class="prompt-code">Analiza esta página de producto como si fueras un experto en CRO de ecommerce. URL: [PEGA LA URL]. Dame: 1) Los 3 problemas principales que están matando la conversión, 2) Cómo arreglar cada uno con instrucciones específicas, 3) Qué elementos faltan que deberían estar.</div>
+      <button class="copy-btn" onclick="copy(this)">Copiar prompt</button>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-title">Analizar métricas de Meta Ads</div>
+      <div class="prompt-code">Mis métricas de Meta Ads este mes: Gasto [X]€, Compras [X], CPA [X]€, ROAS [X], CTR [X]%, CPM [X]€. Mi ticket medio es [X]€ y mi margen bruto es [X]%. Dime: 1) Si estoy ganando o perdiendo dinero de verdad, 2) Qué métrica debo mejorar primero, 3) Acciones concretas para mejorarla esta semana.</div>
+      <button class="copy-btn" onclick="copy(this)">Copiar prompt</button>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-title">Crear email de carrito abandonado</div>
+      <div class="prompt-code">Escribe una secuencia de 3 emails de carrito abandonado para una tienda de [NICHO]. Tono directo, sin adornos. Email 1: se envía a la hora (recordatorio). Email 2: se envía a las 24h (objeción principal). Email 3: se envía a las 48h (urgencia real, no falsa). Para cada email: asunto, preview text, y cuerpo completo.</div>
+      <button class="copy-btn" onclick="copy(this)">Copiar prompt</button>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-title">Generar descripción de producto que convierta</div>
+      <div class="prompt-code">Escribe la descripción de este producto para mi tienda Shopify: [PRODUCTO]. Público: [DESCRIPCIÓN DEL CLIENTE]. Estructura: 1) Headline que ataque el problema principal, 2) 3 beneficios con prueba (no features), 3) Sección de objeciones (por qué funciona / por qué es diferente), 4) CTA claro. Tono: directo, sin adjetivos vacíos, con datos específicos.</div>
+      <button class="copy-btn" onclick="copy(this)">Copiar prompt</button>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-title">Calcular si tu producto es rentable ANTES de lanzar</div>
+      <div class="prompt-code">Quiero validar si este producto es rentable. Datos: Coste del producto: [X]€. Coste de envío: [X]€. Precio de venta previsto: [X]€. CPA estimado: [X]€. Tasa de devolución estimada: [X]%. Calcula: margen bruto, margen neto estimado, break-even en unidades, y dime si merece la pena o no con argumentos claros.</div>
+      <button class="copy-btn" onclick="copy(this)">Copiar prompt</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Herramienta gratuita de</p>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+function copy(btn) {
+  const code = btn.previousElementSibling.textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = 'Copiado';
+    setTimeout(() => btn.textContent = 'Copiar prompt', 2000);
+  });
+}
+</script>
+</body>
+</html>

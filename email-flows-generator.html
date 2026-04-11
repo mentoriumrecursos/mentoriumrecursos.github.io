@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Email Flows — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#08080a;color:#fff;min-height:100vh}
+  .container{max-width:480px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#C45830;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field input,.field select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:16px;font-weight:600;padding:14px 16px;font-family:inherit;outline:none}
+  .field input:focus,.field select:focus{border-color:#C45830}
+  .field select option{background:#111;color:#fff}
+  .btn{width:100%;padding:16px;background:#C45830;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px}
+  .btn:hover{background:#a33d20}
+  .result{display:none;margin-top:20px}
+  .flow-card{background:#111113;border:1px solid #1c1c20;border-radius:16px;margin-bottom:16px;overflow:hidden}
+  .flow-header{background:#1a1a20;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+  .flow-header h3{font-size:16px;font-weight:800;color:#C45830}
+  .flow-header .timing{font-size:12px;color:#666;font-weight:600}
+  .flow-body{padding:20px}
+  .flow-field{margin-bottom:14px}
+  .flow-field .label{font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+  .flow-field .content{font-size:14px;color:#ccc;line-height:1.6;background:#0c0c0e;padding:14px;border-radius:8px;border:1px solid #1a1a1a}
+  .copy-btn{display:inline-block;padding:8px 16px;background:transparent;border:1px solid #333;border-radius:6px;color:#888;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px}
+  .copy-btn:active{background:#C45830;border-color:#C45830;color:#fff}
+  .stat-bar{display:flex;gap:10px;margin-top:16px}
+  .stat{flex:1;text-align:center;padding:12px;background:#0c0c0e;border-radius:8px;border:1px solid #1a1a1a}
+  .stat .num{font-size:20px;font-weight:900;color:#C45830}
+  .stat .desc{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+  .footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #1a1a1a}
+  .footer .brand{font-size:12px;font-weight:800;color:#C45830;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de Email Flows</h1>
+    <p>Los 5 flows que toda tienda necesita. Personalizados para tu nicho. Listos para copiar en Klaviyo.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu tienda</div>
+    <div class="field"><label>Que vendes (nicho)</label><input type="text" id="nicho" placeholder="Ej: cosmetica natural, gadgets tech, moda mujer..."></div>
+    <div class="field"><label>Nombre de tu tienda</label><input type="text" id="tienda" placeholder="Ej: GlowSkin, TechVibe..."></div>
+    <div class="field"><label>Ticket medio</label>
+      <select id="ticket">
+        <option value="bajo">Menos de 30E</option>
+        <option value="medio" selected>30E - 80E</option>
+        <option value="alto">Mas de 80E</option>
+      </select>
+    </div>
+    <div class="field"><label>Tono de marca</label>
+      <select id="tono">
+        <option value="cercano">Cercano y humano</option>
+        <option value="premium">Premium y exclusivo</option>
+        <option value="directo" selected>Directo y sin rodeos</option>
+        <option value="divertido">Divertido y fresco</option>
+      </select>
+    </div>
+    <button class="btn" onclick="generar()">Generar mis 5 flows</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="stat-bar">
+      <div class="stat"><div class="num">5</div><div class="desc">Flows</div></div>
+      <div class="stat"><div class="num">15</div><div class="desc">Emails</div></div>
+      <div class="stat"><div class="num">~25%</div><div class="desc">Recovery rate</div></div>
+    </div>
+    <div id="flows"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+<script>
+function generar(){
+  var nicho=document.getElementById('nicho').value||'tu nicho';
+  var tienda=document.getElementById('tienda').value||'Tu Tienda';
+  var ticket=document.getElementById('ticket').value;
+  var tono=document.getElementById('tono').value;
+
+  var descuento=ticket=='bajo'?'10%':ticket=='medio'?'15%':'10% o envio gratis';
+  var saludo=tono=='cercano'?'Hola!':tono=='premium'?'Bienvenido/a.':tono=='directo'?'Hey.':tono=='divertido'?'Ey! 👋':'Hola!';
+  var cierre=tono=='cercano'?'Un abrazo,\n'+tienda:tono=='premium'?'Atentamente,\n'+tienda:tono=='directo'?'— '+tienda:tono=='divertido'?'Nos vemos! ✌️\n'+tienda:'— '+tienda;
+
+  var flows=[
+    {name:'Flow 1: Bienvenida',timing:'Trigger: suscripcion al newsletter',emails:[
+      {timing:'Inmediato',subject:'Bienvenido/a a '+tienda+' (tu '+descuento+' dentro)',body:saludo+'\n\nGracias por unirte.\n\nAqui tienes tu codigo de '+descuento+' de descuento: BIENVENIDA'+descuento.replace('%','').replace(' ','').toUpperCase()+'\n\nVálido 48 horas.\n\nMientras, te cuento rápido que hacemos:\n'+tienda+' es '+nicho+'. Cada producto que vendemos pasa por [tu diferenciador].\n\n'+cierre},
+      {timing:'+24h',subject:'Lo que nos hace diferentes',body:saludo+'\n\nNo somos otra tienda de '+nicho+'.\n\nLo que nos diferencia:\n1. [Beneficio 1 — el más potente]\n2. [Beneficio 2]\n3. [Beneficio 3]\n\nMas de [X] clientes ya lo han probado.\n\n'+cierre},
+      {timing:'+72h',subject:'Tu '+descuento+' caduca manana',body:'Solo un recordatorio:\n\nTu codigo BIENVENIDA'+descuento.replace('%','').replace(' ','').toUpperCase()+' caduca manana.\n\n'+descuento+' en cualquier producto. Sin mínimo.\n\n[Boton: VER PRODUCTOS]\n\n'+cierre}
+    ]},
+    {name:'Flow 2: Carrito Abandonado',timing:'Trigger: add to cart sin comprar',emails:[
+      {timing:'+1 hora',subject:'Te dejaste algo en el carrito',body:saludo+'\n\nVi que estabas mirando [producto].\n\nLo he guardado para ti, pero no puedo mantener el stock mucho tiempo.\n\n[Imagen del producto]\n[Boton: COMPLETAR MI PEDIDO]\n\nSi tienes alguna duda, responde a este email.\n\n'+cierre},
+      {timing:'+24h',subject:'Sigue disponible (por ahora)',body:'Tu [producto] sigue en el carrito.\n\nLo que dicen otros clientes:\n"[Review real de un cliente]"\n\nEnvio en 24-48h. Devolución gratis 30 dias.\n\n[Boton: COMPLETAR MI PEDIDO]\n\n'+cierre},
+      {timing:'+48h',subject:descuento+' extra para decidirte',body:'Ultimo intento.\n\nSe que a veces cuesta decidirse. Asi que te dejo un '+descuento+' extra:\n\nCodigo: TUCARRITO\nValido solo 24 horas.\n\n[Boton: USAR MI DESCUENTO]\n\nDespues de esto no vuelvo a escribirte sobre esto.\n\n'+cierre}
+    ]},
+    {name:'Flow 3: Post-Compra',timing:'Trigger: compra completada',emails:[
+      {timing:'+2h',subject:'Pedido confirmado — lo que viene ahora',body:saludo+'\n\nTu pedido esta confirmado.\n\nQue pasa ahora:\n1. Lo preparamos hoy\n2. Te llega en [X] dias\n3. Te mando el tracking por email\n\nSi necesitas algo, responde aqui.\n\n'+cierre},
+      {timing:'+7 dias',subject:'Que te ha parecido?',body:saludo+'\n\nYa deberia haberte llegado tu [producto].\n\nMe encantaria saber que te parece. 30 segundos:\n\n[Boton: DEJAR MI OPINION]\n\nTu opinion ayuda a otros clientes a decidirse.\n\n'+cierre},
+      {timing:'+14 dias',subject:'Algo que te puede interesar',body:'Los clientes que compraron [producto] también les gusto:\n\n[Producto complementario 1]\n[Producto complementario 2]\n\nComo ya eres cliente: envio gratis en tu proximo pedido.\n\nCodigo: REPITE\n\n'+cierre}
+    ]},
+    {name:'Flow 4: Winback (cliente inactivo)',timing:'Trigger: ultima compra hace +60 dias',emails:[
+      {timing:'Dia 60',subject:'Hace tiempo que no te vemos',body:saludo+'\n\nHace un tiempo que no pasas por '+tienda+'.\n\nDesde tu ultima compra hemos anadido:\n- [Producto nuevo 1]\n- [Producto nuevo 2]\n\nTe dejo un '+descuento+' para tu vuelta: VUELVO\n\n'+cierre},
+      {timing:'Dia 90',subject:'Nos echas de menos? Nosotros si',body:'Ultima oportunidad de usar tu '+descuento+'.\n\nCodigo: VUELVO\nCaduca en 48 horas.\n\n[Boton: VER NOVEDADES]\n\n'+cierre}
+    ]},
+    {name:'Flow 5: VIP / Repeat Buyer',timing:'Trigger: 2a compra completada',emails:[
+      {timing:'Inmediato',subject:'Eres parte del club',body:saludo+'\n\nSegunda compra. Eso te convierte en VIP.\n\nLo que significa:\n- Acceso anticipado a lanzamientos\n- Descuentos exclusivos\n- Envio prioritario\n\nGracias por confiar.\n\n'+cierre},
+      {timing:'+30 dias',subject:'Solo para VIPs: acceso anticipado',body:'Antes de que nadie lo vea:\n\n[Producto nuevo / coleccion]\n\nDisponible para ti 48h antes que para el resto.\n\n[Boton: VER ANTES QUE NADIE]\n\n'+cierre}
+    ]}
+  ];
+
+  var html='';
+  flows.forEach(function(flow){
+    html+='<div class="flow-card"><div class="flow-header"><h3>'+flow.name+'</h3><div class="timing">'+flow.timing+'</div></div><div class="flow-body">';
+    flow.emails.forEach(function(email){
+      html+='<div class="flow-field"><div class="label">Envio: '+email.timing+'</div></div>';
+      html+='<div class="flow-field"><div class="label">Asunto</div><div class="content">'+email.subject+'</div></div>';
+      html+='<div class="flow-field"><div class="label">Cuerpo</div><div class="content" style="white-space:pre-wrap">'+email.body+'</div></div>';
+      html+='<button class="copy-btn" onclick="this.textContent=\'Copiado!\';var t=this.previousElementSibling.textContent;navigator.clipboard.writeText(t);setTimeout(function(){this.textContent=\'Copiar email\'},2000)">Copiar email</button>';
+      html+='<hr style="border:none;border-top:1px solid #1a1a1a;margin:20px 0">';
+    });
+    html+='</div></div>';
+  });
+
+  document.getElementById('flows').innerHTML=html;
+  document.getElementById('result').style.display='block';
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Margen con Envio Gratis — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh}
+  .container{max-width:480px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+  .header h1{font-size:21px;font-weight:900;margin-bottom:6px;line-height:1.3}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field label .val{color:#00C853;font-weight:800}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .row .num{width:80px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#00C853}
+  .row .u{color:#555;font-size:13px;font-weight:600;width:20px}
+  .result-card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .result-card .title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .boxes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .box{padding:18px;border-radius:14px;text-align:center}
+  .box .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+  .box .amount{font-size:26px;font-weight:900}
+  .box .sub{font-size:11px;color:#888;margin-top:4px}
+  .box-green{background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2)}
+  .box-green .label{color:#00C853}
+  .box-green .amount{color:#00C853}
+  .box-red{background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.2)}
+  .box-red .label{color:#F44336}
+  .box-red .amount{color:#F44336}
+  .box-amber{background:rgba(255,193,7,0.08);border:1px solid rgba(255,193,7,0.2)}
+  .box-amber .label{color:#FFC107}
+  .box-amber .amount{color:#FFC107}
+  .big-result{text-align:center;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:16px;padding:28px;margin-bottom:16px}
+  .big-result .big{font-size:42px;font-weight:900;color:#00C853;margin-bottom:6px}
+  .big-result .desc{font-size:14px;color:#888;line-height:1.6}
+  .big-result .desc strong{color:#fff}
+  .breakdown{margin-top:16px}
+  .break-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c1c20;font-size:13px}
+  .break-row:last-child{border-bottom:none}
+  .break-row .lbl{color:#888}
+  .break-row .val{font-weight:700;color:#fff}
+  .break-row .val.green{color:#00C853}
+  .break-row .val.red{color:#F44336}
+  .warning{background:rgba(255,193,7,0.06);border:1px solid rgba(255,193,7,0.15);border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#FFC107;line-height:1.6}
+  .warning strong{color:#fff}
+  .tip{background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:12px;padding:16px;margin-top:12px;font-size:13px;color:#00C853;line-height:1.6}
+  .tip strong{color:#fff}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#00C853;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora de Margen con Envio Gratis</h1>
+    <p>Calcula el pedido minimo para ofrecer envio gratis sin destrozar tu margen.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu producto</div>
+    <div class="field">
+      <label>Coste del producto <span class="val" id="lbl_cost">12€</span></label>
+      <div class="row"><input type="range" min="1" max="150" value="12" id="sl_cost" oninput="sync('cost')"><input type="number" class="num" id="in_cost" value="12" oninput="sync('cost',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Precio de venta (unidad) <span class="val" id="lbl_price">39€</span></label>
+      <div class="row"><input type="range" min="5" max="300" value="39" id="sl_price" oninput="sync('price')"><input type="number" class="num" id="in_price" value="39" oninput="sync('price',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Coste de envio por pedido <span class="val" id="lbl_ship">5€</span></label>
+      <div class="row"><input type="range" min="1" max="30" value="5" id="sl_ship" oninput="sync('ship')"><input type="number" class="num" id="in_ship" value="5" oninput="sync('ship',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Margen minimo deseado <span class="val" id="lbl_margin">30%</span></label>
+      <div class="row"><input type="range" min="5" max="70" value="30" id="sl_margin" oninput="sync('margin')"><input type="number" class="num" id="in_margin" value="30" oninput="sync('margin',1)"><span class="u">%</span></div>
+    </div>
+    <div class="field">
+      <label>Pedidos mensuales <span class="val" id="lbl_orders">200</span></label>
+      <div class="row"><input type="range" min="10" max="2000" step="10" value="200" id="sl_orders" oninput="sync('orders')"><input type="number" class="num" id="in_orders" value="200" oninput="sync('orders',1)"><span class="u">uds</span></div>
+    </div>
+  </div>
+
+  <div class="big-result">
+    <div class="big" id="min_order">0€</div>
+    <div class="desc">Pedido minimo para envio gratis<br>manteniendo <strong id="target_pct">30%</strong> de margen</div>
+  </div>
+
+  <div class="result-card">
+    <div class="title">Comparativa mensual</div>
+    <div class="boxes">
+      <div class="box box-green">
+        <div class="label">Con envio cobrado</div>
+        <div class="amount" id="profit_ship">0€</div>
+        <div class="sub">beneficio/mes</div>
+      </div>
+      <div class="box box-amber">
+        <div class="label">Con envio gratis</div>
+        <div class="amount" id="profit_free">0€</div>
+        <div class="sub">beneficio/mes</div>
+      </div>
+    </div>
+    <div class="breakdown">
+      <div class="break-row"><span class="lbl">Margen por unidad (con envio cobrado)</span><span class="val green" id="m_unit_ship">0€</span></div>
+      <div class="break-row"><span class="lbl">Margen por unidad (envio gratis)</span><span class="val" id="m_unit_free">0€</span></div>
+      <div class="break-row"><span class="lbl">Coste envio absorbido/mes</span><span class="val red" id="ship_absorbed">0€</span></div>
+      <div class="break-row"><span class="lbl">Unidades minimas por pedido</span><span class="val green" id="min_units">0</span></div>
+      <div class="break-row"><span class="lbl">Diferencia mensual</span><span class="val red" id="diff_month">0€</span></div>
+    </div>
+  </div>
+
+  <div id="advice"></div>
+
+  <div class="footer">Herramienta interna <span>Mentorium</span></div>
+</div>
+
+<script>
+function sync(f, fromInput) {
+  const sl = document.getElementById('sl_' + f);
+  const inp = document.getElementById('in_' + f);
+  if (fromInput) { sl.value = inp.value; } else { inp.value = sl.value; }
+  const v = parseFloat(inp.value) || 0;
+  const units = {'cost':'€','price':'€','ship':'€','margin':'%','orders':''};
+  document.getElementById('lbl_' + f).textContent = v + (units[f] || '');
+  calc();
+}
+
+function calc() {
+  const cost = parseFloat(document.getElementById('in_cost').value) || 0;
+  const price = parseFloat(document.getElementById('in_price').value) || 0;
+  const ship = parseFloat(document.getElementById('in_ship').value) || 0;
+  const targetMargin = (parseFloat(document.getElementById('in_margin').value) || 0) / 100;
+  const orders = parseFloat(document.getElementById('in_orders').value) || 0;
+
+  // With shipping charged: margin per unit
+  const marginWithShip = price - cost;
+  const marginPctWithShip = price > 0 ? (marginWithShip / price) * 100 : 0;
+
+  // With free shipping: margin per unit (1 unit)
+  const marginFree1 = price - cost - ship;
+  const marginPctFree1 = price > 0 ? (marginFree1 / price) * 100 : 0;
+
+  // Minimum order value for free shipping at target margin
+  // Revenue = OrderValue, Cost = (OrderValue/price)*cost + ship
+  // Margin = (Revenue - Cost) / Revenue >= targetMargin
+  // OrderValue - (OrderValue/price)*cost - ship >= targetMargin * OrderValue
+  // OrderValue * (1 - cost/price - targetMargin) >= ship
+  // OrderValue >= ship / (1 - cost/price - targetMargin)
+  const denominator = 1 - (cost / price) - targetMargin;
+  let minOrderValue = 0;
+  let minUnits = 1;
+  if (denominator > 0 && price > 0) {
+    minOrderValue = ship / denominator;
+    minUnits = Math.ceil(minOrderValue / price);
+    if (minUnits < 1) minUnits = 1;
+    minOrderValue = minUnits * price;
+  } else {
+    minOrderValue = -1; // impossible
+  }
+
+  // Monthly calcs
+  const profitWithShip = marginWithShip * orders;
+  const profitFreeAtMin = minOrderValue > 0 ? ((minOrderValue - (minUnits * cost) - ship) / minOrderValue * minOrderValue) * (orders) / minOrderValue * (minOrderValue - minUnits * cost - ship) : 0;
+  // Simplified: assume avg order = 1 unit when free shipping
+  const profitFree1Unit = marginFree1 * orders;
+  const shipAbsorbed = ship * orders;
+  const diff = profitWithShip - profitFree1Unit;
+
+  document.getElementById('target_pct').textContent = (targetMargin * 100).toFixed(0) + '%';
+
+  if (minOrderValue < 0 || denominator <= 0) {
+    document.getElementById('min_order').textContent = 'Imposible';
+    document.getElementById('min_order').style.color = '#F44336';
+    document.getElementById('min_units').textContent = '---';
+  } else {
+    document.getElementById('min_order').textContent = minOrderValue.toFixed(0) + '€';
+    document.getElementById('min_order').style.color = '#00C853';
+    document.getElementById('min_units').textContent = minUnits + ' uds';
+  }
+
+  document.getElementById('profit_ship').textContent = profitWithShip.toFixed(0) + '€';
+  document.getElementById('profit_free').textContent = profitFree1Unit.toFixed(0) + '€';
+  document.getElementById('m_unit_ship').textContent = marginWithShip.toFixed(2) + '€ (' + marginPctWithShip.toFixed(1) + '%)';
+  document.getElementById('m_unit_free').textContent = marginFree1.toFixed(2) + '€ (' + marginPctFree1.toFixed(1) + '%)';
+  document.getElementById('m_unit_free').className = 'val ' + (marginPctFree1 >= targetMargin * 100 ? 'green' : 'red');
+  document.getElementById('ship_absorbed').textContent = '-' + shipAbsorbed.toFixed(0) + '€';
+  document.getElementById('diff_month').textContent = '-' + diff.toFixed(0) + '€';
+
+  // Advice
+  let adv = '';
+  if (minOrderValue < 0 || denominator <= 0) {
+    adv = '<div class="warning"><strong>Tu margen actual no permite ofrecer envio gratis</strong> al ' + (targetMargin*100).toFixed(0) + '% de margen objetivo. Necesitas subir el precio o bajar el coste de producto/envio.</div>';
+  } else if (minUnits === 1) {
+    adv = '<div class="tip"><strong>Puedes ofrecer envio gratis desde 1 unidad.</strong> Tu margen lo aguanta. El envio gratis aumenta la conversion entre un 15-30% segun datos del sector.</div>';
+  } else if (minUnits <= 3) {
+    adv = '<div class="tip"><strong>Envio gratis a partir de ' + minOrderValue.toFixed(0) + '€</strong> (' + minUnits + ' uds). Crea un bundle o pack para alcanzar ese minimo de forma natural. Los bundles aumentan el AOV un 20-35%.</div>';
+  } else {
+    adv = '<div class="warning"><strong>Necesitas ' + minUnits + ' unidades por pedido (' + minOrderValue.toFixed(0) + '€)</strong> para mantener tu margen. Considera: 1) Negociar envio mas barato, 2) Subir precio un 5-10%, 3) Ofrecer envio gratis solo a partir de ' + Math.round(minOrderValue * 0.8) + '€ y absorber parte del coste.</div>';
+  }
+  document.getElementById('advice').innerHTML = adv;
+}
+
+calc();
+</script>
+</body>
+</html>

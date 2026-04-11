@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría de Velocidad de Tienda — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  input[type=text]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input[type=text]:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+
+  .checklist{list-style:none}
+  .checklist li{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid #141416;cursor:pointer;transition:all 0.2s;user-select:none}
+  .checklist li:last-child{border:none}
+  .checklist li:hover{padding-left:4px}
+  .check-box{width:22px;height:22px;border:2px solid #333;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.3s;margin-top:1px}
+  .check-box svg{width:12px;height:12px;opacity:0;transition:opacity 0.2s}
+  .checklist li.checked .check-box{background:#00C853;border-color:#00C853}
+  .checklist li.checked .check-box svg{opacity:1}
+  .check-content{flex:1}
+  .check-title{font-size:14px;font-weight:700;color:#ddd;margin-bottom:3px;transition:color 0.2s}
+  .checklist li.checked .check-title{color:#00C853}
+  .check-desc{font-size:12px;color:#555;line-height:1.5}
+  .check-weight{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0;margin-top:2px}
+  .w-critical{background:rgba(255,60,60,0.12);color:#ff4444}
+  .w-high{background:rgba(255,150,30,0.12);color:#ff9020}
+  .w-medium{background:rgba(0,200,83,0.1);color:#00C853}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .score-ring{width:160px;height:160px;margin:0 auto 20px;position:relative}
+  .score-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .score-ring .bg{fill:none;stroke:#1c1c20;stroke-width:10}
+  .score-ring .fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s ease,stroke 0.5s}
+  .score-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .score-number{font-size:42px;font-weight:900;letter-spacing:-2px;line-height:1}
+  .score-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#666;margin-top:4px}
+
+  .grade-badge{text-align:center;margin-bottom:20px}
+  .grade-badge span{display:inline-block;padding:8px 24px;border-radius:8px;font-size:14px;font-weight:800;letter-spacing:1px}
+  .grade-a{background:rgba(0,200,83,0.15);color:#00C853}
+  .grade-b{background:rgba(0,200,83,0.1);color:#66BB6A}
+  .grade-c{background:rgba(255,150,30,0.12);color:#ff9020}
+  .grade-d{background:rgba(255,60,60,0.1);color:#ff6644}
+  .grade-f{background:rgba(255,60,60,0.15);color:#ff4444}
+
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+  .summary-item{background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:14px 10px;text-align:center}
+  .summary-item .s-val{font-size:22px;font-weight:900;line-height:1}
+  .summary-item .s-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#555;margin-top:6px}
+
+  .recs{margin-top:16px}
+  .rec{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;margin-bottom:10px;transition:border-color 0.3s}
+  .rec:hover{border-color:#1f1f25}
+  .rec-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .rec-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .rec-icon.red{background:rgba(255,60,60,0.12);color:#ff4444}
+  .rec-icon.orange{background:rgba(255,150,30,0.12);color:#ff9020}
+  .rec-icon.green{background:rgba(0,200,83,0.1);color:#00C853}
+  .rec-title{font-size:14px;font-weight:700}
+  .rec-text{font-size:12px;color:#777;line-height:1.6}
+
+  .impact-bar{margin-top:20px;padding:18px;background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:1px solid #1a3a25;border-radius:14px;text-align:center}
+  .impact-bar .tag{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#00C853;margin-bottom:8px}
+  .impact-bar p{font-size:13px;color:#999;line-height:1.7;font-weight:500}
+  .impact-bar strong{color:#fff}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Auditoría de Velocidad de Tienda</h1>
+    <p>Marca todo lo que tu tienda cumple. Descubre tu puntuación y qué arreglar primero para no perder ventas.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu tienda</div>
+    <div class="field">
+      <label>URL o nombre de tu tienda</label>
+      <input type="text" id="storeUrl" placeholder="Ej: miecommerce.com">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Imágenes y multimedia</div>
+    <ul class="checklist" id="cat1">
+      <li data-points="12" data-cat="critical" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Imágenes en formato WebP o AVIF</div>
+          <div class="check-desc">Los formatos modernos pesan hasta un 80% menos que JPG/PNG sin perder calidad.</div>
+        </div>
+        <span class="check-weight w-critical">Crítico</span>
+      </li>
+      <li data-points="10" data-cat="critical" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Lazy loading en imágenes</div>
+          <div class="check-desc">Las imágenes solo cargan cuando el usuario hace scroll hasta ellas.</div>
+        </div>
+        <span class="check-weight w-critical">Crítico</span>
+      </li>
+      <li data-points="7" data-cat="high" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Imágenes comprimidas (&lt;200KB)</div>
+          <div class="check-desc">Ninguna imagen de producto debería pesar más de 200KB.</div>
+        </div>
+        <span class="check-weight w-high">Alto</span>
+      </li>
+      <li data-points="5" data-cat="medium" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Sin vídeos autoplay pesados</div>
+          <div class="check-desc">Los vídeos en autoplay pueden añadir 5-10 segundos de carga.</div>
+        </div>
+        <span class="check-weight w-medium">Medio</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Código y rendimiento</div>
+    <ul class="checklist" id="cat2">
+      <li data-points="10" data-cat="critical" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">CSS y JS minificados</div>
+          <div class="check-desc">El código comprimido reduce el tamaño de descarga un 30-60%.</div>
+        </div>
+        <span class="check-weight w-critical">Crítico</span>
+      </li>
+      <li data-points="8" data-cat="high" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Menos de 15 apps/plugins instalados</div>
+          <div class="check-desc">Cada app añade código. Más de 15 = tienda lenta casi garantizado.</div>
+        </div>
+        <span class="check-weight w-high">Alto</span>
+      </li>
+      <li data-points="7" data-cat="high" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Sin scripts de terceros innecesarios</div>
+          <div class="check-desc">Hotjar, pop-ups, chats... Cada script = más milisegundos de carga.</div>
+        </div>
+        <span class="check-weight w-high">Alto</span>
+      </li>
+      <li data-points="6" data-cat="medium" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">JavaScript carga en diferido (defer/async)</div>
+          <div class="check-desc">Si JS bloquea el render, la página parece congelada.</div>
+        </div>
+        <span class="check-weight w-medium">Medio</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Infraestructura</div>
+    <ul class="checklist" id="cat3">
+      <li data-points="10" data-cat="critical" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">CDN activado (Cloudflare o similar)</div>
+          <div class="check-desc">Un CDN sirve los archivos desde el servidor más cercano al usuario.</div>
+        </div>
+        <span class="check-weight w-critical">Crítico</span>
+      </li>
+      <li data-points="8" data-cat="high" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Caché del navegador configurada</div>
+          <div class="check-desc">Los recursos se guardan localmente para que la segunda visita sea instantánea.</div>
+        </div>
+        <span class="check-weight w-high">Alto</span>
+      </li>
+      <li data-points="5" data-cat="medium" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Compresión GZIP/Brotli activada</div>
+          <div class="check-desc">Comprime los archivos antes de enviarlos. Reduce transferencia un 70%.</div>
+        </div>
+        <span class="check-weight w-medium">Medio</span>
+      </li>
+      <li data-points="4" data-cat="medium" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">HTTP/2 o HTTP/3 habilitado</div>
+          <div class="check-desc">Protocolos modernos cargan múltiples recursos en paralelo.</div>
+        </div>
+        <span class="check-weight w-medium">Medio</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Experiencia móvil</div>
+    <ul class="checklist" id="cat4">
+      <li data-points="10" data-cat="critical" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Diseño 100% responsive</div>
+          <div class="check-desc">El 70%+ del tráfico viene de móvil. Si no es perfecto ahí, pierdes dinero.</div>
+        </div>
+        <span class="check-weight w-critical">Crítico</span>
+      </li>
+      <li data-points="6" data-cat="high" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Botones táctiles de al menos 44x44px</div>
+          <div class="check-desc">Botones pequeños = frustración = abandono. Google lo penaliza.</div>
+        </div>
+        <span class="check-weight w-high">Alto</span>
+      </li>
+      <li data-points="5" data-cat="medium" onclick="toggleCheck(this)">
+        <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="check-content">
+          <div class="check-title">Sin pop-ups invasivos en móvil</div>
+          <div class="check-desc">Los pop-ups a pantalla completa en móvil matan la experiencia y el SEO.</div>
+        </div>
+        <span class="check-weight w-medium">Medio</span>
+      </li>
+    </ul>
+  </div>
+
+  <button class="btn" onclick="audit()">GENERAR AUDITORÍA</button>
+
+  <div class="results" id="results">
+    <div class="card" style="margin-top:16px;text-align:center">
+      <div class="card-title">Puntuación de velocidad</div>
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="bg" cx="60" cy="60" r="52"/>
+          <circle class="fill" id="scoreCircle" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+        </svg>
+        <div class="score-center">
+          <div class="score-number" id="scoreNum">0</div>
+          <div class="score-label">de 100</div>
+        </div>
+      </div>
+      <div class="grade-badge"><span id="gradeBadge" class="grade-f">—</span></div>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="s-val" id="sCritical" style="color:#ff4444">0</div>
+          <div class="s-label">Críticos</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-val" id="sChecked" style="color:#00C853">0</div>
+          <div class="s-label">Cumplidos</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-val" id="sTotal">0</div>
+          <div class="s-label">Total</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recomendaciones prioritarias</div>
+      <div class="recs" id="recsContainer"></div>
+    </div>
+
+    <div class="impact-bar" id="impactBar">
+      <div class="tag">Impacto estimado</div>
+      <p id="impactText"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+function toggleCheck(li){li.classList.toggle('checked')}
+
+function audit(){
+  const url=document.getElementById('storeUrl').value.trim();
+  if(!url){alert('Escribe la URL o nombre de tu tienda.');return}
+
+  const allItems=document.querySelectorAll('.checklist li');
+  let totalPoints=0,earnedPoints=0,checkedCount=0,criticalMissing=0;
+  const missing=[];
+
+  allItems.forEach(li=>{
+    const pts=parseInt(li.dataset.points);
+    const cat=li.dataset.cat;
+    totalPoints+=pts;
+    if(li.classList.contains('checked')){
+      earnedPoints+=pts;
+      checkedCount++;
+    }else{
+      missing.push({title:li.querySelector('.check-title').textContent,desc:li.querySelector('.check-desc').textContent,cat:cat,pts:pts});
+      if(cat==='critical')criticalMissing++;
+    }
+  });
+
+  const score=Math.round((earnedPoints/totalPoints)*100);
+  const total=allItems.length;
+
+  // Animate score
+  const circle=document.getElementById('scoreCircle');
+  const circumference=2*Math.PI*52;
+  const offset=circumference-(score/100)*circumference;
+  let strokeColor=score>=80?'#00C853':score>=60?'#66BB6A':score>=40?'#ff9020':'#ff4444';
+
+  setTimeout(()=>{
+    circle.style.strokeDashoffset=offset;
+    circle.style.stroke=strokeColor;
+  },200);
+  document.getElementById('scoreNum').textContent=score;
+  document.getElementById('scoreNum').style.color=strokeColor;
+
+  let grade,gradeClass;
+  if(score>=90){grade='A — Excelente';gradeClass='grade-a'}
+  else if(score>=75){grade='B — Buena';gradeClass='grade-b'}
+  else if(score>=55){grade='C — Mejorable';gradeClass='grade-c'}
+  else if(score>=35){grade='D — Preocupante';gradeClass='grade-d'}
+  else{grade='F — Crítica';gradeClass='grade-f'}
+
+  const badge=document.getElementById('gradeBadge');
+  badge.textContent=grade;
+  badge.className=gradeClass;
+
+  document.getElementById('sCritical').textContent=criticalMissing;
+  document.getElementById('sChecked').textContent=checkedCount;
+  document.getElementById('sTotal').textContent=total;
+
+  // Recs
+  missing.sort((a,b)=>b.pts-a.pts);
+  const container=document.getElementById('recsContainer');
+  container.innerHTML='';
+
+  const topRecs=missing.slice(0,5);
+  topRecs.forEach(r=>{
+    const iconClass=r.cat==='critical'?'red':r.cat==='high'?'orange':'green';
+    const icon=r.cat==='critical'?'\u26A0':r.cat==='high'?'\u25B2':'\u2139';
+    container.innerHTML+=`<div class="rec"><div class="rec-header"><div class="rec-icon ${iconClass}">${icon}</div><div class="rec-title">${r.title}</div></div><div class="rec-text">${r.desc}</div></div>`;
+  });
+
+  if(missing.length===0){
+    container.innerHTML='<div class="rec"><div class="rec-header"><div class="rec-icon green">\u2713</div><div class="rec-title">Todo en orden</div></div><div class="rec-text">Tu tienda cumple todos los puntos del checklist. Buen trabajo.</div></div>';
+  }
+
+  // Impact
+  let impactHTML='';
+  if(score<40){
+    impactHTML='<strong>'+url+'</strong> tiene problemas serios de velocidad. Con '+criticalMissing+' puntos críticos sin resolver, estás perdiendo entre un <strong>20-40% de las ventas</strong>. Cada segundo extra de carga = 7% menos de conversión. Prioridad absoluta: resolver los puntos críticos.';
+  }else if(score<65){
+    impactHTML='<strong>'+url+'</strong> tiene margen de mejora importante. Resolver los <strong>'+missing.length+' puntos pendientes</strong> podría mejorar tu conversión entre un <strong>10-25%</strong>. Empieza por los elementos marcados como Crítico y Alto.';
+  }else if(score<85){
+    impactHTML='<strong>'+url+'</strong> va bien pero puede ir mejor. Los <strong>'+missing.length+' puntos que faltan</strong> podrían darte entre un <strong>5-15% más de conversión</strong>. Son ajustes finos que marcan la diferencia entre bueno y excelente.';
+  }else{
+    impactHTML='<strong>'+url+'</strong> está optimizada. Tu tienda carga rápido y la experiencia es sólida. Mantén este nivel y revisa periódicamente que ninguna app nueva esté frenando la velocidad.';
+  }
+  document.getElementById('impactText').innerHTML=impactHTML;
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Descuento por Bundle &mdash; Mentorium</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+.container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+
+.header{text-align:center;padding:30px 0 20px}
+.logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+.header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+.header p{font-size:13px;color:#555;line-height:1.5}
+
+.card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+
+.field{margin-bottom:16px}
+.field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+.field label .val{color:#00C853;font-weight:800;font-size:14px}
+.field select,.field input[type=text]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:14px;font-weight:500;padding:12px 14px;font-family:inherit;outline:none;transition:border-color 0.2s}
+.field select:focus,.field input:focus{border-color:#00C853}
+.field select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.field .hint{font-size:11px;color:#444;margin-top:4px}
+
+.row{display:flex;align-items:center;gap:10px}
+.row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+.row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+.num-input{width:100px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px 12px;text-align:right;font-family:inherit;outline:none}
+.num-input:focus{border-color:#00C853}
+.unit{color:#555;font-size:13px;font-weight:600;width:20px;text-align:left}
+
+.product-list{margin-top:4px}
+.product-item{display:grid;grid-template-columns:1fr 90px 90px 32px;gap:8px;align-items:center;margin-bottom:8px;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.product-item input[type=text]{background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:13px;padding:10px 12px;font-family:inherit;outline:none}
+.product-item input[type=text]:focus{border-color:#00C853}
+.product-item input[type=number]{background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:10px 8px;text-align:right;font-family:inherit;outline:none}
+.product-item input[type=number]:focus{border-color:#00C853}
+.product-item .remove{width:32px;height:32px;background:none;border:1px solid #2a1515;color:#c44;font-size:16px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.product-item .remove:hover{background:#2a1515;color:#ff6b6b}
+.product-labels{display:grid;grid-template-columns:1fr 90px 90px 32px;gap:8px;font-size:11px;color:#555;font-weight:600;margin-bottom:6px;padding:0 2px}
+
+.add-btn{background:none;border:1px dashed #2a2a2e;color:#555;font-size:13px;font-weight:600;padding:10px;width:100%;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s;margin-top:4px}
+.add-btn:hover{border-color:#00C853;color:#00C853}
+
+.btn{width:100%;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.5px;transition:all 0.2s;margin-top:8px}
+.btn:hover{background:#00E676;transform:translateY(-1px)}
+
+.results{display:none;margin-top:16px}
+
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric-grid.triple{grid-template-columns:1fr 1fr 1fr}
+.metric{background:#111113;border:1px solid #1c1c20;border-radius:12px;padding:16px;text-align:center}
+.metric .num{font-size:22px;font-weight:900;color:#fff}
+.metric .num.green{color:#00C853}
+.metric .num.amber{color:#f0a030}
+.metric .num.red{color:#e04040}
+.metric .lab{font-size:10px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+.comparison{margin-bottom:16px}
+.comp-row{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:2px}
+.comp-cell{padding:14px 16px;font-size:13px}
+.comp-cell.head{background:#1c1c20;font-weight:700;color:#999;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.comp-cell.head:first-child{border-radius:10px 0 0 0}
+.comp-cell.head:last-child{border-radius:0 10px 0 0}
+.comp-cell.left{background:#111113;color:#888;border-bottom:1px solid #1c1c20}
+.comp-cell.right{background:#0c0c0e;color:#fff;font-weight:700;border-bottom:1px solid #1c1c20;text-align:right}
+.comp-cell.right .delta{font-size:11px;font-weight:600;margin-left:6px}
+.comp-cell.right .delta.up{color:#00C853}
+.comp-cell.right .delta.down{color:#e04040}
+
+.bundle-cards{display:flex;flex-direction:column;gap:10px}
+.bundle-opt{background:#111113;border:1px solid #1c1c20;border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;transition:all 0.3s}
+.bundle-opt.best{border-color:#00C853;background:#0a1a0f}
+.bundle-opt .left .name{font-size:14px;font-weight:700}
+.bundle-opt .left .det{font-size:12px;color:#666;margin-top:2px}
+.bundle-opt .right{text-align:right}
+.bundle-opt .right .price{font-size:18px;font-weight:900}
+.bundle-opt .right .margin{font-size:12px;color:#888;margin-top:2px}
+.bundle-opt .right .margin span{font-weight:700}
+.bundle-opt .badge{background:#00C853;color:#0a0a0a;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;margin-left:8px}
+
+.chart-area{position:relative;height:200px;margin:16px 0}
+.chart-area canvas{width:100%;height:100%}
+
+.insight{background:#0a1a0f;border:1px solid #1a3a25;border-radius:12px;padding:16px;font-size:13px;color:#6ab880;line-height:1.6;margin-top:16px}
+.insight strong{color:#fff}
+.insight.warning{background:#1a1500;border-color:#3a3000;color:#b8a040}
+
+.footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+.footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+.footer .sub{font-size:12px;color:#333;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Simulador de Descuento por Bundle</h1>
+    <p>Calcula el impacto real de crear bundles: AOV, margen y el tama&ntilde;o &oacute;ptimo del pack.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Productos del bundle</div>
+    <div class="product-labels"><span>Producto</span><span style="text-align:right">PVP</span><span style="text-align:right">Coste</span><span></span></div>
+    <div class="product-list" id="productList">
+      <div class="product-item">
+        <input type="text" value="Producto A" class="p-name">
+        <input type="number" value="29.90" class="p-price" min="0" step="0.01">
+        <input type="number" value="8" class="p-cost" min="0" step="0.01">
+        <button class="remove" onclick="removeProduct(this)">&times;</button>
+      </div>
+      <div class="product-item">
+        <input type="text" value="Producto B" class="p-name">
+        <input type="number" value="24.90" class="p-price" min="0" step="0.01">
+        <input type="number" value="6" class="p-cost" min="0" step="0.01">
+        <button class="remove" onclick="removeProduct(this)">&times;</button>
+      </div>
+      <div class="product-item">
+        <input type="text" value="Producto C" class="p-name">
+        <input type="number" value="19.90" class="p-price" min="0" step="0.01">
+        <input type="number" value="5" class="p-cost" min="0" step="0.01">
+        <button class="remove" onclick="removeProduct(this)">&times;</button>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addProduct()">+ A&ntilde;adir producto</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Configuraci&oacute;n del bundle</div>
+    <div class="field">
+      <label>Descuento del bundle <span class="val" id="lblDisc">15%</span></label>
+      <div class="row">
+        <input type="range" min="5" max="50" value="15" id="slDisc" oninput="syncDisc()">
+        <input type="number" class="num-input" value="15" id="numDisc" min="1" max="80" oninput="syncDiscNum()">
+        <span class="unit">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Ventas individuales actuales / mes <span class="val" id="lblSales">100</span></label>
+      <div class="row">
+        <input type="range" min="10" max="2000" value="100" step="10" id="slSales" oninput="syncSales()">
+        <input type="number" class="num-input" value="100" id="numSales" min="1" oninput="syncSalesNum()">
+        <span class="unit">ud</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>% clientes que elegir&aacute;n bundle <span class="val" id="lblConv">30%</span></label>
+      <div class="row">
+        <input type="range" min="5" max="80" value="30" id="slConv" oninput="syncConv()">
+        <input type="number" class="num-input" value="30" id="numConv" min="1" max="100" oninput="syncConvNum()">
+        <span class="unit">%</span>
+      </div>
+      <div class="hint">Estimaci&oacute;n: qu&eacute; porcentaje de clientes optar&aacute; por el pack</div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="simulate()">Simular bundle</button>
+
+  <div class="results" id="results">
+    <div class="metric-grid triple">
+      <div class="metric"><div class="num green" id="resAOV">0</div><div class="lab">Nuevo AOV</div></div>
+      <div class="metric"><div class="num" id="resAOVdelta">0</div><div class="lab">Variaci&oacute;n AOV</div></div>
+      <div class="metric"><div class="num" id="resProfit">0</div><div class="lab">Beneficio / mes</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Comparativa: sin bundle vs con bundle</div>
+      <div class="comparison" id="comparison"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Tama&ntilde;o &oacute;ptimo del bundle</div>
+      <div class="bundle-cards" id="bundleCards"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Impacto en margen por tama&ntilde;o de bundle</div>
+      <div class="chart-area"><canvas id="chartCanvas"></canvas></div>
+    </div>
+
+    <div id="insightBox"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="sub">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+function syncDisc(){const v=document.getElementById('slDisc').value;document.getElementById('numDisc').value=v;document.getElementById('lblDisc').textContent=v+'%';}
+function syncDiscNum(){const v=document.getElementById('numDisc').value;document.getElementById('slDisc').value=v;document.getElementById('lblDisc').textContent=v+'%';}
+function syncSales(){const v=document.getElementById('slSales').value;document.getElementById('numSales').value=v;document.getElementById('lblSales').textContent=v;}
+function syncSalesNum(){const v=document.getElementById('numSales').value;document.getElementById('slSales').value=v;document.getElementById('lblSales').textContent=v;}
+function syncConv(){const v=document.getElementById('slConv').value;document.getElementById('numConv').value=v;document.getElementById('lblConv').textContent=v+'%';}
+function syncConvNum(){const v=document.getElementById('numConv').value;document.getElementById('slConv').value=v;document.getElementById('lblConv').textContent=v+'%';}
+
+function addProduct(){
+  const list=document.getElementById('productList');
+  const count=list.children.length+1;
+  const item=document.createElement('div');
+  item.className='product-item';
+  item.innerHTML=`<input type="text" value="Producto ${String.fromCharCode(64+count)}" class="p-name"><input type="number" value="19.90" class="p-price" min="0" step="0.01"><input type="number" value="5" class="p-cost" min="0" step="0.01"><button class="remove" onclick="removeProduct(this)">\u00d7</button>`;
+  list.appendChild(item);
+}
+function removeProduct(btn){
+  const list=document.getElementById('productList');
+  if(list.children.length>2)btn.closest('.product-item').remove();
+}
+
+function fmt(n){return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+function simulate(){
+  const items=document.querySelectorAll('.product-item');
+  const products=[];
+  items.forEach(item=>{
+    const name=item.querySelector('.p-name').value;
+    const price=parseFloat(item.querySelector('.p-price').value)||0;
+    const cost=parseFloat(item.querySelector('.p-cost').value)||0;
+    products.push({name,price,cost,margin:price-cost});
+  });
+
+  const discPct=parseFloat(document.getElementById('numDisc').value)||15;
+  const monthlySales=parseInt(document.getElementById('numSales').value)||100;
+  const convPct=parseFloat(document.getElementById('numConv').value)||30;
+
+  const totalBundlePrice=products.reduce((s,p)=>s+p.price,0);
+  const totalBundleCost=products.reduce((s,p)=>s+p.cost,0);
+  const bundleDiscount=totalBundlePrice*(discPct/100);
+  const bundleSellPrice=totalBundlePrice-bundleDiscount;
+  const bundleMargin=bundleSellPrice-totalBundleCost;
+  const bundleMarginPct=(bundleMargin/bundleSellPrice*100);
+
+  const avgPrice=products.reduce((s,p)=>s+p.price,0)/products.length;
+  const avgCost=products.reduce((s,p)=>s+p.cost,0)/products.length;
+  const avgMargin=avgPrice-avgCost;
+  const avgMarginPct=(avgMargin/avgPrice*100);
+
+  // Without bundle
+  const revWithout=monthlySales*avgPrice;
+  const profitWithout=monthlySales*avgMargin;
+  const aovWithout=avgPrice;
+
+  // With bundle
+  const bundleBuyers=Math.round(monthlySales*(convPct/100));
+  const individualBuyers=monthlySales-bundleBuyers;
+  const revIndividual=individualBuyers*avgPrice;
+  const revBundle=bundleBuyers*bundleSellPrice;
+  const revWith=revIndividual+revBundle;
+  const profitIndividual=individualBuyers*avgMargin;
+  const profitBundle=bundleBuyers*bundleMargin;
+  const profitWith=profitIndividual+profitBundle;
+  const totalOrders=individualBuyers+bundleBuyers;
+  const aovWith=revWith/totalOrders;
+
+  const aovDelta=((aovWith-aovWithout)/aovWithout*100);
+  const profitDelta=profitWith-profitWithout;
+
+  // Top metrics
+  document.getElementById('resAOV').textContent=fmt(aovWith)+' \u20ac';
+  const aovEl=document.getElementById('resAOVdelta');
+  aovEl.textContent=(aovDelta>=0?'+':'')+aovDelta.toFixed(1)+'%';
+  aovEl.className='num '+(aovDelta>0?'green':'red');
+  const profEl=document.getElementById('resProfit');
+  profEl.textContent=(profitDelta>=0?'+':'')+fmt(profitDelta)+' \u20ac';
+  profEl.className='num '+(profitDelta>=0?'green':'red');
+
+  // Comparison table
+  const compData=[
+    ['Facturaci\u00f3n / mes',fmt(revWithout)+' \u20ac',fmt(revWith)+' \u20ac',revWith-revWithout],
+    ['Beneficio / mes',fmt(profitWithout)+' \u20ac',fmt(profitWith)+' \u20ac',profitWith-profitWithout],
+    ['AOV (ticket medio)',fmt(aovWithout)+' \u20ac',fmt(aovWith)+' \u20ac',aovWith-aovWithout],
+    ['Margen medio',avgMarginPct.toFixed(1)+'%',((profitWith/revWith)*100).toFixed(1)+'%',0],
+    ['Pedidos bundle','-',bundleBuyers+' ('+convPct+'%)',0],
+  ];
+  let compHTML='<div class="comp-row"><div class="comp-cell head">M\u00e9trica</div><div class="comp-cell head" style="text-align:right">Sin bundle \u2192 Con bundle</div></div>';
+  compData.forEach(row=>{
+    const delta=row[3];
+    let deltaHTML='';
+    if(delta!==0){
+      const sign=delta>0?'+':'';
+      deltaHTML=`<span class="delta ${delta>0?'up':'down'}">${sign}${typeof delta==='number'&&Math.abs(delta)>1?fmt(delta):delta.toFixed(1)}</span>`;
+    }
+    compHTML+=`<div class="comp-row"><div class="comp-cell left">${row[0]}</div><div class="comp-cell right">${row[1]} \u2192 ${row[2]}${deltaHTML}</div></div>`;
+  });
+  document.getElementById('comparison').innerHTML=compHTML;
+
+  // Optimal bundle sizes
+  products.sort((a,b)=>b.margin-a.margin);
+  let bundleHTML='';
+  let bestProfit=-Infinity;
+  let bestSize=2;
+
+  for(let size=2;size<=Math.min(products.length,6);size++){
+    const subset=products.slice(0,size);
+    const sp=subset.reduce((s,p)=>s+p.price,0);
+    const sc=subset.reduce((s,p)=>s+p.cost,0);
+    const bsp=sp*(1-discPct/100);
+    const bm=bsp-sc;
+    const bmPct=(bm/bsp*100);
+    if(bm>bestProfit){bestProfit=bm;bestSize=size;}
+  }
+
+  for(let size=2;size<=Math.min(products.length,6);size++){
+    const subset=products.slice(0,size);
+    const sp=subset.reduce((s,p)=>s+p.price,0);
+    const sc=subset.reduce((s,p)=>s+p.cost,0);
+    const bsp=sp*(1-discPct/100);
+    const bm=bsp-sc;
+    const bmPct=(bm/bsp*100);
+    const isBest=size===bestSize;
+    bundleHTML+=`<div class="bundle-opt${isBest?' best':''}">
+      <div class="left"><div class="name">Pack de ${size} productos${isBest?'<span class="badge">Recomendado</span>':''}</div><div class="det">PVP total: ${fmt(sp)} \u20ac \u2192 Bundle: ${fmt(bsp)} \u20ac (ahorro ${fmt(sp-bsp)} \u20ac)</div></div>
+      <div class="right"><div class="price" style="color:${bmPct>20?'#00C853':bmPct>10?'#f0a030':'#e04040'}">${fmt(bm)} \u20ac</div><div class="margin">Margen: <span style="color:${bmPct>20?'#00C853':bmPct>10?'#f0a030':'#e04040'}">${bmPct.toFixed(1)}%</span></div></div>
+    </div>`;
+  }
+  document.getElementById('bundleCards').innerHTML=bundleHTML;
+
+  // Canvas chart
+  const canvas=document.getElementById('chartCanvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth*2;
+  canvas.height=400;
+  ctx.scale(2,2);
+  const w=canvas.offsetWidth;
+  const h=200;
+  ctx.clearRect(0,0,w,h);
+
+  const chartData=[];
+  for(let d=5;d<=50;d+=5){
+    const bsp=totalBundlePrice*(1-d/100);
+    const bm=bsp-totalBundleCost;
+    const bmPct=(bm/bsp*100);
+    chartData.push({disc:d,margin:bm,pct:bmPct});
+  }
+
+  const maxM=Math.max(...chartData.map(d=>d.margin));
+  const minM=Math.min(...chartData.map(d=>d.margin),0);
+  const range=maxM-minM||1;
+  const padL=50,padR=20,padT=20,padB=30;
+  const cw=w-padL-padR;
+  const ch=h-padT-padB;
+
+  // Grid
+  ctx.strokeStyle='#1c1c20';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=padT+ch*(i/4);
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+    ctx.fillStyle='#444';ctx.font='10px Inter';ctx.textAlign='right';
+    const val=maxM-(range*(i/4));
+    ctx.fillText(val.toFixed(0)+'\u20ac',padL-6,y+3);
+  }
+
+  // Zero line
+  if(minM<0){
+    const zeroY=padT+ch*((maxM-0)/range);
+    ctx.strokeStyle='#e04040';ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(padL,zeroY);ctx.lineTo(w-padR,zeroY);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Bars
+  const barW=cw/chartData.length*0.6;
+  const gap=cw/chartData.length*0.4;
+  chartData.forEach((d,i)=>{
+    const x=padL+(cw/chartData.length)*i+(gap/2);
+    const barH=ch*(d.margin/range);
+    const zeroY=padT+ch*(maxM/range);
+    const y=d.margin>=0?zeroY-barH:zeroY;
+    const absH=Math.abs(barH);
+
+    const isSelected=d.disc===discPct;
+    ctx.fillStyle=d.margin<0?'#e04040':isSelected?'#00C853':'#1a3a25';
+    ctx.beginPath();
+    const r=3;
+    ctx.moveTo(x+r,y);ctx.lineTo(x+barW-r,y);ctx.quadraticCurveTo(x+barW,y,x+barW,y+r);
+    ctx.lineTo(x+barW,y+absH);ctx.lineTo(x,y+absH);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.fill();
+
+    ctx.fillStyle=isSelected?'#fff':'#555';ctx.font=isSelected?'bold 10px Inter':'10px Inter';ctx.textAlign='center';
+    ctx.fillText(d.disc+'%',x+barW/2,h-6);
+
+    if(isSelected){
+      ctx.fillStyle='#00C853';ctx.font='bold 10px Inter';
+      ctx.fillText(fmt(d.margin)+'\u20ac',x+barW/2,y-6);
+    }
+  });
+
+  // Labels
+  ctx.fillStyle='#555';ctx.font='10px Inter';ctx.textAlign='center';
+  ctx.fillText('Descuento %',w/2,h+2);
+
+  // Insight
+  let insightHTML='';
+  if(profitDelta>0&&bundleMarginPct>15){
+    insightHTML=`<div class="insight"><strong>Bundle rentable.</strong> Con un ${discPct}% de descuento, tu margen por bundle es del ${bundleMarginPct.toFixed(1)}% (${fmt(bundleMargin)} \u20ac por pack). Si el ${convPct}% de clientes lo elige, ganas <strong>${fmt(profitDelta)} \u20ac m\u00e1s al mes</strong> y subes el AOV un ${aovDelta.toFixed(1)}%.</div>`;
+  } else if(bundleMarginPct>5){
+    insightHTML=`<div class="insight warning"><strong>Margen ajustado.</strong> El bundle funciona, pero con un margen del ${bundleMarginPct.toFixed(1)}% est\u00e1s cediendo demasiado valor. Prueba a bajar el descuento al ${Math.max(5,discPct-5)}% o elimina el producto con menor margen del pack.</div>`;
+  } else {
+    insightHTML=`<div class="insight" style="background:#1a0a08;border-color:#3a1a15;color:#b86060"><strong>Bundle no rentable.</strong> Con el ${discPct}% de descuento, el margen baja al ${bundleMarginPct.toFixed(1)}%. Est\u00e1s regalando producto. Reduce el descuento o sube el PVP de los productos individuales primero.</div>`;
+  }
+  document.getElementById('insightBox').innerHTML=insightHTML;
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditor SEO de Producto &mdash; Mentorium</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+.container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+
+.header{text-align:center;padding:30px 0 20px}
+.logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+.header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+.header p{font-size:13px;color:#555;line-height:1.5}
+
+.card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+.field input[type=text],.field textarea{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:14px;font-weight:500;padding:12px 14px;font-family:inherit;outline:none;transition:border-color 0.2s}
+.field input:focus,.field textarea:focus{border-color:#00C853}
+.field textarea{resize:vertical;min-height:100px}
+.field .counter{text-align:right;font-size:11px;color:#444;margin-top:4px;font-weight:600}
+.field .counter.warn{color:#f0a030}
+.field .counter.bad{color:#e04040}
+.field .counter.good{color:#00C853}
+.field .hint{font-size:11px;color:#444;margin-top:4px}
+
+.tags-input{display:flex;flex-wrap:wrap;gap:6px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:8px 10px;min-height:44px;cursor:text;transition:border-color 0.2s}
+.tags-input:focus-within{border-color:#00C853}
+.tags-input .tag{background:#1a3a25;color:#00C853;font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;display:flex;align-items:center;gap:4px}
+.tags-input .tag .x{cursor:pointer;font-size:14px;opacity:0.7}
+.tags-input .tag .x:hover{opacity:1}
+.tags-input input{flex:1;min-width:100px;background:none;border:none;color:#fff;font-size:13px;font-family:inherit;outline:none;padding:4px}
+
+.btn{width:100%;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.5px;transition:all 0.2s;margin-top:8px}
+.btn:hover{background:#00E676;transform:translateY(-1px)}
+
+.results{display:none;margin-top:16px}
+
+.score-circle{text-align:center;padding:30px 20px;margin-bottom:16px}
+.circle-wrap{width:140px;height:140px;margin:0 auto;position:relative}
+.circle-svg{transform:rotate(-90deg)}
+.circle-bg{fill:none;stroke:#1c1c20;stroke-width:10}
+.circle-fg{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease,stroke 0.4s}
+.circle-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.circle-text .num{font-size:40px;font-weight:900;line-height:1}
+.circle-text .lab{font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+
+.score-label{text-align:center;font-size:14px;font-weight:700;margin-top:12px;padding:8px 20px;border-radius:8px;display:inline-block}
+.sl-good{background:rgba(0,200,83,0.12);color:#00C853}
+.sl-ok{background:rgba(240,160,48,0.12);color:#f0a030}
+.sl-bad{background:rgba(224,64,64,0.12);color:#e04040}
+
+.check-list{margin-top:8px}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid #141416;font-size:13px;line-height:1.5}
+.check-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;margin-top:1px}
+.ci-pass{background:rgba(0,200,83,0.15);color:#00C853}
+.ci-warn{background:rgba(240,160,48,0.15);color:#f0a030}
+.ci-fail{background:rgba(224,64,64,0.15);color:#e04040}
+.check-text .title{font-weight:700;color:#ccc}
+.check-text .desc{color:#666;font-size:12px;margin-top:2px}
+
+.kw-section{margin-top:16px}
+.kw-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.kw-word{width:120px;font-size:12px;font-weight:600;color:#999;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kw-bar-wrap{flex:1;height:16px;background:#1c1c20;border-radius:4px;overflow:hidden}
+.kw-bar{height:100%;border-radius:4px;transition:width 0.5s ease}
+.kw-count{width:40px;font-size:11px;font-weight:700;color:#888}
+
+.tips-box{background:#0a1a0f;border:1px solid #1a3a25;border-radius:12px;padding:16px;margin-top:16px}
+.tips-box h4{font-size:12px;font-weight:700;color:#00C853;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.tip-item{font-size:13px;color:#6ab880;line-height:1.6;padding:6px 0;border-bottom:1px solid #153020}
+.tip-item:last-child{border-bottom:none}
+.tip-item strong{color:#fff}
+
+.footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+.footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+.footer .sub{font-size:12px;color:#333;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Auditor SEO de Producto</h1>
+    <p>Analiza el SEO de tu ficha de producto y obt&eacute;n recomendaciones instant&aacute;neas.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">T&iacute;tulo del producto</div>
+    <div class="field">
+      <label>T&iacute;tulo (tag H1 / t&iacute;tulo de la ficha)</label>
+      <input type="text" id="prodTitle" placeholder="Ej: Camiseta deportiva transpirable para hombre - Secado r&aacute;pido" oninput="updateTitleCounter()">
+      <div class="counter" id="titleCounter">0 / 70 caracteres</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Meta SEO</div>
+    <div class="field">
+      <label>Meta t&iacute;tulo (title tag)</label>
+      <input type="text" id="metaTitle" placeholder="Ej: Camiseta Deportiva Hombre | Env&iacute;o Gratis | MiTienda" oninput="updateMetaCounter()">
+      <div class="counter" id="metaCounter">0 / 60 caracteres</div>
+    </div>
+    <div class="field">
+      <label>Meta descripci&oacute;n</label>
+      <textarea id="metaDesc" placeholder="Ej: Compra la camiseta deportiva transpirable para hombre con secado r&aacute;pido. Material premium, tallas S-XXL. Env&iacute;o gratis en 24h." oninput="updateDescCounter()"></textarea>
+      <div class="counter" id="descCounter">0 / 160 caracteres</div>
+    </div>
+    <div class="field">
+      <label>URL del producto (slug)</label>
+      <input type="text" id="prodUrl" placeholder="Ej: camiseta-deportiva-hombre-transpirable">
+      <div class="hint">Solo la parte final de la URL, sin dominio</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Descripci&oacute;n del producto</div>
+    <div class="field">
+      <label>Descripci&oacute;n completa</label>
+      <textarea id="prodDesc" style="min-height:150px" placeholder="Pega aqu&iacute; la descripci&oacute;n completa de tu producto..." oninput="updateProdDescCounter()"></textarea>
+      <div class="counter" id="prodDescCounter">0 palabras</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Palabras clave objetivo</div>
+    <div class="field">
+      <label>Keywords principales (pulsa Enter para a&ntilde;adir)</label>
+      <div class="tags-input" id="tagsInput" onclick="document.getElementById('tagField').focus()">
+        <input type="text" id="tagField" placeholder="A&ntilde;ade keyword y pulsa Enter...">
+      </div>
+      <div class="hint">A&ntilde;ade 3-5 keywords principales por las que quieres posicionar</div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="auditSEO()">Auditar SEO del producto</button>
+
+  <div class="results" id="results">
+    <div class="score-circle">
+      <div class="circle-wrap">
+        <svg class="circle-svg" width="140" height="140" viewBox="0 0 140 140">
+          <circle class="circle-bg" cx="70" cy="70" r="60"/>
+          <circle class="circle-fg" id="scoreFg" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="377"/>
+        </svg>
+        <div class="circle-text">
+          <div class="num" id="scoreNum">0</div>
+          <div class="lab">de 100</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:16px">
+        <span class="score-label" id="scoreLabel">-</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">An&aacute;lisis detallado</div>
+      <div class="check-list" id="checkList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Densidad de keywords</div>
+      <div class="kw-section" id="kwSection"></div>
+    </div>
+
+    <div class="tips-box" id="tipsBox"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="sub">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+const keywords = [];
+
+function updateTitleCounter(){
+  const len=document.getElementById('prodTitle').value.length;
+  const el=document.getElementById('titleCounter');
+  el.textContent=len+' / 70 caracteres';
+  el.className='counter '+(len>=30&&len<=70?'good':len>70?'bad':'warn');
+}
+function updateMetaCounter(){
+  const len=document.getElementById('metaTitle').value.length;
+  const el=document.getElementById('metaCounter');
+  el.textContent=len+' / 60 caracteres';
+  el.className='counter '+(len>=30&&len<=60?'good':len>60?'bad':'warn');
+}
+function updateDescCounter(){
+  const len=document.getElementById('metaDesc').value.length;
+  const el=document.getElementById('descCounter');
+  el.textContent=len+' / 160 caracteres';
+  el.className='counter '+(len>=120&&len<=160?'good':len>160?'bad':'warn');
+}
+function updateProdDescCounter(){
+  const text=document.getElementById('prodDesc').value.trim();
+  const words=text?text.split(/\s+/).length:0;
+  const el=document.getElementById('prodDescCounter');
+  el.textContent=words+' palabras';
+  el.className='counter '+(words>=200?'good':words>=100?'warn':'bad');
+}
+
+document.getElementById('tagField').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const val=this.value.trim().toLowerCase();
+    if(val&&!keywords.includes(val)){
+      keywords.push(val);
+      renderTags();
+    }
+    this.value='';
+  }
+});
+
+function renderTags(){
+  const container=document.getElementById('tagsInput');
+  container.querySelectorAll('.tag').forEach(t=>t.remove());
+  const input=document.getElementById('tagField');
+  keywords.forEach((kw,i)=>{
+    const tag=document.createElement('span');
+    tag.className='tag';
+    tag.innerHTML=kw+'<span class="x" onclick="removeTag('+i+')">\u00d7</span>';
+    container.insertBefore(tag,input);
+  });
+}
+function removeTag(i){keywords.splice(i,1);renderTags();}
+
+function auditSEO(){
+  const title=document.getElementById('prodTitle').value.trim();
+  const metaTitle=document.getElementById('metaTitle').value.trim();
+  const metaDesc=document.getElementById('metaDesc').value.trim();
+  const url=document.getElementById('prodUrl').value.trim().toLowerCase();
+  const desc=document.getElementById('prodDesc').value.trim();
+  const descWords=desc?desc.toLowerCase().split(/\s+/):[];
+  const descWordCount=descWords.length;
+  const allText=(title+' '+metaTitle+' '+metaDesc+' '+desc).toLowerCase();
+
+  let score=0;
+  const checks=[];
+  const tips=[];
+
+  // 1. Title length
+  if(title.length>=30&&title.length<=70){
+    score+=12;checks.push({s:'pass',t:'Longitud del t\u00edtulo H1',d:title.length+' caracteres \u2014 longitud \u00f3ptima'});
+  } else if(title.length>0&&title.length<30){
+    score+=5;checks.push({s:'warn',t:'T\u00edtulo H1 demasiado corto',d:title.length+' caracteres. Recomendado: 30-70'});
+    tips.push('Ampl\u00eda el t\u00edtulo a\u00f1adiendo <strong>beneficios o atributos</strong> del producto (material, color, uso).');
+  } else if(title.length>70){
+    score+=6;checks.push({s:'warn',t:'T\u00edtulo H1 demasiado largo',d:title.length+' caracteres. Google puede cortarlo'});
+    tips.push('Reduce el t\u00edtulo a <strong>70 caracteres m\u00e1ximo</strong> para que se muestre completo en Google.');
+  } else {
+    checks.push({s:'fail',t:'Sin t\u00edtulo H1',d:'El t\u00edtulo es el factor SEO on-page m\u00e1s importante'});
+    tips.push('A\u00f1ade un <strong>t\u00edtulo descriptivo</strong> con tu keyword principal.');
+  }
+
+  // 2. Meta title
+  if(metaTitle.length>=30&&metaTitle.length<=60){
+    score+=10;checks.push({s:'pass',t:'Meta t\u00edtulo optimizado',d:metaTitle.length+' caracteres \u2014 se mostrar\u00e1 completo en Google'});
+  } else if(metaTitle.length>0){
+    score+=4;checks.push({s:'warn',t:'Meta t\u00edtulo fuera de rango',d:metaTitle.length+' caracteres. \u00d3ptimo: 30-60'});
+    tips.push('Ajusta el meta t\u00edtulo a <strong>30-60 caracteres</strong> para m\u00e1xima visibilidad en SERPs.');
+  } else {
+    checks.push({s:'fail',t:'Sin meta t\u00edtulo',d:'Google usar\u00e1 el H1 por defecto, pierde control del snippet'});
+    tips.push('Crea un <strong>meta t\u00edtulo \u00fanico</strong> que incluya la keyword principal y un gancho para el clic.');
+  }
+
+  // 3. Meta description
+  if(metaDesc.length>=120&&metaDesc.length<=160){
+    score+=10;checks.push({s:'pass',t:'Meta descripci\u00f3n optimizada',d:metaDesc.length+' caracteres \u2014 longitud perfecta'});
+  } else if(metaDesc.length>0){
+    score+=4;checks.push({s:'warn',t:'Meta descripci\u00f3n fuera de rango',d:metaDesc.length+' caracteres. \u00d3ptimo: 120-160'});
+    tips.push('Ajusta la meta descripci\u00f3n a <strong>120-160 caracteres</strong> con un CTA claro.');
+  } else {
+    checks.push({s:'fail',t:'Sin meta descripci\u00f3n',d:'Google generar\u00e1 una autom\u00e1ticamente y perder\u00e1s control del mensaje'});
+    tips.push('Escribe una <strong>meta descripci\u00f3n persuasiva</strong> con keywords y un motivo para hacer clic.');
+  }
+
+  // 4. URL
+  if(url&&url.length>0){
+    const urlClean=!url.includes(' ')&&!url.includes('_')&&url===url.replace(/[^a-z0-9\-]/g,'');
+    if(urlClean&&url.length<=60){
+      score+=8;checks.push({s:'pass',t:'URL limpia y optimizada',d:'Slug legible con guiones, sin caracteres extra\u00f1os'});
+    } else {
+      score+=3;
+      const issues=[];
+      if(url.includes(' '))issues.push('espacios');
+      if(url.includes('_'))issues.push('guiones bajos');
+      if(url.length>60)issues.push('muy larga');
+      checks.push({s:'warn',t:'URL mejorable',d:'Problemas: '+issues.join(', ')});
+      tips.push('La URL debe usar solo <strong>letras min\u00fasculas, n\u00fameros y guiones</strong>. Sin espacios ni guiones bajos.');
+    }
+  } else {
+    checks.push({s:'fail',t:'Sin URL personalizada',d:'Usa un slug descriptivo con tu keyword principal'});
+    tips.push('Crea una <strong>URL corta y descriptiva</strong>: /tu-keyword-principal');
+  }
+
+  // 5. Description length
+  if(descWordCount>=200){
+    score+=12;checks.push({s:'pass',t:'Descripci\u00f3n extensa',d:descWordCount+' palabras \u2014 buen contenido para indexar'});
+  } else if(descWordCount>=100){
+    score+=7;checks.push({s:'warn',t:'Descripci\u00f3n corta',d:descWordCount+' palabras. M\u00ednimo recomendado: 200'});
+    tips.push('Ampl\u00eda la descripci\u00f3n a <strong>m\u00ednimo 200 palabras</strong>. Incluye beneficios, especificaciones y casos de uso.');
+  } else if(descWordCount>0){
+    score+=3;checks.push({s:'fail',t:'Descripci\u00f3n muy corta',d:descWordCount+' palabras. Insuficiente para SEO'});
+    tips.push('Tu descripci\u00f3n es demasiado corta. Google necesita <strong>contenido sustancial</strong> para posicionar.');
+  } else {
+    checks.push({s:'fail',t:'Sin descripci\u00f3n',d:'Contenido cr\u00edtico para SEO y conversi\u00f3n'});
+    tips.push('A\u00f1ade una <strong>descripci\u00f3n completa del producto</strong> con al menos 200 palabras.');
+  }
+
+  // 6. Keywords in title
+  let kwInTitle=0;
+  keywords.forEach(kw=>{if(title.toLowerCase().includes(kw))kwInTitle++;});
+  if(keywords.length>0){
+    if(kwInTitle>=1){
+      score+=10;checks.push({s:'pass',t:'Keyword en t\u00edtulo H1',d:kwInTitle+' de '+keywords.length+' keywords encontradas en el t\u00edtulo'});
+    } else {
+      checks.push({s:'fail',t:'Keyword ausente del t\u00edtulo',d:'Ninguna keyword objetivo aparece en el t\u00edtulo H1'});
+      tips.push('Incluye tu <strong>keyword principal en el t\u00edtulo</strong>, preferiblemente al inicio.');
+    }
+  }
+
+  // 7. Keywords in meta title
+  let kwInMeta=0;
+  keywords.forEach(kw=>{if(metaTitle.toLowerCase().includes(kw))kwInMeta++;});
+  if(keywords.length>0&&metaTitle){
+    if(kwInMeta>=1){
+      score+=8;checks.push({s:'pass',t:'Keyword en meta t\u00edtulo',d:kwInMeta+' keyword(s) presentes en el title tag'});
+    } else {
+      score+=2;checks.push({s:'warn',t:'Keyword ausente del meta t\u00edtulo',d:'A\u00f1ade al menos una keyword objetivo'});
+    }
+  }
+
+  // 8. Keywords in URL
+  let kwInUrl=0;
+  keywords.forEach(kw=>{if(url.includes(kw.replace(/\s+/g,'-')))kwInUrl++;});
+  if(keywords.length>0&&url){
+    if(kwInUrl>=1){
+      score+=8;checks.push({s:'pass',t:'Keyword en URL',d:'URL contiene keyword(s) objetivo'});
+    } else {
+      score+=2;checks.push({s:'warn',t:'Keyword ausente de la URL',d:'Incluir la keyword en el slug mejora el posicionamiento'});
+      tips.push('Modifica el slug para incluir tu <strong>keyword principal separada por guiones</strong>.');
+    }
+  }
+
+  // 9. Keywords in description
+  let kwInDesc=0;
+  keywords.forEach(kw=>{if(desc.toLowerCase().includes(kw))kwInDesc++;});
+  if(keywords.length>0&&desc){
+    if(kwInDesc===keywords.length){
+      score+=10;checks.push({s:'pass',t:'Todas las keywords en descripci\u00f3n',d:kwInDesc+'/'+keywords.length+' keywords presentes'});
+    } else if(kwInDesc>0){
+      score+=5;checks.push({s:'warn',t:'Keywords parciales en descripci\u00f3n',d:kwInDesc+'/'+keywords.length+' \u2014 faltan algunas keywords'});
+    } else {
+      checks.push({s:'fail',t:'Keywords ausentes de la descripci\u00f3n',d:'Ninguna keyword objetivo aparece en el texto'});
+      tips.push('Integra tus keywords de forma <strong>natural en la descripci\u00f3n</strong>, sin forzar.');
+    }
+  }
+
+  // 10. Meta desc contains keyword
+  let kwInMetaDesc=0;
+  keywords.forEach(kw=>{if(metaDesc.toLowerCase().includes(kw))kwInMetaDesc++;});
+  if(keywords.length>0&&metaDesc){
+    if(kwInMetaDesc>=1){
+      score+=6;checks.push({s:'pass',t:'Keyword en meta descripci\u00f3n',d:'Google la resalta en negrita en los resultados'});
+    } else {
+      score+=1;checks.push({s:'warn',t:'Keyword ausente de meta descripci\u00f3n',d:'Google resalta las keywords en el snippet'});
+    }
+  }
+
+  // 11. Description has structure hints
+  if(desc&&(desc.includes('\n\n')||desc.includes('- ')||desc.includes('\u2022'))){
+    score+=6;checks.push({s:'pass',t:'Descripci\u00f3n estructurada',d:'Uso de p\u00e1rrafos o listas para legibilidad'});
+  } else if(desc){
+    score+=2;checks.push({s:'warn',t:'Descripci\u00f3n sin estructura',d:'A\u00f1ade p\u00e1rrafos, listas o subt\u00edtulos'});
+    tips.push('Estructura la descripci\u00f3n con <strong>p\u00e1rrafos, listas y subt\u00edtulos</strong> para mejorar la legibilidad y el SEO.');
+  }
+
+  score=Math.min(score,100);
+
+  // Render score
+  const fg=document.getElementById('scoreFg');
+  const offset=377-(377*score/100);
+  fg.setAttribute('stroke-dashoffset',offset);
+  fg.setAttribute('stroke',score>=70?'#00C853':score>=40?'#f0a030':'#e04040');
+  document.getElementById('scoreNum').textContent=score;
+  document.getElementById('scoreNum').style.color=score>=70?'#00C853':score>=40?'#f0a030':'#e04040';
+
+  const lbl=document.getElementById('scoreLabel');
+  if(score>=80){lbl.textContent='SEO excelente';lbl.className='score-label sl-good';}
+  else if(score>=60){lbl.textContent='SEO bueno, mejorable';lbl.className='score-label sl-ok';}
+  else if(score>=40){lbl.textContent='SEO d\u00e9bil';lbl.className='score-label sl-ok';}
+  else{lbl.textContent='SEO cr\u00edtico';lbl.className='score-label sl-bad';}
+
+  // Render checks
+  let checkHTML='';
+  checks.forEach(c=>{
+    const icon=c.s==='pass'?'\u2713':c.s==='warn'?'!':'\u2717';
+    checkHTML+=`<div class="check-item"><div class="check-icon ci-${c.s}">${icon}</div><div class="check-text"><div class="title">${c.t}</div><div class="desc">${c.d}</div></div></div>`;
+  });
+  document.getElementById('checkList').innerHTML=checkHTML;
+
+  // Keyword density
+  let kwHTML='';
+  if(keywords.length>0&&descWordCount>0){
+    keywords.forEach(kw=>{
+      const regex=new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+      const matches=desc.match(regex);
+      const count=matches?matches.length:0;
+      const density=((count/descWordCount)*100).toFixed(2);
+      const maxBar=5;
+      const barW=Math.min(parseFloat(density)/maxBar*100,100);
+      const barColor=density>=1&&density<=3?'#00C853':density>3?'#e04040':'#f0a030';
+      kwHTML+=`<div class="kw-bar-row"><span class="kw-word">${kw}</span><div class="kw-bar-wrap"><div class="kw-bar" style="width:${barW}%;background:${barColor}"></div></div><span class="kw-count">${density}%</span></div>`;
+    });
+  } else {
+    kwHTML='<div style="text-align:center;color:#555;font-size:13px;padding:12px">A\u00f1ade keywords y descripci\u00f3n para ver la densidad</div>';
+  }
+  document.getElementById('kwSection').innerHTML=kwHTML;
+
+  // Tips
+  if(tips.length===0)tips.push('Tu ficha de producto est\u00e1 bien optimizada. Sigue monitorizando las posiciones en Google Search Console.');
+  let tipHTML='<h4>Recomendaciones de mejora</h4>';
+  tips.forEach(t=>{tipHTML+=`<div class="tip-item">${t}</div>`;});
+  document.getElementById('tipsBox').innerHTML=tipHTML;
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparador de Proveedores — ¿Cuál te da mejor margen? — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#f8f6f2;color:#1a1a1a;min-height:100vh}
+  .container{max-width:500px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .badge{display:inline-block;background:#C45830;color:#fff;font-size:10px;font-weight:800;padding:6px 16px;border-radius:100px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:8px}
+  .header p{font-size:13px;color:#888;line-height:1.5}
+  .card{background:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+  .card-title{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+  .card-title.a{color:#C45830}
+  .card-title.b{color:#2D8C4E}
+  .card-title.c{color:#5B6ABF}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:12px;font-weight:600;color:#888;margin-bottom:4px}
+  .field input{width:100%;background:#faf9f7;border:1px solid #e8e4de;border-radius:8px;color:#1a1a1a;font-size:15px;font-weight:700;padding:10px 12px;font-family:inherit;outline:none}
+  .field input:focus{border-color:#C45830}
+  .btn{width:100%;padding:14px;background:#1a1a1a;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px}
+  .results{display:none;margin-top:20px}
+  .winner{background:#fff;border:3px solid #2D8C4E;border-radius:16px;padding:24px;text-align:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(45,140,78,0.1)}
+  .winner .crown{font-size:32px;margin-bottom:8px}
+  .winner .name{font-size:20px;font-weight:900;color:#2D8C4E}
+  .winner .reason{font-size:13px;color:#888;margin-top:6px;line-height:1.5}
+  .compare-table{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+  .ct-row{display:grid;grid-template-columns:120px 1fr 1fr 1fr;border-bottom:1px solid #f0ede8}
+  .ct-row:last-child{border-bottom:none}
+  .ct-header{background:#faf9f7;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#888}
+  .ct-cell{padding:12px 10px;font-size:13px;text-align:center}
+  .ct-cell:first-child{text-align:left;font-weight:600;color:#888}
+  .ct-cell.best{color:#2D8C4E;font-weight:800;background:rgba(45,140,78,0.03)}
+  .ct-cell.worst{color:#C45830}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#ccc}
+  .footer span{color:#C45830;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="badge">Comparador</div>
+    <h1>¿Qué proveedor te da mejor margen?</h1>
+    <p>Compara 3 proveedores. Te dice cuál elegir y por qué.</p>
+  </div>
+
+  <div class="card">
+    <div class="field"><label>Precio de venta al cliente</label><input type="number" id="sell_price" placeholder="Ej: 45" value="45"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title a">Proveedor A</div>
+    <div class="field"><label>Nombre</label><input type="text" id="a_name" placeholder="Ej: CJDropshipping" value="Proveedor A"></div>
+    <div class="grid">
+      <div class="field"><label>Coste por unidad (€)</label><input type="number" id="a_cost" placeholder="12" value="12"></div>
+      <div class="field"><label>Envío por unidad (€)</label><input type="number" id="a_ship" placeholder="4" value="4"></div>
+      <div class="field"><label>MOQ (mín. unidades)</label><input type="number" id="a_moq" placeholder="1" value="1"></div>
+      <div class="field"><label>Tiempo envío (días)</label><input type="number" id="a_days" placeholder="7" value="7"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title b">Proveedor B</div>
+    <div class="field"><label>Nombre</label><input type="text" id="b_name" placeholder="Ej: Agente China" value="Proveedor B"></div>
+    <div class="grid">
+      <div class="field"><label>Coste por unidad (€)</label><input type="number" id="b_cost" placeholder="8" value="8"></div>
+      <div class="field"><label>Envío por unidad (€)</label><input type="number" id="b_ship" placeholder="6" value="6"></div>
+      <div class="field"><label>MOQ (mín. unidades)</label><input type="number" id="b_moq" placeholder="50" value="50"></div>
+      <div class="field"><label>Tiempo envío (días)</label><input type="number" id="b_days" placeholder="15" value="15"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title c">Proveedor C</div>
+    <div class="field"><label>Nombre</label><input type="text" id="c_name" placeholder="Ej: Almacén Europa" value="Proveedor C"></div>
+    <div class="grid">
+      <div class="field"><label>Coste por unidad (€)</label><input type="number" id="c_cost" placeholder="15" value="15"></div>
+      <div class="field"><label>Envío por unidad (€)</label><input type="number" id="c_ship" placeholder="2" value="2"></div>
+      <div class="field"><label>MOQ (mín. unidades)</label><input type="number" id="c_moq" placeholder="10" value="10"></div>
+      <div class="field"><label>Tiempo envío (días)</label><input type="number" id="c_days" placeholder="3" value="3"></div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="compare()">Comparar proveedores</button>
+
+  <div class="results" id="results"></div>
+
+  <div class="footer">Herramienta gratuita de <span>MENTORIUM</span></div>
+</div>
+<script>
+function compare(){
+  var sp=parseFloat(document.getElementById('sell_price').value)||45;
+  var provs=[
+    {id:'a',name:document.getElementById('a_name').value,cost:parseFloat(document.getElementById('a_cost').value)||0,ship:parseFloat(document.getElementById('a_ship').value)||0,moq:parseFloat(document.getElementById('a_moq').value)||1,days:parseFloat(document.getElementById('a_days').value)||0},
+    {id:'b',name:document.getElementById('b_name').value,cost:parseFloat(document.getElementById('b_cost').value)||0,ship:parseFloat(document.getElementById('b_ship').value)||0,moq:parseFloat(document.getElementById('b_moq').value)||1,days:parseFloat(document.getElementById('b_days').value)||0},
+    {id:'c',name:document.getElementById('c_name').value,cost:parseFloat(document.getElementById('c_cost').value)||0,ship:parseFloat(document.getElementById('c_ship').value)||0,moq:parseFloat(document.getElementById('c_moq').value)||1,days:parseFloat(document.getElementById('c_days').value)||0}
+  ];
+  provs.forEach(function(p){
+    p.total=p.cost+p.ship;
+    p.margin=sp-p.total;
+    p.marginPct=(p.margin/sp*100);
+    p.investment=p.total*p.moq;
+    // Score: higher margin = better, lower days = better, lower MOQ = better
+    p.score=p.marginPct*2 + (30-Math.min(p.days,30)) + (100-Math.min(p.moq,100))/10;
+  });
+
+  var best=provs.reduce(function(a,b){return a.score>b.score?a:b});
+
+  var html='<div class="winner"><div class="crown">🏆</div><div class="name">'+best.name+'</div><div class="reason">Mejor relación margen ('+best.marginPct.toFixed(0)+'%) + envío ('+best.days+' días) + inversión mínima ('+best.investment+'€)</div></div>';
+
+  html+='<div class="compare-table">';
+  html+='<div class="ct-row ct-header"><div class="ct-cell"></div><div class="ct-cell">'+provs[0].name+'</div><div class="ct-cell">'+provs[1].name+'</div><div class="ct-cell">'+provs[2].name+'</div></div>';
+
+  var metrics=[
+    {label:'Coste/ud',key:'cost',lower:true},
+    {label:'Envío/ud',key:'ship',lower:true},
+    {label:'Coste total',key:'total',lower:true},
+    {label:'Margen/ud',key:'margin',lower:false},
+    {label:'Margen %',key:'marginPct',lower:false,pct:true},
+    {label:'MOQ',key:'moq',lower:true},
+    {label:'Inversión mín.',key:'investment',lower:true},
+    {label:'Días envío',key:'days',lower:true}
+  ];
+
+  metrics.forEach(function(m){
+    var vals=provs.map(function(p){return p[m.key]});
+    var bestVal=m.lower?Math.min.apply(null,vals):Math.max.apply(null,vals);
+    var worstVal=m.lower?Math.max.apply(null,vals):Math.min.apply(null,vals);
+    html+='<div class="ct-row">';
+    html+='<div class="ct-cell">'+m.label+'</div>';
+    provs.forEach(function(p){
+      var v=m.pct?p[m.key].toFixed(0)+'%':p[m.key].toFixed(0)+'€';
+      var cls=p[m.key]===bestVal?'best':p[m.key]===worstVal?'worst':'';
+      html+='<div class="ct-cell '+cls+'">'+v+'</div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+
+  document.getElementById('results').innerHTML=html;
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

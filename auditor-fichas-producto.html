@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditor de Ficha de Producto — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:560px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:420px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .audit-category{margin-bottom:24px}
+  .audit-category:last-child{margin-bottom:0}
+  .cat-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .cat-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#0a0a0a;flex-shrink:0}
+  .cat-name{font-size:14px;font-weight:700}
+  .cat-weight{font-size:11px;color:#555;font-weight:600;margin-left:auto}
+
+  .check-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.2s;user-select:none}
+  .check-item:hover{border-color:#222}
+  .check-item.checked{border-color:rgba(0,200,83,0.3);background:rgba(0,200,83,0.03)}
+  .check-item.checked .checkbox{background:#00C853;border-color:#00C853}
+  .check-item.checked .checkbox::after{opacity:1}
+  .checkbox{width:22px;height:22px;border:2px solid #333;border-radius:6px;flex-shrink:0;position:relative;transition:all 0.2s;margin-top:1px}
+  .checkbox::after{content:'\2713';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:900;color:#0a0a0a;opacity:0;transition:opacity 0.2s}
+  .check-text{flex:1}
+  .check-label{font-size:13px;font-weight:600;line-height:1.4}
+  .check-desc{font-size:11px;color:#555;margin-top:3px;line-height:1.4}
+  .check-points{font-size:12px;font-weight:800;color:#444;flex-shrink:0;margin-top:2px}
+  .check-item.checked .check-points{color:#00C853}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .score-hero{text-align:center;padding:30px 20px;border-radius:18px;margin-bottom:16px;position:relative}
+  .score-hero.excellent{background:linear-gradient(135deg,#0a1a0f,#111113);border:2px solid #1a3a25}
+  .score-hero.good{background:linear-gradient(135deg,#0a1a0f,#111113);border:2px solid #1a3a25}
+  .score-hero.average{background:linear-gradient(135deg,#1a1500,#111113);border:2px solid #3a2a00}
+  .score-hero.poor{background:linear-gradient(135deg,#1a0a08,#111113);border:2px solid #3a1a15}
+  .score-label{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:12px}
+  .score-ring{width:140px;height:140px;margin:0 auto 16px;position:relative}
+  .score-ring svg{transform:rotate(-90deg)}
+  .score-ring .score-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:42px;font-weight:900;letter-spacing:-2px}
+  .score-ring .score-max{position:absolute;top:62%;left:50%;transform:translate(-50%,0);font-size:13px;color:#555;font-weight:600}
+  .score-verdict{font-size:15px;font-weight:800;margin-top:6px}
+  .score-verdict.c-green{color:#00C853}
+  .score-verdict.c-yellow{color:#F5A623}
+  .score-verdict.c-red{color:#E53935}
+
+  .category-breakdown{margin-bottom:8px}
+  .cat-bar-row{display:grid;grid-template-columns:120px 1fr 50px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #141416}
+  .cat-bar-label{font-size:12px;font-weight:600;color:#888}
+  .cat-bar-bg{height:8px;background:#1c1c20;border-radius:4px;overflow:hidden}
+  .cat-bar-fill{height:100%;border-radius:4px;transition:width 0.8s ease}
+  .cat-bar-score{font-size:13px;font-weight:800;text-align:right}
+
+  .fix-list{margin-top:0}
+  .fix-item{display:flex;gap:12px;padding:14px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;margin-bottom:8px}
+  .fix-priority{width:8px;border-radius:4px;flex-shrink:0}
+  .fix-priority.high{background:#E53935}
+  .fix-priority.med{background:#F5A623}
+  .fix-priority.low{background:#00C853}
+  .fix-content{flex:1}
+  .fix-title{font-size:13px;font-weight:700;margin-bottom:3px}
+  .fix-desc{font-size:12px;color:#666;line-height:1.5}
+  .fix-impact{font-size:11px;font-weight:700;margin-top:6px;color:#888}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Auditor de Ficha de Producto</h1>
+    <p>20 puntos que tu ficha debe cumplir para convertir. Marca cada uno y descubre tu nota real.</p>
+  </div>
+
+  <div id="audit-form"></div>
+
+  <button class="btn" onclick="audit()">AUDITAR FICHA</button>
+
+  <div class="results" id="results">
+    <div class="score-hero" id="score-hero">
+      <div class="score-label">Puntuación de tu ficha</div>
+      <div class="score-ring">
+        <svg width="140" height="140">
+          <circle cx="70" cy="70" r="60" stroke="#1c1c20" stroke-width="10" fill="none"/>
+          <circle id="score-circle" cx="70" cy="70" r="60" stroke="#00C853" stroke-width="10" fill="none" stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round" style="transition:stroke-dashoffset 1s ease"/>
+        </svg>
+        <div class="score-num" id="score-num">0</div>
+      </div>
+      <div class="score-verdict" id="score-verdict"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Puntuación por categoría</div>
+      <div id="category-breakdown"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Correcciones prioritarias</div>
+      <div id="fix-list"></div>
+    </div>
+
+    <div class="footer">
+      <div class="brand">MENTORIUM</div>
+      <div class="handle">@javier.sanchezecom</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = [
+  {
+    name: 'Título y SEO', icon: 'T', color: '#4285F4', weight: 20,
+    items: [
+      {label:'Título con keyword principal', desc:'Incluye la palabra clave que busca tu cliente', points:5, fix:'Añade la keyword principal al inicio del título. Ej: "Sérum Vitamina C" en vez de "Nuestro mejor sérum"', impact:'Alto impacto en SEO y CTR'},
+      {label:'Título entre 50-70 caracteres', desc:'Ni muy corto ni cortado en Google', points:5, fix:'Ajusta el título para que tenga entre 50 y 70 caracteres. Usa la fórmula: [Producto] + [Beneficio principal] + [Diferenciador]', impact:'Mejora visibilidad en buscadores'},
+      {label:'Meta descripción optimizada', desc:'155 caracteres con beneficio + CTA', points:5, fix:'Escribe una meta descripción de 150-155 caracteres que incluya el beneficio principal y termine con una llamada a la acción', impact:'Aumenta CTR desde Google un 15-30%'},
+      {label:'URL limpia y descriptiva', desc:'Sin números aleatorios ni caracteres raros', points:5, fix:'Cambia la URL a formato: tutienda.com/producto/nombre-producto-keyword. Sin IDs, sin números, sin mayúsculas', impact:'Mejora SEO y confianza del usuario'},
+    ]
+  },
+  {
+    name: 'Imágenes', icon: 'I', color: '#00C853', weight: 25,
+    items: [
+      {label:'Mínimo 5 imágenes de producto', desc:'Diferentes ángulos, contextos y detalles', points:5, fix:'Sube al menos 5 fotos: frontal, lateral, detalle, en uso/lifestyle y packaging. Más fotos = más confianza', impact:'Cada foto extra puede aumentar conversión un 3-5%'},
+      {label:'Primera imagen sobre fondo blanco', desc:'La imagen principal debe ser limpia y profesional', points:5, fix:'Usa fondo blanco puro (#FFFFFF) para la primera imagen. Es lo que sale en búsquedas y comparadores', impact:'Mejora CTR en catálogo y Google Shopping'},
+      {label:'Al menos 1 imagen lifestyle', desc:'El producto en contexto real de uso', points:5, fix:'Añade mínimo una foto del producto siendo usado por una persona real. Ayuda al cliente a visualizarse con él', impact:'Las fotos lifestyle aumentan tiempo en página un 25%'},
+      {label:'Imágenes en alta calidad (mín 1000px)', desc:'Que se pueda hacer zoom sin pixelar', points:5, fix:'Todas las imágenes deben ser de mínimo 1000x1000px. Usa formato WebP para mejor carga', impact:'El zoom funcional reduce devoluciones un 10-15%'},
+      {label:'Imagen con beneficios/specs superpuestos', desc:'Infografía visual con datos clave del producto', points:5, fix:'Crea una imagen tipo infografía que muestre los 3-4 beneficios principales directamente sobre la foto del producto', impact:'Reduce preguntas frecuentes y acelera la decisión'},
+    ]
+  },
+  {
+    name: 'Descripción y copy', icon: 'D', color: '#F5A623', weight: 25,
+    items: [
+      {label:'Primer párrafo con beneficio principal', desc:'No features, sino qué problema resuelve', points:5, fix:'Reescribe el primer párrafo centrado en el beneficio: qué gana el cliente, qué problema elimina. Sin hablar del producto aún', impact:'El 60% de los usuarios solo lee el primer párrafo'},
+      {label:'Bullets con características clave', desc:'3-5 bullets escaneables con specs importantes', points:5, fix:'Añade 3-5 bullet points con formato: [Beneficio] + [Característica técnica]. Ej: "Piel hidratada 24h — fórmula con ácido hialurónico al 2%"', impact:'Los bullets se leen 3x más que los párrafos'},
+      {label:'Descripción de más de 200 palabras', desc:'Contenido suficiente para SEO y para convencer', points:5, fix:'Amplía la descripción hasta al menos 200 palabras. Incluye: problema, solución, cómo usar, para quién es, qué incluye', impact:'Las fichas con +200 palabras posicionan un 30% mejor'},
+      {label:'Incluye sección "Para quién es"', desc:'Segmenta al buyer persona dentro de la ficha', points:5, fix:'Añade un bloque "Ideal para ti si..." con 3-4 situaciones que reflejen a tu cliente ideal. Ayuda a la autoidentificación', impact:'Aumenta relevancia percibida y reduce tasa de rebote'},
+      {label:'CTA claro y diferenciado', desc:'Botón de compra visible con texto persuasivo', points:5, fix:'El botón debe decir más que "Añadir al carrito". Prueba: "Lo quiero", "Comprar ahora — Envío gratis" o "Conseguir el mío"', impact:'CTAs personalizados mejoran conversión un 5-10%'},
+    ]
+  },
+  {
+    name: 'Confianza y prueba social', icon: 'C', color: '#7C4DFF', weight: 30,
+    items: [
+      {label:'Mínimo 10 reseñas visibles', desc:'Con foto y nombre real si es posible', points:6, fix:'Si no tienes 10 reseñas, activa un flujo post-compra automático. Ofrece un 10% en la siguiente compra a cambio de reseña con foto', impact:'Las fichas con +10 reseñas convierten un 45% más'},
+      {label:'Puntuación media visible (estrellas)', desc:'Rating agregado en la parte superior de la ficha', points:6, fix:'Muestra la puntuación media con estrellas justo debajo del título. Si usas Shopify, instala Judge.me o Loox', impact:'Las estrellas aumentan CTR un 35% en búsquedas'},
+      {label:'Badges de confianza (envío, garantía, pago)', desc:'Iconos visibles de envío gratis, devolución y pago seguro', points:6, fix:'Añade 3-4 iconos justo debajo del botón de compra: envío gratis, devolución en 30 días, pago seguro, soporte 24/7', impact:'Los trust badges aumentan conversión un 12-15%'},
+      {label:'Política de devoluciones visible', desc:'El cliente sabe qué pasa si no le gusta', points:6, fix:'Incluye un acordeón o bloque visible con tu política de devoluciones. Mínimo: plazo, condiciones y proceso', impact:'La garantía visible reduce abandono de carrito un 18%'},
+      {label:'Sello o certificación si aplica', desc:'Eco, cruelty-free, FDA, CE u otros', points:6, fix:'Si tu producto tiene alguna certificación, muéstrala con icono visible. Si no, destaca "fabricado en la UE" o "testado dermatológicamente"', impact:'Las certificaciones aumentan confianza percibida un 20%'},
+    ]
+  }
+];
+
+const totalMaxPoints = CATEGORIES.reduce((s,c) => s + c.items.reduce((ss,it) => ss + it.points, 0), 0);
+
+function buildForm(){
+  const form = document.getElementById('audit-form');
+  CATEGORIES.forEach((cat, ci) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    let html = `
+      <div class="cat-header">
+        <div class="cat-icon" style="background:${cat.color}">${cat.icon}</div>
+        <div class="cat-name">${cat.name}</div>
+        <div class="cat-weight">${cat.weight}% del total</div>
+      </div>
+    `;
+    cat.items.forEach((item, ii) => {
+      const id = `check-${ci}-${ii}`;
+      html += `
+        <div class="check-item" id="${id}" onclick="toggleCheck('${id}')">
+          <div class="checkbox"></div>
+          <div class="check-text">
+            <div class="check-label">${item.label}</div>
+            <div class="check-desc">${item.desc}</div>
+          </div>
+          <div class="check-points">${item.points}pts</div>
+        </div>
+      `;
+    });
+    card.innerHTML = html;
+    form.appendChild(card);
+  });
+}
+
+function toggleCheck(id){
+  document.getElementById(id).classList.toggle('checked');
+}
+
+function audit(){
+  let totalScore = 0;
+  const catScores = [];
+  const fixes = [];
+
+  CATEGORIES.forEach((cat, ci) => {
+    let catMax = 0, catGot = 0;
+    cat.items.forEach((item, ii) => {
+      catMax += item.points;
+      const el = document.getElementById(`check-${ci}-${ii}`);
+      if(el.classList.contains('checked')){
+        catGot += item.points;
+      } else {
+        fixes.push({
+          label: item.label,
+          fix: item.fix,
+          impact: item.impact,
+          points: item.points,
+          category: cat.name
+        });
+      }
+    });
+    totalScore += catGot;
+    catScores.push({name: cat.name, color: cat.color, got: catGot, max: catMax, pct: Math.round(catGot/catMax*100)});
+  });
+
+  const pct = Math.round(totalScore / totalMaxPoints * 100);
+
+  // Score hero
+  const heroEl = document.getElementById('score-hero');
+  let verdictText, verdictClass, heroClass, strokeColor;
+  if(pct >= 85){
+    verdictText = 'Ficha excelente \u2014 Optimiza detalles';
+    verdictClass = 'c-green'; heroClass = 'excellent'; strokeColor = '#00C853';
+  } else if(pct >= 65){
+    verdictText = 'Buena base \u2014 Hay margen de mejora';
+    verdictClass = 'c-green'; heroClass = 'good'; strokeColor = '#00C853';
+  } else if(pct >= 40){
+    verdictText = 'Ficha mediocre \u2014 Estás perdiendo ventas';
+    verdictClass = 'c-yellow'; heroClass = 'average'; strokeColor = '#F5A623';
+  } else {
+    verdictText = 'Ficha rota \u2014 Corrige antes de meter tráfico';
+    verdictClass = 'c-red'; heroClass = 'poor'; strokeColor = '#E53935';
+  }
+
+  heroEl.className = 'score-hero ' + heroClass;
+  document.getElementById('score-num').textContent = totalScore;
+  document.getElementById('score-num').style.color = strokeColor;
+  const circumference = 2 * Math.PI * 60;
+  const offset = circumference - (pct / 100) * circumference;
+  const circle = document.getElementById('score-circle');
+  circle.style.stroke = strokeColor;
+  setTimeout(() => { circle.style.strokeDashoffset = offset; }, 100);
+  document.getElementById('score-verdict').textContent = verdictText;
+  document.getElementById('score-verdict').className = 'score-verdict ' + verdictClass;
+
+  // Category breakdown
+  const breakdownEl = document.getElementById('category-breakdown');
+  breakdownEl.innerHTML = '';
+  catScores.forEach(cs => {
+    breakdownEl.innerHTML += `
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">${cs.name}</div>
+        <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${cs.pct}%;background:${cs.color}"></div></div>
+        <div class="cat-bar-score" style="color:${cs.pct>=70?'#00C853':cs.pct>=40?'#F5A623':'#E53935'}">${cs.got}/${cs.max}</div>
+      </div>
+    `;
+  });
+
+  // Fixes sorted by points (highest impact first)
+  fixes.sort((a,b) => b.points - a.points);
+  const fixEl = document.getElementById('fix-list');
+  fixEl.innerHTML = '';
+  fixes.slice(0, 8).forEach((f, i) => {
+    const priority = i < 3 ? 'high' : (i < 6 ? 'med' : 'low');
+    fixEl.innerHTML += `
+      <div class="fix-item">
+        <div class="fix-priority ${priority}"></div>
+        <div class="fix-content">
+          <div class="fix-title">${f.label}</div>
+          <div class="fix-desc">${f.fix}</div>
+          <div class="fix-impact">${f.impact} \u2022 +${f.points} puntos</div>
+        </div>
+      </div>
+    `;
+  });
+
+  if(fixes.length === 0){
+    fixEl.innerHTML = '<div style="text-align:center;padding:20px;color:#00C853;font-weight:700">Tu ficha cumple todos los puntos. Enhorabuena.</div>';
+  }
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+buildForm();
+</script>
+</body>
+</html>

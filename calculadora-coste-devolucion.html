@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Coste Real de Devoluciones — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+
+  .field{margin-bottom:16px}
+  .field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field label .val{color:#00C853;font-weight:800;font-size:14px}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .row .num-input{width:90px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px 12px;text-align:right;font-family:inherit;outline:none}
+  .row .num-input:focus{border-color:#00C853}
+  .row .unit{color:#555;font-size:13px;font-weight:600;min-width:20px}
+
+  .result-box{text-align:center;padding:30px 20px;border-radius:16px;margin-top:16px;transition:all 0.3s}
+  .result-box.negative{background:linear-gradient(135deg,#1a0a08,#0c0c0e);border:2px solid #3a1a15}
+  .result-box.warning{background:linear-gradient(135deg,#1a1700,#0c0c0e);border:2px solid #3a3015}
+  .result-box.good{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:2px solid #1a3a25}
+  .result-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:8px}
+  .result-amount{font-size:44px;font-weight:900;letter-spacing:-2px;line-height:1}
+  .result-amount.neg{color:#E53935}
+  .result-amount.warn{color:#FFB300}
+  .result-amount.pos{color:#00C853}
+  .result-pct{font-size:14px;color:#666;margin-top:8px;font-weight:600}
+
+  .details{margin-top:10px}
+  .detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #141416;font-size:13px}
+  .detail-row:last-child{border-bottom:none}
+  .detail-row .lab{color:#666;font-weight:500}
+  .detail-row .val{font-weight:700}
+  .detail-row .val.neg{color:#E53935}
+  .detail-row .val.pos{color:#00C853}
+  .detail-row .val.warn{color:#FFB300}
+
+  .insight-box{border-radius:12px;padding:16px;margin-top:16px;font-size:13px;line-height:1.6}
+  .insight-box.bad{background:#1a0a08;border:1px solid #3a1510;color:#E57373}
+  .insight-box.mid{background:#1a1700;border:1px solid #3a3010;color:#FFD54F}
+  .insight-box.ok{background:#0a1a0f;border:1px solid #1a3a25;color:#81C784}
+  .insight-box strong{color:#fff}
+
+  .policy-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:16px;margin-top:12px}
+  .policy-card h3{font-size:13px;font-weight:800;color:#00C853;margin-bottom:10px;text-transform:uppercase;letter-spacing:2px}
+  .policy-item{font-size:13px;color:#aaa;line-height:1.7;padding-left:16px;position:relative;margin-bottom:4px}
+  .policy-item::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;background:#00C853;border-radius:2px}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora de Coste Real de Devoluciones</h1>
+    <p>Descubre cuanto te cuesta realmente cada devolucion y optimiza tu politica.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos del producto</div>
+    <div class="field">
+      <label>Precio de venta (PVP) <span class="val" id="lbl_pvp">40,00 &euro;</span></label>
+      <div class="row">
+        <input type="range" id="rng_pvp" min="5" max="500" step="1" value="40">
+        <input type="text" class="num-input" id="inp_pvp" value="40">
+        <span class="unit">&euro;</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Coste del producto <span class="val" id="lbl_coste">12,00 &euro;</span></label>
+      <div class="row">
+        <input type="range" id="rng_coste" min="1" max="300" step="0.5" value="12">
+        <input type="text" class="num-input" id="inp_coste" value="12">
+        <span class="unit">&euro;</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Coste de envio al cliente <span class="val" id="lbl_envio">4,50 &euro;</span></label>
+      <div class="row">
+        <input type="range" id="rng_envio" min="0" max="30" step="0.5" value="4.5">
+        <input type="text" class="num-input" id="inp_envio" value="4.5">
+        <span class="unit">&euro;</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Coste de envio de devolucion <span class="val" id="lbl_devenvio">5,50 &euro;</span></label>
+      <div class="row">
+        <input type="range" id="rng_devenvio" min="0" max="30" step="0.5" value="5.5">
+        <input type="text" class="num-input" id="inp_devenvio" value="5.5">
+        <span class="unit">&euro;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Costes ocultos</div>
+    <div class="field">
+      <label>Tiempo gestion devolucion <span class="val" id="lbl_minutos">15 min</span></label>
+      <div class="row">
+        <input type="range" id="rng_minutos" min="5" max="60" step="1" value="15">
+        <input type="text" class="num-input" id="inp_minutos" value="15">
+        <span class="unit">min</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Coste hora empleado <span class="val" id="lbl_hora">12,00 &euro;/h</span></label>
+      <div class="row">
+        <input type="range" id="rng_hora" min="6" max="40" step="0.5" value="12">
+        <input type="text" class="num-input" id="inp_hora" value="12">
+        <span class="unit">&euro;/h</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Producto recuperable <span class="val" id="lbl_recup">80%</span></label>
+      <div class="row">
+        <input type="range" id="rng_recup" min="0" max="100" step="5" value="80">
+        <input type="text" class="num-input" id="inp_recup" value="80">
+        <span class="unit">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Tasa de devolucion de tu tienda <span class="val" id="lbl_tasa">8%</span></label>
+      <div class="row">
+        <input type="range" id="rng_tasa" min="1" max="40" step="1" value="8">
+        <input type="text" class="num-input" id="inp_tasa" value="8">
+        <span class="unit">%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Pedidos mensuales <span class="val" id="lbl_pedidos">200</span></label>
+      <div class="row">
+        <input type="range" id="rng_pedidos" min="10" max="5000" step="10" value="200">
+        <input type="text" class="num-input" id="inp_pedidos" value="200">
+        <span class="unit">uds</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Coste real por devolucion</div>
+    <div class="result-box negative" id="resultBox">
+      <div class="result-label">Cada devolucion te cuesta</div>
+      <div class="result-amount neg" id="costePorDev">-0,00 &euro;</div>
+      <div class="result-pct" id="pctMargen">0% de tu PVP</div>
+    </div>
+
+    <div class="details" id="detalles">
+      <div class="detail-row"><span class="lab">Envio original perdido</span><span class="val neg" id="d_envio">0,00 &euro;</span></div>
+      <div class="detail-row"><span class="lab">Envio devolucion</span><span class="val neg" id="d_devenvio">0,00 &euro;</span></div>
+      <div class="detail-row"><span class="lab">Coste gestion (tiempo)</span><span class="val neg" id="d_gestion">0,00 &euro;</span></div>
+      <div class="detail-row"><span class="lab">Producto no recuperable</span><span class="val neg" id="d_merma">0,00 &euro;</span></div>
+      <div class="detail-row"><span class="lab">Margen perdido por venta</span><span class="val neg" id="d_margen">0,00 &euro;</span></div>
+      <div class="detail-row" style="border-top:2px solid #1c1c20;padding-top:12px"><span class="lab" style="color:#fff;font-weight:700">Coste total por devolucion</span><span class="val neg" id="d_total" style="font-size:16px">0,00 &euro;</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Impacto mensual</div>
+    <div class="details">
+      <div class="detail-row"><span class="lab">Devoluciones estimadas/mes</span><span class="val warn" id="m_devs">0</span></div>
+      <div class="detail-row"><span class="lab">Coste total devoluciones/mes</span><span class="val neg" id="m_coste">0,00 &euro;</span></div>
+      <div class="detail-row"><span class="lab">Facturacion mensual bruta</span><span class="val" id="m_fact">0,00 &euro;</span></div>
+      <div class="detail-row"><span class="lab">% facturacion perdida en devs</span><span class="val neg" id="m_pct">0%</span></div>
+      <div class="detail-row"><span class="lab">Beneficio mensual sin devs</span><span class="val pos" id="m_sindevs">0,00 &euro;</span></div>
+      <div class="detail-row"><span class="lab">Beneficio mensual con devs</span><span class="val" id="m_condevs">0,00 &euro;</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Politica de devolucion recomendada</div>
+    <div id="policyResult"></div>
+  </div>
+
+  <div id="insightResult"></div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+const fields = [
+  {id:'pvp', min:5, max:500, step:1, fmt:v=>`${f(v)} \u20ac`},
+  {id:'coste', min:1, max:300, step:0.5, fmt:v=>`${f(v)} \u20ac`},
+  {id:'envio', min:0, max:30, step:0.5, fmt:v=>`${f(v)} \u20ac`},
+  {id:'devenvio', min:0, max:30, step:0.5, fmt:v=>`${f(v)} \u20ac`},
+  {id:'minutos', min:5, max:60, step:1, fmt:v=>`${v} min`},
+  {id:'hora', min:6, max:40, step:0.5, fmt:v=>`${f(v)} \u20ac/h`},
+  {id:'recup', min:0, max:100, step:5, fmt:v=>`${v}%`},
+  {id:'tasa', min:1, max:40, step:1, fmt:v=>`${v}%`},
+  {id:'pedidos', min:10, max:5000, step:10, fmt:v=>`${v}`}
+];
+
+function f(n){return Number(n).toFixed(2).replace('.',',')}
+
+fields.forEach(fd=>{
+  const rng=document.getElementById('rng_'+fd.id);
+  const inp=document.getElementById('inp_'+fd.id);
+  const lbl=document.getElementById('lbl_'+fd.id);
+  rng.addEventListener('input',()=>{inp.value=rng.value;lbl.textContent=fd.fmt(rng.value);calc()});
+  inp.addEventListener('input',()=>{
+    let v=parseFloat(inp.value)||0;
+    v=Math.max(fd.min,Math.min(fd.max,v));
+    rng.value=v;lbl.textContent=fd.fmt(v);calc()
+  });
+});
+
+function gv(id){return parseFloat(document.getElementById('rng_'+id).value)||0}
+
+function calc(){
+  const pvp=gv('pvp'), coste=gv('coste'), envio=gv('envio'), devenvio=gv('devenvio');
+  const minutos=gv('minutos'), hora=gv('hora'), recup=gv('recup')/100, tasa=gv('tasa')/100, pedidos=gv('pedidos');
+
+  const margenVenta=pvp-coste-envio;
+  const costeGestion=(minutos/60)*hora;
+  const merma=coste*(1-recup);
+  const costeDev=envio+devenvio+costeGestion+merma+margenVenta;
+  const pctPvp=(costeDev/pvp*100);
+
+  document.getElementById('costePorDev').textContent=`-${f(costeDev)} \u20ac`;
+  document.getElementById('pctMargen').textContent=`${pctPvp.toFixed(1).replace('.',',')}% de tu PVP`;
+
+  document.getElementById('d_envio').textContent=`-${f(envio)}  \u20ac`;
+  document.getElementById('d_devenvio').textContent=`-${f(devenvio)} \u20ac`;
+  document.getElementById('d_gestion').textContent=`-${f(costeGestion)} \u20ac`;
+  document.getElementById('d_merma').textContent=`-${f(merma)} \u20ac`;
+  document.getElementById('d_margen').textContent=`-${f(margenVenta)} \u20ac`;
+  document.getElementById('d_total').textContent=`-${f(costeDev)} \u20ac`;
+
+  const devsEstimadas=Math.round(pedidos*tasa);
+  const costeMensual=devsEstimadas*costeDev;
+  const factBruta=pedidos*pvp;
+  const pctFact=(costeMensual/factBruta*100);
+  const benSinDevs=pedidos*margenVenta;
+  const benConDevs=benSinDevs-costeMensual;
+
+  document.getElementById('m_devs').textContent=devsEstimadas;
+  document.getElementById('m_coste').textContent=`-${f(costeMensual)} \u20ac`;
+  document.getElementById('m_fact').textContent=`${f(factBruta)} \u20ac`;
+  document.getElementById('m_pct').textContent=`${pctFact.toFixed(1).replace('.',',')}%`;
+  document.getElementById('m_sindevs').textContent=`${f(benSinDevs)} \u20ac`;
+  const mcd=document.getElementById('m_condevs');
+  mcd.textContent=`${f(benConDevs)} \u20ac`;
+  mcd.className=benConDevs>=0?'val pos':'val neg';
+
+  const rb=document.getElementById('resultBox');
+  if(pctPvp>60){rb.className='result-box negative'}
+  else if(pctPvp>35){rb.className='result-box warning'}
+  else{rb.className='result-box good'}
+
+  // Policy recommendation
+  let policyHTML='';
+  if(costeDev>pvp*0.5){
+    policyHTML=`<div class="policy-card">
+      <h3>Politica restrictiva recomendada</h3>
+      <div class="policy-item">Devolucion solo por defecto de fabricacion (no cambio de opinion)</div>
+      <div class="policy-item">Plazo maximo: 14 dias (minimo legal)</div>
+      <div class="policy-item">Coste de envio de devolucion a cargo del cliente</div>
+      <div class="policy-item">Fotos/video obligatorios para procesar la devolucion</div>
+      <div class="policy-item">Ofrecer cambio por otro producto antes que reembolso</div>
+      <div class="policy-item">Considerar subir PVP un ${Math.ceil(tasa*100*0.5)}% para absorber coste</div>
+    </div>`;
+  } else if(costeDev>pvp*0.25){
+    policyHTML=`<div class="policy-card">
+      <h3>Politica equilibrada recomendada</h3>
+      <div class="policy-item">Devolucion gratuita por defecto; cobrar envio en cambio de opinion</div>
+      <div class="policy-item">Plazo: 30 dias para generar confianza</div>
+      <div class="policy-item">Ofrecer credito en tienda (+10% bonus) como alternativa al reembolso</div>
+      <div class="policy-item">Automatizar proceso con etiquetas prepagadas para reducir gestion</div>
+      <div class="policy-item">Implementar guia de tallas/uso detallada para reducir devs evitables</div>
+    </div>`;
+  } else {
+    policyHTML=`<div class="policy-card">
+      <h3>Politica generosa viable</h3>
+      <div class="policy-item">Devolucion gratuita y sin preguntas (ventaja competitiva)</div>
+      <div class="policy-item">Plazo: 60 dias para maximizar confianza</div>
+      <div class="policy-item">Envio de devolucion con etiqueta prepagada incluida</div>
+      <div class="policy-item">Reembolso inmediato al recibir tracking de devolucion</div>
+      <div class="policy-item">Usar como argumento de venta en fichas de producto</div>
+    </div>`;
+  }
+  document.getElementById('policyResult').innerHTML=policyHTML;
+
+  // Insight
+  let insightClass, insightText;
+  if(pctPvp>60){
+    insightClass='bad';
+    insightText=`<strong>Alerta roja:</strong> Cada devolucion te cuesta <strong>${pctPvp.toFixed(0)}% del PVP</strong>. Con tu tasa actual del ${(tasa*100).toFixed(0)}%, pierdes <strong>${f(costeMensual)} \u20ac al mes</strong> solo en devoluciones. Necesitas reducir tu tasa urgentemente o subir precios.`;
+  } else if(pctPvp>35){
+    insightClass='mid';
+    insightText=`<strong>Zona de atencion:</strong> El coste por devolucion es significativo (${pctPvp.toFixed(0)}% del PVP). Reducir la tasa de devolucion un 2% te ahorraria <strong>${f(pedidos*0.02*costeDev)} \u20ac/mes</strong>. Revisa las descripciones de producto y la guia de tallas.`;
+  } else {
+    insightClass='ok';
+    insightText=`<strong>Buena salud:</strong> Tu coste de devolucion es manejable (${pctPvp.toFixed(0)}% del PVP). Puedes usar una politica de devolucion generosa como ventaja competitiva. Impacto mensual controlado: <strong>${f(costeMensual)} \u20ac</strong>.`;
+  }
+  document.getElementById('insightResult').innerHTML=`<div class="insight-box ${insightClass}">${insightText}</div>`;
+}
+
+calc();
+</script>
+</body>
+</html>

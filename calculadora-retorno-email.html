@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora ROI Email Marketing — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+  .field label .val{color:#00C853;font-weight:800;font-size:14px}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .row .num-input{width:100px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px 12px;text-align:right;font-family:inherit;outline:none}
+  .row .num-input:focus{border-color:#00C853}
+  .row .unit{color:#555;font-size:13px;font-weight:600;min-width:30px}
+  .freq-tabs{display:flex;gap:8px;margin-bottom:20px}
+  .freq-tab{flex:1;padding:10px 8px;background:#1a1a1e;border:1px solid #2a2a2e;border-radius:10px;text-align:center;cursor:pointer;font-size:12px;font-weight:700;color:#888;transition:all 0.2s}
+  .freq-tab:hover{border-color:#333}
+  .freq-tab.active{background:rgba(0,200,83,0.1);border-color:#00C853;color:#00C853}
+  .funnel-visual{position:relative;padding:20px 0}
+  .funnel-step{display:flex;align-items:center;gap:14px;margin-bottom:4px}
+  .funnel-bar-bg{flex:1;height:40px;background:#1c1c20;border-radius:8px;overflow:hidden;position:relative}
+  .funnel-bar-fill{height:100%;border-radius:8px;display:flex;align-items:center;padding:0 14px;transition:width 0.4s ease;min-width:40px}
+  .funnel-bar-text{font-size:12px;font-weight:800;color:rgba(255,255,255,0.9);white-space:nowrap}
+  .funnel-label{min-width:90px;font-size:11px;font-weight:700;color:#666;text-align:right}
+  .funnel-amount{min-width:70px;font-size:13px;font-weight:800;text-align:right}
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .result-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:18px;text-align:center}
+  .result-card .rc-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#555;margin-bottom:6px}
+  .result-card .rc-value{font-size:26px;font-weight:900;letter-spacing:-1px}
+  .result-card .rc-sub{font-size:11px;color:#444;margin-top:4px}
+  .result-card.highlight{border-color:#1a3a20;background:#0d1a0f}
+  .result-card.highlight .rc-value{color:#00C853}
+  .big-result{background:#0d1a0f;border:2px solid #1a3a20;border-radius:16px;padding:30px;text-align:center;margin-top:16px}
+  .big-result .br-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:8px}
+  .big-result .br-value{font-size:48px;font-weight:900;letter-spacing:-2px;color:#00C853}
+  .big-result .br-sub{font-size:14px;color:#666;margin-top:6px;font-weight:600}
+  .comparison-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #141416;font-size:13px}
+  .comparison-row:last-child{border-bottom:none}
+  .comparison-row .cr-label{color:#666;font-weight:500}
+  .comparison-row .cr-value{font-weight:700}
+  .comparison-row .cr-value.green{color:#00C853}
+  .comparison-row .cr-value.yellow{color:#C8AA28}
+  .comparison-row .cr-value.red{color:#ff6b6b}
+  .benchmark-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+  .bench-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;padding:10px;text-align:center}
+  .bench-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:2px}
+  .bench-value{font-size:12px;font-weight:800;color:#888}
+  .bench-status{font-size:10px;font-weight:700;margin-top:2px}
+  .insight-box{background:#0d1a0f;border:1px solid #1a3a20;border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#5a9a65;line-height:1.7}
+  .insight-box strong{color:#fff}
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora ROI Email Marketing</h1>
+    <p>Descubre cuanto dinero te genera (o deberia generar) tu lista de email cada mes.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu lista</div>
+    <div class="field">
+      <label>Tamano de la lista <span class="val" id="lbl_list">5.000</span></label>
+      <div class="row">
+        <input type="range" min="100" max="100000" step="100" value="5000" id="sl_list" oninput="sync('list')">
+        <input type="number" class="num-input" id="in_list" value="5000" oninput="sync('list',true)">
+        <span class="unit">subs</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Frecuencia de envio</label>
+      <div class="freq-tabs">
+        <div class="freq-tab" data-freq="2" onclick="setFreq(this)">2/mes</div>
+        <div class="freq-tab active" data-freq="4" onclick="setFreq(this)">1/sem</div>
+        <div class="freq-tab" data-freq="8" onclick="setFreq(this)">2/sem</div>
+        <div class="freq-tab" data-freq="12" onclick="setFreq(this)">3/sem</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Metricas</div>
+    <div class="field">
+      <label>Tasa de apertura (Open Rate) <span class="val" id="lbl_open">25%</span></label>
+      <div class="row">
+        <input type="range" min="5" max="60" step="1" value="25" id="sl_open" oninput="sync('open')">
+        <input type="number" class="num-input" id="in_open" value="25" oninput="sync('open',true)">
+        <span class="unit">%</span>
+      </div>
+      <div class="hint">Media ecommerce: 15-25%. Bueno: 25%+</div>
+    </div>
+    <div class="field">
+      <label>Tasa de clic (CTR) <span class="val" id="lbl_click">3.5%</span></label>
+      <div class="row">
+        <input type="range" min="0.5" max="15" step="0.5" value="3.5" id="sl_click" oninput="sync('click')">
+        <input type="number" class="num-input" id="in_click" value="3.5" step="0.1" oninput="sync('click',true)">
+        <span class="unit">%</span>
+      </div>
+      <div class="hint">Media ecommerce: 2-4%. Bueno: 3.5%+</div>
+    </div>
+    <div class="field">
+      <label>Tasa de conversion <span class="val" id="lbl_conv">2%</span></label>
+      <div class="row">
+        <input type="range" min="0.5" max="10" step="0.5" value="2" id="sl_conv" oninput="sync('conv')">
+        <input type="number" class="num-input" id="in_conv" value="2" step="0.1" oninput="sync('conv',true)">
+        <span class="unit">%</span>
+      </div>
+      <div class="hint">% de los que hacen clic y compran. Media: 1-3%</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Ventas</div>
+    <div class="field">
+      <label>Ticket medio (AOV) <span class="val" id="lbl_aov">45 EUR</span></label>
+      <div class="row">
+        <input type="range" min="10" max="500" step="5" value="45" id="sl_aov" oninput="sync('aov')">
+        <input type="number" class="num-input" id="in_aov" value="45" oninput="sync('aov',true)">
+        <span class="unit">EUR</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Coste herramienta email/mes <span class="val" id="lbl_cost">30 EUR</span></label>
+      <div class="row">
+        <input type="range" min="0" max="500" step="5" value="30" id="sl_cost" oninput="sync('cost')">
+        <input type="number" class="num-input" id="in_cost" value="30" oninput="sync('cost',true)">
+        <span class="unit">EUR</span>
+      </div>
+      <div class="hint">Klaviyo, Mailchimp, etc. Pon 0 si no pagas aun</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Embudo de email</div>
+    <div class="funnel-visual" id="funnelVisual"></div>
+  </div>
+
+  <div class="big-result">
+    <div class="br-label">Ingresos mensuales por email</div>
+    <div class="br-value" id="monthlyRevenue">0 EUR</div>
+    <div class="br-sub" id="monthlyRevenueContext">--</div>
+  </div>
+
+  <div class="result-grid">
+    <div class="result-card highlight">
+      <div class="rc-label">Revenue / suscriptor</div>
+      <div class="rc-value" id="revPerSub">0 EUR</div>
+      <div class="rc-sub">al mes</div>
+    </div>
+    <div class="result-card highlight">
+      <div class="rc-label">ROI del email</div>
+      <div class="rc-value" id="emailROI">0x</div>
+      <div class="rc-sub">retorno por cada EUR</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">Pedidos / mes</div>
+      <div class="rc-value" id="ordersMonth" style="color:#fff">0</div>
+      <div class="rc-sub">via email</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">Revenue anual</div>
+      <div class="rc-value" id="annualRev" style="color:#fff">0 EUR</div>
+      <div class="rc-sub">proyeccion 12 meses</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">Benchmarks vs tu rendimiento</div>
+    <div class="benchmark-grid" id="benchmarks"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Proyeccion de crecimiento</div>
+    <div id="projections"></div>
+  </div>
+
+  <div class="insight-box" id="insightBox"></div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+<script>
+var emailsPerMonth = 4;
+
+function fmt(n){return n.toLocaleString('es-ES',{maximumFractionDigits:0})}
+function fmt2(n){return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+function setFreq(el){
+  document.querySelectorAll('.freq-tab').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  emailsPerMonth = parseInt(el.dataset.freq);
+  calculate();
+}
+
+function sync(key, fromInput){
+  var sl = document.getElementById('sl_'+key);
+  var inp = document.getElementById('in_'+key);
+  if(fromInput){sl.value=inp.value}else{inp.value=sl.value}
+
+  var labels = {
+    list: function(v){return fmt(+v)},
+    open: function(v){return v+'%'},
+    click: function(v){return v+'%'},
+    conv: function(v){return v+'%'},
+    aov: function(v){return fmt(+v)+' EUR'},
+    cost: function(v){return fmt(+v)+' EUR'}
+  };
+
+  var lbl = document.getElementById('lbl_'+key);
+  if(lbl && labels[key]) lbl.textContent = labels[key](inp.value);
+
+  calculate();
+}
+
+function calculate(){
+  var listSize = +document.getElementById('in_list').value;
+  var openRate = +document.getElementById('in_open').value / 100;
+  var clickRate = +document.getElementById('in_click').value / 100;
+  var convRate = +document.getElementById('in_conv').value / 100;
+  var aov = +document.getElementById('in_aov').value;
+  var toolCost = +document.getElementById('in_cost').value;
+
+  var opensPerEmail = listSize * openRate;
+  var clicksPerEmail = opensPerEmail * clickRate;
+  var ordersPerEmail = clicksPerEmail * convRate;
+  var revenuePerEmail = ordersPerEmail * aov;
+
+  var monthlyOrders = ordersPerEmail * emailsPerMonth;
+  var monthlyRevenue = revenuePerEmail * emailsPerMonth;
+  var monthlyProfit = monthlyRevenue - toolCost;
+  var roi = toolCost > 0 ? monthlyRevenue / toolCost : 0;
+  var revPerSub = listSize > 0 ? monthlyRevenue / listSize : 0;
+
+  // Funnel visual
+  var steps = [
+    {label:'Lista total', value:listSize, color:'#4a9eff', pct:100},
+    {label:'Abren (x'+emailsPerMonth+')', value:Math.round(opensPerEmail*emailsPerMonth), color:'#00C853', pct:openRate*100},
+    {label:'Hacen clic', value:Math.round(clicksPerEmail*emailsPerMonth), color:'#C8AA28', pct:openRate*clickRate*100},
+    {label:'Compran', value:Math.round(monthlyOrders), color:'#ff6b6b', pct:openRate*clickRate*convRate*100}
+  ];
+  var maxVal = steps[0].value || 1;
+  var funnelHtml = '';
+  steps.forEach(function(s){
+    var w = Math.max(8, (s.value / maxVal) * 100);
+    funnelHtml += '<div class="funnel-step">';
+    funnelHtml += '<div class="funnel-label">'+s.label+'</div>';
+    funnelHtml += '<div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:'+w+'%;background:'+s.color+'"><span class="funnel-bar-text">'+fmt(s.value)+'</span></div></div>';
+    funnelHtml += '<div class="funnel-amount" style="color:'+s.color+'">'+s.pct.toFixed(1)+'%</div>';
+    funnelHtml += '</div>';
+  });
+  document.getElementById('funnelVisual').innerHTML = funnelHtml;
+
+  // Main results
+  document.getElementById('monthlyRevenue').textContent = fmt(Math.round(monthlyRevenue)) + ' EUR';
+  document.getElementById('monthlyRevenueContext').textContent = emailsPerMonth + ' emails/mes a ' + fmt(listSize) + ' suscriptores';
+  document.getElementById('revPerSub').textContent = fmt2(revPerSub) + ' EUR';
+  document.getElementById('emailROI').textContent = roi > 0 ? roi.toFixed(0) + 'x' : 'N/A';
+  document.getElementById('ordersMonth').textContent = fmt(Math.round(monthlyOrders));
+  document.getElementById('annualRev').textContent = fmt(Math.round(monthlyRevenue * 12)) + ' EUR';
+
+  // Benchmarks
+  var benchData = [
+    {label:'Open Rate', yours:openRate*100, avg:20, good:30, unit:'%'},
+    {label:'CTR', yours:clickRate*100, avg:2.5, good:4, unit:'%'},
+    {label:'Conversion', yours:convRate*100, avg:1.5, good:3, unit:'%'},
+    {label:'Rev/Sub', yours:revPerSub, avg:0.50, good:1.50, unit:' EUR'},
+    {label:'ROI', yours:roi, avg:36, good:45, unit:'x'},
+    {label:'Email %Rev', yours: monthlyRevenue > 0 ? 25 : 0, avg:25, good:35, unit:'%'}
+  ];
+  var benchHtml = '';
+  benchData.forEach(function(b){
+    var status = '';
+    var statusColor = '';
+    if(b.yours >= b.good){status='Excelente';statusColor='#00C853'}
+    else if(b.yours >= b.avg){status='En media';statusColor='#C8AA28'}
+    else{status='Por debajo';statusColor='#ff6b6b'}
+    benchHtml += '<div class="bench-card">';
+    benchHtml += '<div class="bench-label">'+b.label+'</div>';
+    benchHtml += '<div class="bench-value">'+(b.unit==' EUR'?fmt2(b.yours):b.unit==='x'?b.yours.toFixed(0):b.yours.toFixed(1))+b.unit+'</div>';
+    benchHtml += '<div class="bench-status" style="color:'+statusColor+'">'+status+'</div>';
+    benchHtml += '</div>';
+  });
+  document.getElementById('benchmarks').innerHTML = benchHtml;
+
+  // Projections
+  var projHtml = '';
+  var growthScenarios = [
+    {label:'Lista x2 ('+fmt(listSize*2)+' subs)', rev: monthlyRevenue * 2},
+    {label:'Open Rate +5% ('+(openRate*100+5).toFixed(0)+'%)', rev: listSize * (openRate+0.05) * clickRate * convRate * aov * emailsPerMonth},
+    {label:'CTR +2% ('+(clickRate*100+2).toFixed(1)+'%)', rev: listSize * openRate * (clickRate+0.02) * convRate * aov * emailsPerMonth},
+    {label:'Todo optimizado', rev: listSize * 1.5 * (openRate+0.05) * (clickRate+0.02) * (convRate+0.01) * aov * emailsPerMonth}
+  ];
+  growthScenarios.forEach(function(g){
+    var diff = g.rev - monthlyRevenue;
+    var diffPct = monthlyRevenue > 0 ? (diff / monthlyRevenue) * 100 : 0;
+    projHtml += '<div class="comparison-row">';
+    projHtml += '<span class="cr-label">'+g.label+'</span>';
+    projHtml += '<span class="cr-value green">'+fmt(Math.round(g.rev))+' EUR <span style="font-size:11px;color:#666">(+'+(diffPct).toFixed(0)+'%)</span></span>';
+    projHtml += '</div>';
+  });
+  document.getElementById('projections').innerHTML = projHtml;
+
+  // Insight
+  var ins = document.getElementById('insightBox');
+  if(monthlyRevenue < 100){
+    ins.innerHTML = '<strong>Tu email aun no genera.</strong> Con '+fmt(listSize)+' suscriptores y estas metricas, el email te da '+fmt(Math.round(monthlyRevenue))+' EUR/mes. Prioridad 1: hacer crecer la lista. Prioridad 2: mejorar el open rate con mejores asuntos. El email es el canal mas rentable — pero necesita volumen.';
+  } else if(revPerSub < 0.5){
+    ins.innerHTML = '<strong>Tu lista no rinde lo que deberia.</strong> '+fmt2(revPerSub)+' EUR/suscriptor al mes esta por debajo de la media. Dos palancas rapidas: mejora los asuntos (sube open rate) y anade segmentacion para personalizar ofertas. Cada 1% de mejora en CTR son '+fmt(Math.round(listSize*openRate*0.01*convRate*aov*emailsPerMonth))+' EUR mas al mes.';
+  } else if(roi < 36){
+    ins.innerHTML = '<strong>El ROI es bajo para email.</strong> El email deberia dar 36-45x de retorno. Tu estas en '+roi.toFixed(0)+'x. Revisa si estas sobre-pagando la herramienta para tu tamano de lista, o si tus flujos automaticos (bienvenida, carrito abandonado, post-compra) estan activos.';
+  } else {
+    ins.innerHTML = '<strong>Tu email funciona bien.</strong> '+fmt(Math.round(monthlyRevenue))+' EUR/mes con '+roi.toFixed(0)+'x ROI es solido. El siguiente paso: automatizar flujos (bienvenida, carrito abandonado, win-back) para sumar un 20-30% de revenue extra sin enviar mas campanas manuales.';
+  }
+}
+
+calculate();
+</script>
+</body>
+</html>

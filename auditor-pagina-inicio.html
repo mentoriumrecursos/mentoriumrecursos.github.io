@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditor de Pagina de Inicio — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .section-group{margin-bottom:24px}
+  .section-label{font-size:14px;font-weight:800;color:#fff;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #1c1c20}
+  .check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #0e0e10}
+  .check-item:last-child{border-bottom:none}
+  .check-box{width:22px;height:22px;background:#0c0c0e;border:2px solid #2a2a2e;border-radius:6px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;margin-top:1px}
+  .check-box:hover{border-color:#00C853}
+  .check-box.checked{background:#00C853;border-color:#00C853}
+  .check-box.checked::after{content:'';width:6px;height:10px;border:solid #0a0a0a;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);margin-top:-2px}
+  .check-info{flex:1}
+  .check-name{font-size:13px;font-weight:700;color:#ddd;margin-bottom:2px}
+  .check-desc{font-size:11px;color:#555;line-height:1.5}
+  .check-weight{font-size:10px;font-weight:800;color:#333;margin-top:4px}
+  .progress-section{margin-top:20px}
+  .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .progress-label{font-size:14px;font-weight:800}
+  .progress-score{font-size:28px;font-weight:900;letter-spacing:-1px}
+  .progress-score.score-low{color:#ff4444}
+  .progress-score.score-mid{color:#C8AA28}
+  .progress-score.score-good{color:#00C853}
+  .progress-bar-bg{height:12px;background:#1c1c20;border-radius:100px;overflow:hidden}
+  .progress-bar-fill{height:100%;border-radius:100px;transition:all 0.4s ease}
+  .progress-bar-fill.bar-low{background:linear-gradient(90deg,#ff4444,#ff6b6b)}
+  .progress-bar-fill.bar-mid{background:linear-gradient(90deg,#C8AA28,#e0cc40)}
+  .progress-bar-fill.bar-good{background:linear-gradient(90deg,#00C853,#33e077)}
+  .grade-badge{display:inline-block;padding:8px 24px;border-radius:10px;font-size:20px;font-weight:900;margin-top:12px}
+  .grade-F{background:rgba(255,68,68,0.15);color:#ff4444}
+  .grade-D{background:rgba(255,107,107,0.15);color:#ff6b6b}
+  .grade-C{background:rgba(200,170,40,0.12);color:#C8AA28}
+  .grade-B{background:rgba(0,200,83,0.12);color:#66dd88}
+  .grade-A{background:rgba(0,200,83,0.18);color:#00C853}
+  .results-card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-top:16px}
+  .improvement{padding:14px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;margin-bottom:10px}
+  .improvement:last-child{margin-bottom:0}
+  .imp-priority{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+  .imp-priority.critical{color:#ff4444}
+  .imp-priority.high{color:#ff6b6b}
+  .imp-priority.medium{color:#C8AA28}
+  .imp-title{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px}
+  .imp-desc{font-size:12px;color:#666;line-height:1.5}
+  .section-scores{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .sec-score-card{background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:14px;text-align:center}
+  .sec-score-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:4px}
+  .sec-score-val{font-size:24px;font-weight:900}
+  .btn-audit{width:100%;padding:16px;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:16px;transition:background 0.2s}
+  .btn-audit:hover{background:#00b348}
+  .hidden{display:none}
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Auditor de Pagina de Inicio</h1>
+    <p>Marca cada elemento que tiene tu homepage. Descubre tu puntuacion y que arreglar primero.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Auditoria completa</div>
+    <p style="font-size:12px;color:#555;margin-bottom:20px">Revisa tu pagina de inicio y marca TODO lo que cumple. Se honesto — mentirte aqui te cuesta dinero.</p>
+
+    <div class="section-group" data-section="hero">
+      <div class="section-label">Hero Section (Above the fold)</div>
+      <div class="check-item"><div class="check-box" data-points="8" data-cat="hero" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Propuesta de valor clara en menos de 5 segundos</div><div class="check-desc">El visitante entiende que vendes y por que le importa sin hacer scroll</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="6" data-cat="hero" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">CTA principal visible y con contraste</div><div class="check-desc">Boton de accion claro (Comprar, Ver catalogo, Anadir al carrito) que destaque del fondo</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="5" data-cat="hero" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Imagen/video de producto profesional</div><div class="check-desc">No stock generico. Foto real del producto o lifestyle que conecta con el ICP</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="4" data-cat="hero" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Titular con beneficio, no con caracteristica</div><div class="check-desc">"Duerme como nunca" vs "Colchon de espuma viscoelastica"</div></div></div>
+    </div>
+
+    <div class="section-group" data-section="trust">
+      <div class="section-label">Confianza y Prueba Social</div>
+      <div class="check-item"><div class="check-box" data-points="7" data-cat="trust" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Reviews o testimonios visibles</div><div class="check-desc">Opiniones reales de clientes con nombre y/o foto. Estrellas. Numero de reviews.</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="5" data-cat="trust" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Logos de confianza o sellos</div><div class="check-desc">Metodos de pago, envio seguro, garantia, certificaciones</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="4" data-cat="trust" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Numero de clientes o pedidos</div><div class="check-desc">"Mas de 5.000 clientes satisfechos" o "12.000 pedidos enviados"</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="3" data-cat="trust" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Mencion en medios o influencers</div><div class="check-desc">"Visto en..." con logos reconocibles o capturas reales</div></div></div>
+    </div>
+
+    <div class="section-group" data-section="nav">
+      <div class="section-label">Navegacion y UX</div>
+      <div class="check-item"><div class="check-box" data-points="5" data-cat="nav" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Menu simple con max 5-7 elementos</div><div class="check-desc">Sin submenus infinitos. Categorias claras. El visitante encuentra lo que busca en 1 clic</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="4" data-cat="nav" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Barra de busqueda funcional</div><div class="check-desc">Visible y con autocompletado o sugerencias. Critico si tienes +20 productos</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="3" data-cat="nav" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Categorias bien organizadas</div><div class="check-desc">Agrupaciones logicas. No 50 categorias sin sentido</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="4" data-cat="nav" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Barra de beneficios (envio gratis, garantia, etc)</div><div class="check-desc">Franja visible con iconos: envio gratis, devolucion facil, pago seguro, atencion rapida</div></div></div>
+    </div>
+
+    <div class="section-group" data-section="content">
+      <div class="section-label">Contenido y Conversion</div>
+      <div class="check-item"><div class="check-box" data-points="6" data-cat="content" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Productos destacados o bestsellers</div><div class="check-desc">Seccion con los mas vendidos o recomendados. No lanzar todo el catalogo de golpe</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="4" data-cat="content" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Ofertas o urgencia visible</div><div class="check-desc">Descuento activo, contador de tiempo, stock limitado — algo que empuje a la accion</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="3" data-cat="content" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Seccion "Como funciona" o beneficios clave</div><div class="check-desc">3-4 pasos o beneficios con iconos que expliquen el proceso o el valor</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="4" data-cat="content" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Captacion de email (popup o seccion)</div><div class="check-desc">Lead magnet, descuento por suscripcion, o formulario de newsletter visible</div></div></div>
+    </div>
+
+    <div class="section-group" data-section="technical">
+      <div class="section-label">Rendimiento Tecnico</div>
+      <div class="check-item"><div class="check-box" data-points="7" data-cat="technical" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Carga en menos de 3 segundos</div><div class="check-desc">Testea en PageSpeed Insights. Si tarda mas de 3s, pierdes el 53% de los visitantes movil</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="6" data-cat="technical" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">100% responsive en movil</div><div class="check-desc">Todo se ve perfecto en movil. Botones tocables. Texto legible. Sin scroll horizontal</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="3" data-cat="technical" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Sin popups agresivos en los primeros 5 segundos</div><div class="check-desc">El popup de email puede esperar. No asaltes al visitante nada mas entrar</div></div></div>
+      <div class="check-item"><div class="check-box" data-points="4" data-cat="technical" onclick="toggleCheck(this)"></div><div class="check-info"><div class="check-name">Imagenes optimizadas (WebP, lazy loading)</div><div class="check-desc">Imagenes pesadas = tienda lenta = menos conversiones. Usa formatos modernos</div></div></div>
+    </div>
+
+    <button class="btn-audit" onclick="runAudit()">Ver resultado de la auditoria</button>
+  </div>
+
+  <div id="resultsSection" class="hidden">
+    <div class="card">
+      <div class="card-title">Resultado</div>
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-label">Puntuacion total</span>
+          <span class="progress-score" id="totalScore">0/100</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+        <div style="text-align:center;margin-top:12px">
+          <div class="grade-badge" id="gradeBadge">F</div>
+        </div>
+      </div>
+
+      <div class="section-scores" id="sectionScores"></div>
+    </div>
+
+    <div class="results-card">
+      <div class="card-title">Mejoras prioritarias</div>
+      <div id="improvementsList"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">mentoriumacademy.com</div>
+  </div>
+</div>
+<script>
+var maxPoints = 0;
+var checkBoxes = [];
+
+document.addEventListener('DOMContentLoaded', function(){
+  checkBoxes = document.querySelectorAll('.check-box');
+  checkBoxes.forEach(function(cb){ maxPoints += parseInt(cb.dataset.points); });
+});
+
+function toggleCheck(el){
+  el.classList.toggle('checked');
+}
+
+var improvements = {
+  hero: [
+    {name:'Propuesta de valor clara en menos de 5 segundos', fix:'Reescribe tu titular principal. Una frase que diga QUE resuelves y PARA QUIEN. Testea: ensenale la pagina a alguien 5 segundos y preguntale que vendes.', priority:'critical'},
+    {name:'CTA principal visible y con contraste', fix:'Usa un color que contraste con el fondo. El boton debe ser el elemento mas visible del hero. Texto en accion: "Ver catalogo", "Comprar ahora", no "Saber mas".', priority:'critical'},
+    {name:'Imagen/video de producto profesional', fix:'Invierte en fotos reales. Un producto bien fotografiado convierte 2-3x mas que stock generico. Si vendes lifestyle, muestra el producto en contexto real.', priority:'high'},
+    {name:'Titular con beneficio, no con caracteristica', fix:'Cambia "Material premium de bamboo" por "La toalla que seca en la mitad de tiempo". Beneficio > caracteristica siempre.', priority:'medium'}
+  ],
+  trust: [
+    {name:'Reviews o testimonios visibles', fix:'Instala Loox, Judge.me o similar. Las reviews con foto convierten hasta 3x mas. Pon las mejores en la homepage, no solo en ficha de producto.', priority:'critical'},
+    {name:'Logos de confianza o sellos', fix:'Anade barra de logos: Visa, Mastercard, PayPal, envio asegurado, garantia de devolucion. Reduce la friccion de compra un 15-20%.', priority:'high'},
+    {name:'Numero de clientes o pedidos', fix:'Si tienes datos, muestra "+2.000 clientes" o "Valoracion 4.8/5". Los numeros generan confianza automatica.', priority:'medium'},
+    {name:'Mencion en medios o influencers', fix:'Si algun medio o influencer ha hablado de ti, ponlo. Si no, consigue UGC de microinfluencers y usa esas citas.', priority:'medium'}
+  ],
+  nav: [
+    {name:'Menu simple con max 5-7 elementos', fix:'Reduce el menu a lo esencial: Inicio, Catalogo/Colecciones (2-3 max), Sobre nosotros, Contacto. Nada mas.', priority:'high'},
+    {name:'Barra de busqueda funcional', fix:'Activa la busqueda predictiva en Shopify o instala Searchanise/Algolia. Si tienen que buscar y no encuentran, se van.', priority:'medium'},
+    {name:'Categorias bien organizadas', fix:'Agrupa por uso o tipo, no por caracteristicas tecnicas. "Para el salon" es mejor que "Textil hogar categoria B".', priority:'medium'},
+    {name:'Barra de beneficios', fix:'Anade una franja justo debajo del hero con 3-4 iconos: envio gratis +X, devolucion 30 dias, pago seguro, atencion 24h.', priority:'high'}
+  ],
+  content: [
+    {name:'Productos destacados o bestsellers', fix:'Crea una seccion "Los mas vendidos" con 4-8 productos. El visitante no quiere elegir entre 200 productos — guiale.', priority:'high'},
+    {name:'Ofertas o urgencia visible', fix:'Si tienes descuento activo, que sea lo primero que se vea. Barra superior con countdown o banner de oferta limitada.', priority:'medium'},
+    {name:'Seccion como funciona', fix:'3 pasos con icono: 1. Elige tu producto, 2. Lo recibes en 48h, 3. Si no te convence, devuelves gratis. Reduce incertidumbre.', priority:'medium'},
+    {name:'Captacion de email', fix:'Popup con 10% descuento por suscripcion despues de 15-20 segundos. O seccion fija en la home. El email es tuyo — las redes no.', priority:'high'}
+  ],
+  technical: [
+    {name:'Carga en menos de 3 segundos', fix:'Testa en PageSpeed Insights. Reduce imagenes, elimina apps innecesarias, usa un tema rapido. Cada segundo de mas = -7% conversion.', priority:'critical'},
+    {name:'100% responsive en movil', fix:'El 70%+ del trafico es movil. Revisa CADA elemento en tu telefono. Botones demasiado pequenos, texto cortado, imagenes desbordadas — todo mata conversiones.', priority:'critical'},
+    {name:'Sin popups agresivos', fix:'Configura tu popup para que aparezca tras 15-20 segundos o con exit intent. Nunca en los primeros 5 segundos.', priority:'medium'},
+    {name:'Imagenes optimizadas', fix:'Convierte a WebP, activa lazy loading, y comprime. TinyPNG o Shopify Image Optimizer. Tu pagina deberia pesar menos de 3MB total.', priority:'high'}
+  ]
+};
+
+function runAudit(){
+  var scored = 0;
+  var catScores = {hero:0,trust:0,nav:0,content:0,technical:0};
+  var catMax = {hero:0,trust:0,nav:0,content:0,technical:0};
+  var unchecked = [];
+
+  checkBoxes.forEach(function(cb, idx){
+    var pts = parseInt(cb.dataset.points);
+    var cat = cb.dataset.cat;
+    catMax[cat] = (catMax[cat]||0) + pts;
+    if(cb.classList.contains('checked')){
+      scored += pts;
+      catScores[cat] = (catScores[cat]||0) + pts;
+    } else {
+      var nameEl = cb.parentElement.querySelector('.check-name');
+      unchecked.push({cat:cat, name:nameEl?nameEl.textContent:'', points:pts});
+    }
+  });
+
+  var pct = maxPoints > 0 ? Math.round((scored/maxPoints)*100) : 0;
+  var scoreEl = document.getElementById('totalScore');
+  scoreEl.textContent = pct + '/100';
+  scoreEl.className = 'progress-score ' + (pct < 40 ? 'score-low' : pct < 70 ? 'score-mid' : 'score-good');
+
+  var bar = document.getElementById('progressBar');
+  bar.style.width = pct + '%';
+  bar.className = 'progress-bar-fill ' + (pct < 40 ? 'bar-low' : pct < 70 ? 'bar-mid' : 'bar-good');
+
+  var grade = pct >= 90 ? 'A' : pct >= 75 ? 'B' : pct >= 55 ? 'C' : pct >= 35 ? 'D' : 'F';
+  var badge = document.getElementById('gradeBadge');
+  badge.textContent = grade;
+  badge.className = 'grade-badge grade-' + grade;
+
+  var catNames = {hero:'Hero Section',trust:'Confianza',nav:'Navegacion',content:'Contenido',technical:'Tecnico'};
+  var secHtml = '';
+  Object.keys(catNames).forEach(function(k){
+    var sPct = catMax[k] > 0 ? Math.round((catScores[k]/catMax[k])*100) : 0;
+    var sColor = sPct < 40 ? '#ff4444' : sPct < 70 ? '#C8AA28' : '#00C853';
+    secHtml += '<div class="sec-score-card"><div class="sec-score-label">'+catNames[k]+'</div><div class="sec-score-val" style="color:'+sColor+'">'+sPct+'%</div></div>';
+  });
+  document.getElementById('sectionScores').innerHTML = secHtml;
+
+  unchecked.sort(function(a,b){return b.points - a.points});
+  var impHtml = '';
+  var shown = 0;
+  unchecked.forEach(function(item){
+    if(shown >= 6) return;
+    var cats = improvements[item.cat] || [];
+    var match = null;
+    cats.forEach(function(imp){ if(imp.name === item.name) match = imp; });
+    if(match){
+      impHtml += '<div class="improvement">';
+      impHtml += '<div class="imp-priority '+match.priority+'">'+match.priority.toUpperCase()+' — '+item.points+' puntos</div>';
+      impHtml += '<div class="imp-title">'+match.name+'</div>';
+      impHtml += '<div class="imp-desc">'+match.fix+'</div>';
+      impHtml += '</div>';
+      shown++;
+    }
+  });
+  if(!impHtml){
+    impHtml = '<div class="improvement"><div class="imp-priority medium">PERFECTO</div><div class="imp-title">Tu pagina cumple todos los criterios</div><div class="imp-desc">Sigue optimizando con A/B testing para subir la conversion aun mas.</div></div>';
+  }
+  document.getElementById('improvementsList').innerHTML = impHtml;
+
+  document.getElementById('resultsSection').classList.remove('hidden');
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

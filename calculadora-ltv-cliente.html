@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora LTV de Cliente — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+  .container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+
+  .header{text-align:center;padding:30px 0 24px}
+  .logo{width:44px;height:44px;background:#00C853;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0a0a;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.3}
+  .header p{font-size:13px;color:#666;line-height:1.6;max-width:400px;margin:0 auto}
+
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px;transition:border-color 0.3s}
+  .card:hover{border-color:#1f1f25}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:8px}
+  .field .hint{font-size:11px;color:#444;margin-top:4px}
+  .input-wrap{position:relative}
+  .input-wrap .prefix,.input-wrap .suffix{position:absolute;top:50%;transform:translateY(-50%);font-size:14px;font-weight:700;color:#444;pointer-events:none}
+  .input-wrap .prefix{left:14px}
+  .input-wrap .suffix{right:14px}
+  input[type=number]{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:16px;font-weight:700;padding:14px 50px 14px 14px;font-family:inherit;outline:none;transition:border-color 0.3s}
+  input[type=number]:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  input[type=number].has-prefix{padding-left:36px}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+  input[type=number]{-moz-appearance:textfield}
+  select{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:15px;font-weight:600;padding:14px;font-family:inherit;outline:none;cursor:pointer;transition:border-color 0.3s;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+  select:focus{border-color:#00C853;box-shadow:0 0 0 3px rgba(0,200,83,0.1)}
+  select option{background:#111;color:#fff}
+
+  .btn{width:100%;padding:16px;border:none;border-radius:12px;background:#00C853;color:#0a0a0a;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;margin-top:8px}
+  .btn:hover{background:#00E676;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,200,83,0.25)}
+  .btn:active{transform:translateY(0)}
+
+  .results{display:none;animation:fadeUp 0.5s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  .ltv-hero{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#0a1a0f,#111113);border:2px solid #1a3a25;border-radius:18px;margin-top:16px;margin-bottom:16px}
+  .ltv-label{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:12px}
+  .ltv-value{font-size:56px;font-weight:900;letter-spacing:-3px;line-height:1;color:#fff}
+  .ltv-sub{font-size:14px;color:#666;margin-top:10px;font-weight:600}
+
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .metric{background:#0c0c0e;border:1px solid #1c1c20;border-radius:12px;padding:18px 16px;text-align:center;transition:all 0.3s}
+  .metric:hover{border-color:#00C853;transform:translateY(-2px)}
+  .metric .label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  .metric .value{font-size:22px;font-weight:900;letter-spacing:-1px;line-height:1;color:#fff}
+  .metric .value.green{color:#00C853}
+  .metric .sub{font-size:11px;color:#555;margin-top:6px;font-weight:600}
+
+  .timeline{padding:20px 0}
+  .timeline-header{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:16px}
+  .timeline-row{display:grid;grid-template-columns:60px 1fr 80px;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #141416}
+  .timeline-row:last-child{border:none}
+  .timeline-period{font-size:13px;font-weight:800;color:#888}
+  .timeline-bar-track{height:24px;background:#1c1c20;border-radius:6px;overflow:hidden}
+  .timeline-bar-fill{height:100%;background:linear-gradient(90deg,#00C853,#00E676);border-radius:6px;transition:width 0.8s ease;min-width:4px}
+  .timeline-val{font-size:14px;font-weight:800;text-align:right}
+
+  .cac-section{background:#0c0c0e;border:1px solid #1c1c20;border-radius:14px;padding:20px;margin-top:16px}
+  .cac-section h3{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:16px}
+  .cac-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .cac-item{text-align:center;padding:14px 8px;background:rgba(0,0,0,0.3);border-radius:10px}
+  .cac-item .c-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:6px}
+  .cac-item .c-value{font-size:20px;font-weight:900;color:#00C853}
+  .cac-item .c-sub{font-size:10px;color:#444;margin-top:4px}
+  .cac-item.conservative .c-value{color:#66BB6A}
+  .cac-item.moderate .c-value{color:#00C853}
+  .cac-item.aggressive .c-value{color:#00E676}
+
+  .insight{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:1px solid #1a3a25;border-radius:14px;padding:18px;margin-top:16px}
+  .insight .tag{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#00C853;margin-bottom:8px}
+  .insight p{font-size:13px;color:#999;line-height:1.7;font-weight:500}
+  .insight strong{color:#fff}
+
+  .footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+  .footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora LTV de Cliente</h1>
+    <p>Conoce el valor real de cada cliente y cuánto puedes invertir en adquisición sin perder dinero.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de tu negocio</div>
+    <div class="field">
+      <label>Valor medio del pedido (AOV)</label>
+      <div class="input-wrap">
+        <span class="prefix">&euro;</span>
+        <input type="number" class="has-prefix" id="aov" value="55" min="1" step="1" placeholder="55">
+      </div>
+      <div class="hint">Facturación total / número de pedidos</div>
+    </div>
+    <div class="field">
+      <label>Frecuencia de compra (veces al año)</label>
+      <div class="input-wrap">
+        <input type="number" id="frequency" value="3" min="0.5" max="52" step="0.5" placeholder="3">
+        <span class="suffix">/ año</span>
+      </div>
+      <div class="hint">Cuántas veces al año compra un cliente de media</div>
+    </div>
+    <div class="field">
+      <label>Margen bruto (%)</label>
+      <div class="input-wrap">
+        <input type="number" id="margin" value="40" min="1" max="99" step="1" placeholder="40">
+        <span class="suffix">%</span>
+      </div>
+      <div class="hint">Lo que te queda después de pagar el producto y envío</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Retención</div>
+    <div class="field">
+      <label>Tasa de retención anual (%)</label>
+      <div class="input-wrap">
+        <input type="number" id="retention" value="30" min="1" max="99" step="1" placeholder="30">
+        <span class="suffix">%</span>
+      </div>
+      <div class="hint">% de clientes que repiten compra al año siguiente. Media ecommerce: 20-35%</div>
+    </div>
+    <div class="field">
+      <label>Horizonte temporal</label>
+      <select id="horizon">
+        <option value="3" selected>3 años</option>
+        <option value="5">5 años</option>
+        <option value="7">7 años</option>
+        <option value="10">10 años</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn" onclick="calculate()">CALCULAR LTV</button>
+
+  <div class="results" id="results">
+    <div class="ltv-hero">
+      <div class="ltv-label">Lifetime Value por cliente</div>
+      <div class="ltv-value" id="ltvMain">&euro;0</div>
+      <div class="ltv-sub" id="ltvSub">en 0 años</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Métricas clave</div>
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="label">Revenue anual/cliente</div>
+          <div class="value" id="mAnnualRev">&euro;0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Beneficio anual/cliente</div>
+          <div class="value green" id="mAnnualProfit">&euro;0</div>
+        </div>
+        <div class="metric">
+          <div class="label">Vida media del cliente</div>
+          <div class="value" id="mLifespan">0</div>
+          <div class="sub">años</div>
+        </div>
+        <div class="metric">
+          <div class="label">Pedidos totales</div>
+          <div class="value" id="mTotalOrders">0</div>
+          <div class="sub">de media</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Evolución del LTV por año</div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <div class="cac-section">
+      <h3>Presupuesto de adquisición recomendado (CAC)</h3>
+      <div class="cac-grid">
+        <div class="cac-item conservative">
+          <div class="c-label">Conservador</div>
+          <div class="c-value" id="cacLow">&euro;0</div>
+          <div class="c-sub">20% del LTV</div>
+        </div>
+        <div class="cac-item moderate">
+          <div class="c-label">Moderado</div>
+          <div class="c-value" id="cacMid">&euro;0</div>
+          <div class="c-sub">30% del LTV</div>
+        </div>
+        <div class="cac-item aggressive">
+          <div class="c-label">Agresivo</div>
+          <div class="c-value" id="cacHigh">&euro;0</div>
+          <div class="c-sub">40% del LTV</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight" id="insight">
+      <div class="tag">Diagnóstico</div>
+      <p id="insightText"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+
+<script>
+function fmt(n){return n.toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0})}
+function fmtD(n){return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+function calculate(){
+  const aov=parseFloat(document.getElementById('aov').value)||0;
+  const freq=parseFloat(document.getElementById('frequency').value)||0;
+  const margin=parseFloat(document.getElementById('margin').value)||0;
+  const retention=parseFloat(document.getElementById('retention').value)||0;
+  const horizon=parseInt(document.getElementById('horizon').value)||3;
+
+  if(aov<=0||freq<=0||margin<=0||retention<=0){alert('Rellena todos los campos con valores mayores que 0.');return}
+
+  const annualRev=aov*freq;
+  const annualProfit=annualRev*(margin/100);
+  const avgLifespan=1/(1-(retention/100));
+
+  // LTV by year (decaying)
+  let cumulativeLTV=0;
+  const yearlyData=[];
+  for(let y=1;y<=horizon;y++){
+    const retainedPct=Math.pow(retention/100,y-1);
+    const yearRev=annualProfit*retainedPct;
+    cumulativeLTV+=yearRev;
+    yearlyData.push({year:y,cumulative:cumulativeLTV,yearRev:yearRev,retainedPct:retainedPct});
+  }
+
+  const ltv=cumulativeLTV;
+  const totalOrders=freq*Math.min(avgLifespan,horizon);
+
+  // Main display
+  document.getElementById('ltvMain').textContent='\u20AC'+fmt(Math.round(ltv));
+  document.getElementById('ltvSub').textContent='en '+horizon+' años \u00B7 Margen '+margin+'%';
+  document.getElementById('mAnnualRev').textContent='\u20AC'+fmt(Math.round(annualRev));
+  document.getElementById('mAnnualProfit').textContent='\u20AC'+fmt(Math.round(annualProfit));
+  document.getElementById('mLifespan').textContent=fmtD(Math.min(avgLifespan,horizon));
+  document.getElementById('mTotalOrders').textContent=fmtD(totalOrders);
+
+  // Timeline
+  const timeline=document.getElementById('timeline');
+  let timelineHTML='';
+  const maxLTV=yearlyData[yearlyData.length-1].cumulative;
+
+  yearlyData.forEach(d=>{
+    const pct=Math.max(3,(d.cumulative/maxLTV)*100);
+    timelineHTML+=`<div class="timeline-row">
+      <div class="timeline-period">Año ${d.year}</div>
+      <div class="timeline-bar-track"><div class="timeline-bar-fill" style="width:${pct}%"></div></div>
+      <div class="timeline-val">\u20AC${fmt(Math.round(d.cumulative))}</div>
+    </div>`;
+  });
+  timeline.innerHTML='<div class="timeline-header">LTV acumulado</div>'+timelineHTML;
+
+  // CAC recommendations
+  const cacLow=ltv*0.20;
+  const cacMid=ltv*0.30;
+  const cacHigh=ltv*0.40;
+  document.getElementById('cacLow').textContent='\u20AC'+fmt(Math.round(cacLow));
+  document.getElementById('cacMid').textContent='\u20AC'+fmt(Math.round(cacMid));
+  document.getElementById('cacHigh').textContent='\u20AC'+fmt(Math.round(cacHigh));
+
+  // Insight
+  let insightHTML='';
+  if(retention<20){
+    insightHTML='Tu retención del <strong>'+retention+'%</strong> es baja. Eso significa que la mayoría de tus clientes solo compran una vez y no vuelven. Antes de invertir más en captar clientes nuevos, <strong>arregla la retención</strong>: email marketing, programa de fidelización, experiencia post-compra. Cada punto de retención que subas multiplica tu LTV de forma exponencial.';
+  }else if(retention<35){
+    insightHTML='Con un LTV de <strong>\u20AC'+fmt(Math.round(ltv))+'</strong>, puedes invertir hasta <strong>\u20AC'+fmt(Math.round(cacMid))+'</strong> en captar cada cliente y seguir siendo rentable. Tu retención del '+retention+'% es aceptable pero tiene margen. Subir al 40% llevaría tu LTV a <strong>\u20AC'+fmt(Math.round(annualProfit*(1/(1-0.4))))+'</strong> en vida útil. El email marketing post-compra es la palanca más rentable aquí.';
+  }else{
+    insightHTML='Retención del <strong>'+retention+'%</strong> y LTV de <strong>\u20AC'+fmt(Math.round(ltv))+'</strong>. Buen dato. Puedes ser agresivo en adquisición invirtiendo hasta <strong>\u20AC'+fmt(Math.round(cacHigh))+'</strong> por cliente. La clave ahora es <strong>escalar el tráfico manteniendo la retención</strong>. Si metes más clientes sin que baje la retención, escalas con beneficio real.';
+  }
+  document.getElementById('insightText').innerHTML=insightHTML;
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+document.querySelectorAll('input').forEach(el=>{el.addEventListener('keypress',e=>{if(e.key==='Enter')calculate()})});
+</script>
+</body>
+</html>

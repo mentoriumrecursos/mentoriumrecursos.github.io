@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de FAQs para Tienda Online &mdash; Mentorium</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+.container{max-width:520px;margin:0 auto;padding:24px 16px 60px}
+
+.header{text-align:center;padding:30px 0 20px}
+.logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+.header h1{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+.header p{font-size:13px;color:#555;line-height:1.5}
+
+.card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
+.field select,.field input[type=text],.field textarea{width:100%;background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;color:#fff;font-size:14px;font-weight:500;padding:12px 14px;font-family:inherit;outline:none;transition:border-color 0.2s}
+.field select:focus,.field input:focus,.field textarea:focus{border-color:#00C853}
+.field textarea{resize:vertical;min-height:70px}
+.field select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.field select option{background:#111;color:#fff}
+.field .hint{font-size:11px;color:#444;margin-top:4px}
+
+.checkbox-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.checkbox-row label{display:flex;align-items:center;gap:6px;font-size:12px;color:#999;cursor:pointer;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;padding:8px 12px;transition:all 0.2s}
+.checkbox-row label:hover{border-color:#333}
+.checkbox-row input[type=checkbox]{accent-color:#00C853;width:14px;height:14px}
+.checkbox-row label.checked{border-color:#00C853;color:#fff;background:#0a1a0f}
+
+.btn{width:100%;background:#00C853;color:#0a0a0a;border:none;border-radius:12px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.5px;transition:all 0.2s;margin-top:8px}
+.btn:hover{background:#00E676;transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-secondary{background:none;border:2px solid #00C853;color:#00C853;margin-top:12px}
+.btn-secondary:hover{background:#00C853;color:#0a0a0a}
+
+.results{display:none;margin-top:16px}
+
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-box{background:#111113;border:1px solid #1c1c20;border-radius:10px;padding:12px;text-align:center}
+.stat-box .num{font-size:20px;font-weight:900;color:#00C853}
+.stat-box .lab{font-size:10px;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+.faq-list{display:flex;flex-direction:column;gap:8px}
+.faq-item{background:#111113;border:1px solid #1c1c20;border-radius:12px;overflow:hidden;transition:all 0.3s}
+.faq-item.open{border-color:#1a3a25}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:16px;cursor:pointer;gap:12px;transition:background 0.2s}
+.faq-q:hover{background:#151517}
+.faq-q .num{width:28px;height:28px;background:#0a1a0f;border:1px solid #1a3a25;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#00C853;flex-shrink:0}
+.faq-q .text{flex:1;font-size:14px;font-weight:700;color:#ddd;line-height:1.4}
+.faq-q .arrow{color:#555;font-size:14px;transition:transform 0.3s;flex-shrink:0}
+.faq-item.open .faq-q .arrow{transform:rotate(180deg);color:#00C853}
+.faq-a{padding:0 16px;max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.3s ease}
+.faq-item.open .faq-a{max-height:400px;padding:0 16px 16px}
+.faq-a-text{font-size:13px;color:#999;line-height:1.7;padding-top:8px;border-top:1px solid #1c1c20}
+
+.category-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00C853;margin:20px 0 10px;padding-left:4px}
+.category-label:first-child{margin-top:0}
+
+.copy-all{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.copy-all h3{font-size:14px;font-weight:700;color:#00C853}
+.copy-btn{background:#1c1c20;border:1px solid #2a2a2e;color:#999;font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.copy-btn:hover{background:#00C853;color:#0a0a0a;border-color:#00C853}
+.copy-btn.copied{background:#00C853;color:#0a0a0a;border-color:#00C853}
+
+.seo-tip{background:#0a1a0f;border:1px solid #1a3a25;border-radius:12px;padding:16px;font-size:13px;color:#6ab880;line-height:1.6;margin-top:16px}
+.seo-tip strong{color:#fff}
+.seo-tip h4{font-size:12px;font-weight:700;color:#00C853;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+
+.footer{text-align:center;padding:30px 0 10px;border-top:1px solid #141416;margin-top:24px}
+.footer .brand{font-size:12px;font-weight:800;color:#00C853;letter-spacing:3px}
+.footer .sub{font-size:12px;color:#333;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Generador de FAQs para Tienda Online</h1>
+    <p>Genera preguntas frecuentes profesionales listas para copiar y pegar en tu tienda.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de tu tienda</div>
+    <div class="field">
+      <label>Nombre de la tienda</label>
+      <input type="text" id="storeName" placeholder="Ej: MiTiendaOnline.com">
+    </div>
+    <div class="field">
+      <label>Tipo de producto principal</label>
+      <select id="productType">
+        <option value="moda">Moda y ropa</option>
+        <option value="electronica">Electr&oacute;nica y gadgets</option>
+        <option value="belleza">Belleza y cosmética</option>
+        <option value="hogar">Hogar y decoraci&oacute;n</option>
+        <option value="deporte">Deporte y fitness</option>
+        <option value="mascotas">Productos para mascotas</option>
+        <option value="joyeria">Joyer&iacute;a y accesorios</option>
+        <option value="infantil">Productos infantiles</option>
+        <option value="alimentacion">Alimentaci&oacute;n y suplementos</option>
+        <option value="general">Tienda general / multiproducto</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Email de contacto</label>
+      <input type="text" id="email" placeholder="soporte@tutienda.com">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Env&iacute;o y log&iacute;stica</div>
+    <div class="field">
+      <label>M&eacute;todo de env&iacute;o</label>
+      <select id="shippingMethod">
+        <option value="dropshipping">Dropshipping (env&iacute;o desde proveedor)</option>
+        <option value="propio">Almac&eacute;n propio / local</option>
+        <option value="fulfillment">Centro de fulfillment (3PL)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Plazo de entrega habitual</label>
+      <select id="deliveryTime">
+        <option value="24h">24-48 horas</option>
+        <option value="3-5">3-5 d&iacute;as laborables</option>
+        <option value="7-15" selected>7-15 d&iacute;as laborables</option>
+        <option value="15-30">15-30 d&iacute;as laborables</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Env&iacute;o gratuito</label>
+      <select id="freeShipping">
+        <option value="siempre">S&iacute;, siempre gratuito</option>
+        <option value="minimo" selected>Gratis a partir de un importe m&iacute;nimo</option>
+        <option value="nunca">No, siempre de pago</option>
+      </select>
+    </div>
+    <div class="field" id="minAmountField">
+      <label>Importe m&iacute;nimo para env&iacute;o gratis</label>
+      <input type="text" id="minAmount" value="49" placeholder="Ej: 49">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pol&iacute;tica de devoluciones</div>
+    <div class="field">
+      <label>Plazo de devoluci&oacute;n</label>
+      <select id="returnDays">
+        <option value="14">14 d&iacute;as</option>
+        <option value="30" selected>30 d&iacute;as</option>
+        <option value="60">60 d&iacute;as</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tipo de reembolso</label>
+      <select id="refundType">
+        <option value="completo">Reembolso completo</option>
+        <option value="sin-envio">Reembolso sin gastos de env&iacute;o</option>
+        <option value="credito">Cr&eacute;dito en tienda</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Categor&iacute;as de FAQs a incluir</div>
+    <div class="checkbox-row" id="categories">
+      <label class="checked"><input type="checkbox" value="envio" checked> Env&iacute;os</label>
+      <label class="checked"><input type="checkbox" value="devoluciones" checked> Devoluciones</label>
+      <label class="checked"><input type="checkbox" value="pagos" checked> Pagos</label>
+      <label class="checked"><input type="checkbox" value="producto" checked> Producto</label>
+      <label><input type="checkbox" value="cuenta"> Mi cuenta</label>
+      <label><input type="checkbox" value="seguridad"> Seguridad</label>
+      <label><input type="checkbox" value="descuentos"> Descuentos</label>
+      <label><input type="checkbox" value="contacto"> Contacto</label>
+    </div>
+  </div>
+
+  <button class="btn" onclick="generateFAQs()">Generar FAQs completas</button>
+
+  <div class="results" id="results">
+    <div class="stats-row">
+      <div class="stat-box"><div class="num" id="statTotal">0</div><div class="lab">Preguntas</div></div>
+      <div class="stat-box"><div class="num" id="statCats">0</div><div class="lab">Categor&iacute;as</div></div>
+      <div class="stat-box"><div class="num" id="statWords">0</div><div class="lab">Palabras</div></div>
+    </div>
+
+    <div class="copy-all">
+      <h3>FAQs generadas</h3>
+      <button class="copy-btn" id="copyBtn" onclick="copyAll()">Copiar todo</button>
+    </div>
+
+    <div class="faq-list" id="faqList"></div>
+
+    <button class="btn btn-secondary" id="copyPlainBtn" onclick="copyPlainText()">Copiar como texto plano</button>
+
+    <div class="seo-tip" id="seoTip"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="sub">mentoriumacademy.com</div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.checkbox-row input').forEach(cb=>{
+  cb.addEventListener('change',function(){this.closest('label').classList.toggle('checked',this.checked);});
+});
+
+document.getElementById('freeShipping').addEventListener('change',function(){
+  document.getElementById('minAmountField').style.display=this.value==='minimo'?'block':'none';
+});
+
+function generateFAQs(){
+  const name=document.getElementById('storeName').value.trim()||'nuestra tienda';
+  const type=document.getElementById('productType').value;
+  const email=document.getElementById('email').value.trim()||'soporte@tutienda.com';
+  const shipping=document.getElementById('shippingMethod').value;
+  const delivery=document.getElementById('deliveryTime').value;
+  const freeShip=document.getElementById('freeShipping').value;
+  const minAmt=document.getElementById('minAmount').value||'49';
+  const returnDays=document.getElementById('returnDays').value;
+  const refund=document.getElementById('refundType').value;
+
+  const selectedCats=Array.from(document.querySelectorAll('#categories input:checked')).map(c=>c.value);
+  if(selectedCats.length===0){alert('Selecciona al menos una categor\u00eda');return;}
+
+  const deliveryTexts={'24h':'24-48 horas','3-5':'3-5 d\u00edas laborables','7-15':'7-15 d\u00edas laborables','15-30':'15-30 d\u00edas laborables'};
+  const deliveryText=deliveryTexts[delivery];
+
+  const shippingTexts={dropshipping:'enviados directamente desde nuestro proveedor autorizado',propio:'enviados desde nuestro almac\u00e9n',fulfillment:'gestionados por nuestro centro log\u00edstico'};
+
+  let freeShipText='';
+  if(freeShip==='siempre')freeShipText='Todos los pedidos incluyen env\u00edo gratuito, sin importe m\u00ednimo.';
+  else if(freeShip==='minimo')freeShipText=`El env\u00edo es gratuito en pedidos superiores a ${minAmt}\u20ac. Para pedidos inferiores, el coste de env\u00edo se calcula autom\u00e1ticamente en el checkout.`;
+  else freeShipText='Los gastos de env\u00edo se calculan en funci\u00f3n del peso y destino del pedido. Podr\u00e1s ver el coste exacto antes de confirmar la compra.';
+
+  let refundText='';
+  if(refund==='completo')refundText='el reembolso completo del importe pagado, incluyendo gastos de env\u00edo';
+  else if(refund==='sin-envio')refundText='el reembolso del importe del producto (los gastos de env\u00edo no son reembolsables)';
+  else refundText='un cr\u00e9dito equivalente en tienda para tu pr\u00f3xima compra';
+
+  const typeSpecific={
+    moda:{talla:'Disponemos de una gu\u00eda de tallas detallada en cada ficha de producto. Mide tu cuerpo con una cinta m\u00e9trica y compara con nuestra tabla. Si est\u00e1s entre dos tallas, te recomendamos elegir la mayor para mayor comodidad.',cuidado:'Cada producto incluye instrucciones de lavado en la etiqueta. Como norma general, recomendamos lavar a m\u00e1quina en agua fr\u00eda y secar al aire para mantener la calidad del tejido.'},
+    electronica:{garantia:'Todos nuestros productos electr\u00f3nicos incluyen una garant\u00eda m\u00ednima de 2 a\u00f1os conforme a la legislaci\u00f3n europea. Para hacer efectiva la garant\u00eda, conserva tu comprobante de compra.',compat:'En la ficha de cada producto encontrar\u00e1s las especificaciones t\u00e9cnicas y la compatibilidad. Si tienes dudas, escr\u00edbenos a '+email+' con el modelo de tu dispositivo y te asesoramos.'},
+    belleza:{ingredientes:'La lista completa de ingredientes (INCI) est\u00e1 disponible en cada ficha de producto. Todos nuestros cosm\u00e9ticos cumplen con la normativa europea de seguridad.',sensible:'Recomendamos hacer una prueba en una peque\u00f1a zona de piel antes del primer uso. Si experimentas cualquier reacci\u00f3n, suspende el uso y consulta a un dermat\u00f3logo.'},
+    default:{calidad:'Todos nuestros productos pasan por un control de calidad antes de ser enviados. Trabajamos directamente con proveedores verificados para garantizar la mejor relaci\u00f3n calidad-precio.',disponibilidad:'El stock se actualiza en tiempo real en nuestra web. Si un producto aparece como disponible, puedes comprarlo con total confianza.'}
+  };
+  const typeInfo=typeSpecific[type]||typeSpecific.default;
+
+  const allFAQs={
+    envio:[
+      {q:'\u00bfCu\u00e1nto tarda en llegar mi pedido?',a:`Los pedidos son ${shippingTexts[shipping]}. El plazo de entrega habitual es de ${deliveryText} desde la confirmaci\u00f3n del pago. Recibir\u00e1s un email con el n\u00famero de seguimiento en cuanto tu pedido sea expedido.`},
+      {q:'\u00bfEl env\u00edo es gratuito?',a:freeShipText},
+      {q:'\u00bfC\u00f3mo puedo rastrear mi pedido?',a:`Una vez que tu pedido salga de nuestras instalaciones, recibir\u00e1s un email autom\u00e1tico con el n\u00famero de seguimiento y un enlace para rastrearlo en tiempo real. Si no recibes el email en 48 horas, rev\u00edsa tu carpeta de spam o escr\u00edbenos a ${email}.`},
+      {q:'\u00bfRealizan env\u00edos internacionales?',a:`S\u00ed, realizamos env\u00edos a la mayor\u00eda de pa\u00edses. Los plazos y costes var\u00edan seg\u00fan el destino. Ten en cuenta que los pedidos internacionales pueden estar sujetos a tasas aduaneras que son responsabilidad del comprador.`}
+    ],
+    devoluciones:[
+      {q:'\u00bfCu\u00e1l es la pol\u00edtica de devoluciones?',a:`Dispones de ${returnDays} d\u00edas naturales desde la recepci\u00f3n del producto para solicitar una devoluci\u00f3n. El producto debe estar sin usar, en su embalaje original y con todas las etiquetas intactas.`},
+      {q:'\u00bfC\u00f3mo solicito una devoluci\u00f3n?',a:`Env\u00eda un email a ${email} indicando tu n\u00famero de pedido y el motivo de la devoluci\u00f3n. Te responderemos en un m\u00e1ximo de 48 horas con las instrucciones para realizar el env\u00edo de vuelta.`},
+      {q:'\u00bfCu\u00e1ndo recibir\u00e9 mi reembolso?',a:`Una vez recibido y verificado el estado del producto, procesar\u00e9s ${refundText}. El plazo de procesamiento es de 5 a 10 d\u00edas h\u00e1biles. Recibir\u00e1s un email de confirmaci\u00f3n cuando se procese.`},
+      {q:'\u00bfQu\u00e9 hago si recibo un producto defectuoso?',a:`Si has recibido un producto defectuoso o incorrecto, cont\u00e1ctanos inmediatamente a ${email} con fotograf\u00edas del producto y del embalaje. Nos hacemos cargo del env\u00edo de devoluci\u00f3n y te enviaremos un reemplazo o procesaremos el reembolso completo.`}
+    ],
+    pagos:[
+      {q:'\u00bfQu\u00e9 m\u00e9todos de pago aceptan?',a:'Aceptamos todas las tarjetas de cr\u00e9dito y d\u00e9bito principales (Visa, Mastercard, American Express), PayPal, Apple Pay y Google Pay. Todos los pagos se procesan de forma segura con encriptaci\u00f3n SSL de 256 bits.'},
+      {q:'\u00bfPuedo pagar a plazos?',a:'S\u00ed, ofrecemos la opci\u00f3n de pago fraccionado a trav\u00e9s de servicios como Klarna o Sequra (seg\u00fan disponibilidad en tu pa\u00eds). Podr\u00e1s seleccionar esta opci\u00f3n en el checkout.'},
+      {q:'\u00bfEs seguro comprar en esta tienda?',a:`Tu seguridad es nuestra prioridad. ${name} utiliza certificado SSL, pasarelas de pago con encriptaci\u00f3n avanzada y nunca almacena los datos de tu tarjeta. Adem\u00e1s, cumplimos con la normativa PCI DSS.`}
+    ],
+    producto:[
+      {q:'\u00bfLos productos son originales?',a:`Todos los productos de ${name} son 100% originales y proceden de proveedores verificados. Nos comprometemos con la autenticidad y calidad de cada art\u00edculo que vendemos.`},
+      {q:'\u00bfC\u00f3mo elijo la talla/variante correcta?',a:typeInfo.talla||typeInfo.calidad||typeSpecific.default.calidad},
+      {q:'\u00bfLos colores son exactos a los de la foto?',a:'Hacemos todo lo posible para que las fotograf\u00edas representen fielmente el producto. Sin embargo, los colores pueden variar ligeramente seg\u00fan la pantalla de tu dispositivo. Si tienes dudas sobre un color espec\u00edfico, cont\u00e1ctanos antes de comprar.'}
+    ],
+    cuenta:[
+      {q:'\u00bfNecesito crear una cuenta para comprar?',a:'No es obligatorio. Puedes comprar como invitado. Sin embargo, crear una cuenta te permite hacer seguimiento de tus pedidos, guardar direcciones y acceder a ofertas exclusivas.'},
+      {q:'\u00bfC\u00f3mo cambio mis datos personales?',a:`Accede a tu cuenta en nuestra web, ve a "Mi perfil" y actualiza la informaci\u00f3n que necesites. Si tienes problemas, escr\u00edbenos a ${email} y te ayudamos.`}
+    ],
+    seguridad:[
+      {q:'\u00bfMis datos personales est\u00e1n protegidos?',a:`Cumplimos rigurosamente con el Reglamento General de Protecci\u00f3n de Datos (RGPD). Tus datos personales est\u00e1n encriptados y nunca se comparten con terceros sin tu consentimiento. Puedes consultar nuestra pol\u00edtica de privacidad completa en la web.`},
+      {q:'\u00bfC\u00f3mo puedo eliminar mi cuenta?',a:`Puedes solicitar la eliminaci\u00f3n de tu cuenta y todos tus datos personales enviando un email a ${email}. Procesaremos tu solicitud en un m\u00e1ximo de 30 d\u00edas conforme a la normativa RGPD.`}
+    ],
+    descuentos:[
+      {q:'\u00bfTienen c\u00f3digos de descuento?',a:`Publicamos c\u00f3digos de descuento exclusivos en nuestras redes sociales y newsletter. Suscr\u00edbete a nuestro bolet\u00edn para no perderte ninguna oferta.`},
+      {q:'\u00bfHacen rebajas o promociones especiales?',a:'S\u00ed, realizamos promociones especiales en fechas clave como Black Friday, rebajas de temporada y aniversarios. S\u00edguenos en redes sociales para enterarte antes que nadie.'},
+      {q:'\u00bfPuedo combinar varios c\u00f3digos de descuento?',a:'Solo se puede aplicar un c\u00f3digo de descuento por pedido. El sistema aplica autom\u00e1ticamente el descuento m\u00e1s beneficioso si tienes varios disponibles.'}
+    ],
+    contacto:[
+      {q:'\u00bfC\u00f3mo puedo contactar con atenci\u00f3n al cliente?',a:`Puedes contactarnos por email a ${email}. Respondemos en un m\u00e1ximo de 24-48 horas laborables. Tambi\u00e9n puedes escribirnos por el chat en vivo de nuestra web o a trav\u00e9s de nuestras redes sociales.`},
+      {q:'\u00bfCu\u00e1l es el horario de atenci\u00f3n?',a:'Nuestro equipo de atenci\u00f3n al cliente est\u00e1 disponible de lunes a viernes de 9:00 a 18:00 (hora peninsular espa\u00f1ola). Los emails recibidos fuera de este horario se responden al siguiente d\u00eda laborable.'}
+    ]
+  };
+
+  const catNames={envio:'Env\u00edos y entrega',devoluciones:'Devoluciones y reembolsos',pagos:'Pagos y seguridad',producto:'Productos',cuenta:'Mi cuenta',seguridad:'Privacidad y seguridad',descuentos:'Ofertas y descuentos',contacto:'Contacto y soporte'};
+
+  let faqHTML='';
+  let plainText='PREGUNTAS FRECUENTES \u2014 '+name.toUpperCase()+'\n'+'='.repeat(40)+'\n\n';
+  let totalQ=0;
+  let totalWords=0;
+  let catCount=0;
+  let globalIdx=1;
+
+  selectedCats.forEach(cat=>{
+    const faqs=allFAQs[cat];
+    if(!faqs)return;
+    catCount++;
+    faqHTML+=`<div class="category-label">${catNames[cat]}</div>`;
+    plainText+=catNames[cat].toUpperCase()+'\n'+'-'.repeat(30)+'\n\n';
+
+    faqs.forEach((faq,i)=>{
+      totalQ++;
+      const words=faq.a.split(/\s+/).length;
+      totalWords+=words;
+      faqHTML+=`<div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-q"><span class="num">${globalIdx}</span><span class="text">${faq.q}</span><span class="arrow">\u25BC</span></div>
+        <div class="faq-a"><div class="faq-a-text">${faq.a}</div></div>
+      </div>`;
+      plainText+=globalIdx+'. '+faq.q+'\n'+faq.a+'\n\n';
+      globalIdx++;
+    });
+  });
+
+  document.getElementById('statTotal').textContent=totalQ;
+  document.getElementById('statCats').textContent=catCount;
+  document.getElementById('statWords').textContent=totalWords;
+  document.getElementById('faqList').innerHTML=faqHTML;
+
+  // Store plain text for copy
+  window._faqPlainText=plainText;
+
+  // SEO tip
+  document.getElementById('seoTip').innerHTML=`<h4>Consejo SEO para tus FAQs</h4>
+A\u00f1ade estas FAQs con <strong>schema markup FAQ (JSON-LD)</strong> para que Google las muestre como fragmentos enriquecidos en los resultados de b\u00fasqueda. Esto puede aumentar tu CTR org\u00e1nico entre un 15% y un 30%.
+<br><br>
+Cada FAQ tiene respuestas de longitud \u00f3ptima para SEO (50-150 palabras). Las preguntas usan lenguaje natural que coincide con b\u00fasquedas reales de usuarios.`;
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+function toggleFAQ(el){el.classList.toggle('open');}
+
+function copyAll(){
+  const faqs=document.querySelectorAll('.faq-item');
+  let html='';
+  faqs.forEach(faq=>{
+    const q=faq.querySelector('.faq-q .text').textContent;
+    const a=faq.querySelector('.faq-a-text').textContent;
+    html+=`<h3>${q}</h3>\n<p>${a}</p>\n\n`;
+  });
+  navigator.clipboard.writeText(html).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='Copiado';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copiar todo';btn.classList.remove('copied');},2000);
+  });
+}
+
+function copyPlainText(){
+  if(window._faqPlainText){
+    navigator.clipboard.writeText(window._faqPlainText).then(()=>{
+      const btn=document.getElementById('copyPlainBtn');
+      btn.textContent='Texto copiado';btn.style.background='#00C853';btn.style.color='#0a0a0a';btn.style.borderColor='#00C853';
+      setTimeout(()=>{btn.textContent='Copiar como texto plano';btn.style.background='';btn.style.color='';btn.style.borderColor='';},2000);
+    });
+  }
+}
+</script>
+</body>
+</html>

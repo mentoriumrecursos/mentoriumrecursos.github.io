@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Descuento Real — ¿Cuánto margen pierdes realmente? — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#08080a;color:#fff;min-height:100vh}
+  .container{max-width:460px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#C45830;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field label .val{color:#C45830;font-weight:800}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#C45830;border-radius:50%;cursor:pointer;border:3px solid #08080a}
+  .row .num{width:80px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#C45830}
+  .row .u{color:#555;font-size:13px;font-weight:600;width:16px}
+  .result{margin-top:20px}
+  .boxes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .box{padding:18px;border-radius:14px;text-align:center}
+  .box .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+  .box .amount{font-size:28px;font-weight:900}
+  .box .sub{font-size:11px;color:#888;margin-top:4px}
+  .box-before{background:rgba(45,140,78,0.08);border:1px solid rgba(45,140,78,0.2)}
+  .box-before .label{color:#2D8C4E}
+  .box-before .amount{color:#2D8C4E}
+  .box-after{background:rgba(196,88,48,0.08);border:1px solid rgba(196,88,48,0.2)}
+  .box-after .label{color:#C45830}
+  .box-after .amount{color:#C45830}
+  .impact{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;text-align:center}
+  .impact .big{font-size:42px;font-weight:900;color:#C45830;margin-bottom:8px}
+  .impact .desc{font-size:14px;color:#888;line-height:1.5}
+  .impact .desc strong{color:#fff}
+  .warning{background:rgba(196,88,48,0.06);border:1px solid rgba(196,88,48,0.15);border-radius:12px;padding:16px;margin-top:16px;font-size:13px;color:#C45830;line-height:1.6}
+  .warning strong{color:#fff}
+  .alternatives{margin-top:20px}
+  .alt{background:#111113;border:1px solid #1c1c20;border-radius:12px;padding:16px;margin-bottom:10px}
+  .alt h4{font-size:14px;font-weight:800;color:#C45830;margin-bottom:6px}
+  .alt p{font-size:13px;color:#888;line-height:1.5}
+  .alt .nums{font-size:13px;color:#2D8C4E;font-weight:700;margin-top:6px}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#C45830;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>¿Cuánto margen pierdes con un descuento?</h1>
+    <p>El 20% de descuento NO es el 20% de tu margen. Es mucho más.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu producto</div>
+    <div class="field">
+      <label>Precio de venta <span class="val" id="lbl_price">45€</span></label>
+      <div class="row"><input type="range" min="10" max="200" value="45" id="sl_price" oninput="s('price')"><input type="number" class="num" id="in_price" value="45" oninput="s('price',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Coste total (producto + envío) <span class="val" id="lbl_cost">16€</span></label>
+      <div class="row"><input type="range" min="1" max="100" value="16" id="sl_cost" oninput="s('cost')"><input type="number" class="num" id="in_cost" value="16" oninput="s('cost',1)"><span class="u">€</span></div>
+    </div>
+    <div class="field">
+      <label>Descuento que quieres aplicar <span class="val" id="lbl_disc">20%</span></label>
+      <div class="row"><input type="range" min="5" max="50" value="20" id="sl_disc" oninput="s('disc')"><input type="number" class="num" id="in_disc" value="20" oninput="s('disc',1)"><span class="u">%</span></div>
+    </div>
+    <div class="field">
+      <label>Ventas mensuales (unidades) <span class="val" id="lbl_units">100</span></label>
+      <div class="row"><input type="range" min="10" max="1000" step="10" value="100" id="sl_units" oninput="s('units')"><input type="number" class="num" id="in_units" value="100" oninput="s('units',1)"><span class="u">uds</span></div>
+    </div>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="footer">Herramienta gratuita de <span>MENTORIUM</span></div>
+</div>
+<script>
+function s(k,fi){var sl=document.getElementById('sl_'+k),inp=document.getElementById('in_'+k);if(fi)sl.value=inp.value;else inp.value=sl.value;calc();}
+function fmt(n){return Math.round(n).toLocaleString('es-ES')+'€'}
+function calc(){
+  var price=parseFloat(document.getElementById('in_price').value)||0;
+  var cost=parseFloat(document.getElementById('in_cost').value)||0;
+  var disc=parseFloat(document.getElementById('in_disc').value)||0;
+  var units=parseFloat(document.getElementById('in_units').value)||0;
+  document.getElementById('lbl_price').textContent=price+'€';
+  document.getElementById('lbl_cost').textContent=cost+'€';
+  document.getElementById('lbl_disc').textContent=disc+'%';
+  document.getElementById('lbl_units').textContent=units;
+
+  var margin_before=price-cost;
+  var margin_before_pct=(margin_before/price*100);
+  var disc_price=price*(1-disc/100);
+  var margin_after=disc_price-cost;
+  var margin_after_pct=disc_price>0?(margin_after/disc_price*100):0;
+  var margin_loss_pct=margin_before>0?((1-margin_after/margin_before)*100):0;
+
+  var profit_before=margin_before*units;
+  var profit_after=margin_after*units;
+  var profit_loss=profit_before-profit_after;
+
+  // How many more units needed to compensate
+  var units_needed=margin_after>0?Math.ceil(profit_before/margin_after):Infinity;
+  var extra_units=units_needed-units;
+  var extra_pct=Math.round(extra_units/units*100);
+
+  var html='<div class="boxes">';
+  html+='<div class="box box-before"><div class="label">Sin descuento</div><div class="amount">'+margin_before.toFixed(0)+'€</div><div class="sub">margen/ud ('+margin_before_pct.toFixed(0)+'%)</div></div>';
+  html+='<div class="box box-after"><div class="label">Con -'+disc+'%</div><div class="amount">'+margin_after.toFixed(0)+'€</div><div class="sub">margen/ud ('+margin_after_pct.toFixed(0)+'%)</div></div>';
+  html+='</div>';
+
+  html+='<div class="impact">';
+  html+='<div class="big">-'+margin_loss_pct.toFixed(0)+'%</div>';
+  html+='<div class="desc">Un descuento del '+disc+'% elimina el <strong>'+margin_loss_pct.toFixed(0)+'% de tu margen</strong>.<br>No el '+disc+'%. El '+margin_loss_pct.toFixed(0)+'%.</div>';
+  html+='</div>';
+
+  if(margin_after<=0){
+    html+='<div class="warning"><strong>PIERDES DINERO.</strong> Con este descuento el margen es negativo ('+margin_after.toFixed(0)+'€/ud). Cada venta con descuento te CUESTA '+Math.abs(margin_after).toFixed(0)+'€.</div>';
+  }else{
+    html+='<div class="warning"><strong>Para compensar</strong> necesitas vender <strong>'+units_needed+' unidades</strong> ('+extra_units+' más, un +'+extra_pct+'%) para ganar lo mismo que sin descuento.</div>';
+  }
+
+  html+='<div class="alternatives"><div class="card-title" style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:14px">Alternativas al descuento</div>';
+  html+='<div class="alt"><h4>Envío gratis (absorber en precio)</h4><p>Sube el precio un 10-15% y ofrece envío gratis. Convierte un 20% más sin perder margen.</p><div class="nums">Margen se mantiene. Conversión sube.</div></div>';
+  html+='<div class="alt"><h4>Bundle 2x1 con descuento</h4><p>2 unidades por '+(price*1.6).toFixed(0)+'€ en vez de '+(price*2).toFixed(0)+'€. Ticket medio sube un 60%.</p><div class="nums">Margen por venta: '+(price*1.6-cost*2).toFixed(0)+'€ vs '+margin_before.toFixed(0)+'€ sin bundle</div></div>';
+  html+='<div class="alt"><h4>Regalo en vez de descuento</h4><p>Añade un producto de coste bajo (2-3€) como "regalo". Percepción de valor alta sin destruir margen.</p><div class="nums">Coste real: 2-3€. Percepción: "me regalan algo".</div></div>';
+  html+='</div>';
+
+  document.getElementById('result').innerHTML=html;
+}
+calc();
+</script>
+</body>
+</html>

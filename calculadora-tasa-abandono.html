@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Tasa de Abandono del Carrito — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh}
+  .container{max-width:500px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#00C853;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px;color:#0a0a0a}
+  .header h1{font-size:21px;font-weight:900;margin-bottom:6px;line-height:1.3}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00C853;margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#777;margin-bottom:6px}
+  .field label .val{color:#00C853;font-weight:800}
+  .row{display:flex;align-items:center;gap:10px}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#1c1c20;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#00C853;border-radius:50%;cursor:pointer;border:3px solid #0a0a0a}
+  .row .num{width:90px;background:#0c0c0e;border:1px solid #1c1c20;border-radius:8px;color:#fff;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#00C853}
+  .row .u{color:#555;font-size:13px;font-weight:600;width:16px}
+  .extra-field{margin-top:16px;padding-top:16px;border-top:1px solid #1c1c20}
+  .funnel{margin-bottom:20px}
+  .funnel-step{position:relative;margin-bottom:2px}
+  .funnel-bar{height:44px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:12px;font-weight:700;transition:width .5s}
+  .funnel-bar .step-name{color:rgba(255,255,255,0.9)}
+  .funnel-bar .step-val{color:#fff;font-weight:900}
+  .funnel-drop{text-align:right;padding:4px 8px 8px;font-size:11px;font-weight:700}
+  .boxes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .box{padding:18px;border-radius:14px;text-align:center}
+  .box .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+  .box .amount{font-size:26px;font-weight:900}
+  .box .sub{font-size:11px;color:#888;margin-top:4px}
+  .box-green{background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2)}
+  .box-green .label{color:#00C853}
+  .box-green .amount{color:#00C853}
+  .box-red{background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.2)}
+  .box-red .label{color:#F44336}
+  .box-red .amount{color:#F44336}
+  .box-amber{background:rgba(255,193,7,0.08);border:1px solid rgba(255,193,7,0.2)}
+  .box-amber .label{color:#FFC107}
+  .box-amber .amount{color:#FFC107}
+  .leak-alert{border-radius:14px;padding:20px;margin-bottom:16px;text-align:center}
+  .leak-alert .icon{font-size:28px;margin-bottom:8px}
+  .leak-alert .title{font-size:16px;font-weight:900;margin-bottom:6px}
+  .leak-alert .desc{font-size:13px;line-height:1.6}
+  .leak-alert .desc strong{color:#fff}
+  .breakdown{margin-top:12px}
+  .break-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1c1c20;font-size:13px}
+  .break-row:last-child{border-bottom:none}
+  .break-row .lbl{color:#888}
+  .break-row .val{font-weight:700}
+  .break-row .val.green{color:#00C853}
+  .break-row .val.red{color:#F44336}
+  .break-row .val.amber{color:#FFC107}
+  .solutions{margin-top:16px}
+  .solution{background:#111113;border:1px solid #1c1c20;border-radius:12px;padding:16px;margin-bottom:10px}
+  .solution .sol-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .solution .sol-header h4{font-size:13px;font-weight:800;color:#00C853}
+  .solution .sol-header .impact{font-size:11px;font-weight:800;background:rgba(0,200,83,0.1);color:#00C853;padding:3px 8px;border-radius:4px}
+  .solution p{font-size:12px;color:#888;line-height:1.6}
+  .revenue-box{background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.15);border-radius:14px;padding:20px;margin-top:16px;text-align:center}
+  .revenue-box .big{font-size:32px;font-weight:900;color:#00C853;margin-bottom:4px}
+  .revenue-box .desc{font-size:13px;color:#888;line-height:1.5}
+  .revenue-box .desc strong{color:#fff}
+  .benchmarks{margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .bench{background:#0c0c0e;border:1px solid #1c1c20;border-radius:10px;padding:12px;text-align:center}
+  .bench .val{font-size:16px;font-weight:900;color:#888;margin-bottom:2px}
+  .bench .lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#555}
+  .bench.current .val{color:#00C853}
+  .bench.current{border-color:rgba(0,200,83,0.3)}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#444}
+  .footer span{color:#00C853;font-weight:800}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Calculadora de Tasa de Abandono</h1>
+    <p>Identifica en que paso exacto de tu funnel se pierden los clientes y cuanto dinero te esta costando.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu funnel de compra</div>
+    <div class="field">
+      <label>Sesiones mensuales <span class="val" id="lbl_sessions">5000</span></label>
+      <div class="row"><input type="range" min="100" max="100000" step="100" value="5000" id="sl_sessions" oninput="sync('sessions')"><input type="number" class="num" id="in_sessions" value="5000" oninput="sync('sessions',1)"></div>
+    </div>
+    <div class="field">
+      <label>Anadir al carrito <span class="val" id="lbl_atc">400</span></label>
+      <div class="row"><input type="range" min="1" max="10000" step="1" value="400" id="sl_atc" oninput="sync('atc')"><input type="number" class="num" id="in_atc" value="400" oninput="sync('atc',1)"></div>
+    </div>
+    <div class="field">
+      <label>Inician checkout <span class="val" id="lbl_checkout">200</span></label>
+      <div class="row"><input type="range" min="1" max="5000" step="1" value="200" id="sl_checkout" oninput="sync('checkout')"><input type="number" class="num" id="in_checkout" value="200" oninput="sync('checkout',1)"></div>
+    </div>
+    <div class="field">
+      <label>Compras completadas <span class="val" id="lbl_purchases">80</span></label>
+      <div class="row"><input type="range" min="1" max="3000" step="1" value="80" id="sl_purchases" oninput="sync('purchases')"><input type="number" class="num" id="in_purchases" value="80" oninput="sync('purchases',1)"></div>
+    </div>
+    <div class="extra-field">
+      <div class="field">
+        <label>AOV (valor medio del pedido) <span class="val" id="lbl_aov">45€</span></label>
+        <div class="row"><input type="range" min="10" max="300" value="45" id="sl_aov" oninput="sync('aov')"><input type="number" class="num" id="in_aov" value="45" oninput="sync('aov',1)"><span class="u">€</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Embudo visual</div>
+    <div class="funnel" id="funnel"></div>
+  </div>
+
+  <div id="leakAlert"></div>
+
+  <div class="card">
+    <div class="card-title">Tasas de abandono por paso</div>
+    <div class="boxes" id="rateBoxes"></div>
+    <div class="breakdown" id="breakdown"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tu posicion vs benchmarks del sector</div>
+    <div class="benchmarks" id="benchmarks"></div>
+  </div>
+
+  <div class="revenue-box" id="revenueBox"></div>
+
+  <div class="solutions" id="solutions"></div>
+
+  <div class="footer">Herramienta interna <span>Mentorium</span></div>
+</div>
+
+<script>
+function sync(f, fromInput) {
+  const sl = document.getElementById('sl_' + f);
+  const inp = document.getElementById('in_' + f);
+  if (fromInput) sl.value = inp.value; else inp.value = sl.value;
+  const v = parseFloat(inp.value) || 0;
+  const units = {aov:'€'};
+  document.getElementById('lbl_' + f).textContent = (f === 'sessions' && v >= 1000 ? (v/1000).toFixed(1).replace('.0','') + 'K' : v) + (units[f] || '');
+  calc();
+}
+
+function fmt(n) { return n >= 10000 ? (n/1000).toFixed(1).replace('.0','') + 'K' : n >= 1000 ? (n/1000).toFixed(1) + 'K' : Math.round(n); }
+
+function calc() {
+  const sessions = parseFloat(document.getElementById('in_sessions').value) || 0;
+  const atc = parseFloat(document.getElementById('in_atc').value) || 0;
+  const checkout = parseFloat(document.getElementById('in_checkout').value) || 0;
+  const purchases = parseFloat(document.getElementById('in_purchases').value) || 0;
+  const aov = parseFloat(document.getElementById('in_aov').value) || 0;
+
+  // Rates
+  const atcRate = sessions > 0 ? (atc / sessions) * 100 : 0;
+  const checkoutRate = atc > 0 ? (checkout / atc) * 100 : 0;
+  const purchaseRate = checkout > 0 ? (purchases / checkout) * 100 : 0;
+  const overallCR = sessions > 0 ? (purchases / sessions) * 100 : 0;
+
+  // Drop-off rates (abandonment)
+  const dropBrowse = 100 - atcRate; // browse to cart
+  const dropCart = 100 - checkoutRate; // cart to checkout
+  const dropCheckout = 100 - purchaseRate; // checkout to purchase
+
+  // Lost at each step
+  const lostBrowse = sessions - atc;
+  const lostCart = atc - checkout;
+  const lostCheckout = checkout - purchases;
+
+  // Revenue lost
+  const revLostCart = lostCart * aov;
+  const revLostCheckout = lostCheckout * aov;
+  const totalRevLost = revLostCart + revLostCheckout;
+
+  // Find worst leak
+  const leaks = [
+    {step:'Navegacion a Carrito', rate: dropBrowse, lost: lostBrowse, type:'browse'},
+    {step:'Carrito a Checkout', rate: dropCart, lost: lostCart, type:'cart'},
+    {step:'Checkout a Compra', rate: dropCheckout, lost: lostCheckout, type:'checkout'}
+  ];
+  const worst = leaks.reduce((a,b) => {
+    // Weight by intent: checkout abandonment is worse than browse
+    const aScore = a.type === 'checkout' ? a.rate * 2 : a.type === 'cart' ? a.rate * 1.5 : a.rate * 0.5;
+    const bScore = b.type === 'checkout' ? b.rate * 2 : b.type === 'cart' ? b.rate * 1.5 : b.rate * 0.5;
+    return aScore > bScore ? a : b;
+  });
+
+  // Funnel visual
+  const maxWidth = 100;
+  const steps = [
+    {name:'Sesiones', val: sessions, color:'#1a3d24', text:'#00C853'},
+    {name:'Anadir al carrito', val: atc, color:'#0d2a4a', text:'#2196F3'},
+    {name:'Inician checkout', val: checkout, color:'#2a1a3d', text:'#9C27B0'},
+    {name:'Compras', val: purchases, color:'#3d2a0d', text:'#FF9800'}
+  ];
+  let funnelHTML = '';
+  steps.forEach((s, i) => {
+    const pct = sessions > 0 ? Math.max((s.val / sessions) * 100, 8) : 8;
+    funnelHTML += `<div class="funnel-step">
+      <div class="funnel-bar" style="width:${pct}%;background:${s.color};border:1px solid ${s.text}30">
+        <span class="step-name" style="color:${s.text}">${s.name}</span>
+        <span class="step-val">${fmt(s.val)}</span>
+      </div>`;
+    if (i < steps.length - 1) {
+      const dropPct = s.val > 0 ? ((s.val - steps[i+1].val) / s.val * 100) : 0;
+      const dropColor = dropPct > 70 ? '#F44336' : dropPct > 50 ? '#FFC107' : '#00C853';
+      funnelHTML += `<div class="funnel-drop" style="color:${dropColor}">-${dropPct.toFixed(1)}% (${fmt(s.val - steps[i+1].val)} perdidos)</div>`;
+    }
+    funnelHTML += `</div>`;
+  });
+  document.getElementById('funnel').innerHTML = funnelHTML;
+
+  // Leak alert
+  let alertBg, alertBorder, alertColor;
+  if (worst.type === 'checkout') { alertBg = 'rgba(244,67,54,0.06)'; alertBorder = 'rgba(244,67,54,0.2)'; alertColor = '#F44336'; }
+  else if (worst.type === 'cart') { alertBg = 'rgba(255,193,7,0.06)'; alertBorder = 'rgba(255,193,7,0.2)'; alertColor = '#FFC107'; }
+  else { alertBg = 'rgba(33,150,243,0.06)'; alertBorder = 'rgba(33,150,243,0.2)'; alertColor = '#2196F3'; }
+
+  const leakMessages = {
+    browse: 'Tu mayor problema esta en que los visitantes no anaden productos al carrito. Puede ser problema de fichas de producto, precios o publico equivocado.',
+    cart: 'Tu mayor fuga esta entre el carrito y el checkout. Los usuarios anaden productos pero no inician el pago. Causas tipicas: costes ocultos, envio caro, falta de confianza.',
+    checkout: 'Tu mayor fuga esta en el checkout. Los usuarios quieren comprar pero algo les frena al final. Causas tipicas: proceso largo, pocos metodos de pago, errores tecnicos.'
+  };
+
+  document.getElementById('leakAlert').innerHTML = `<div class="leak-alert" style="background:${alertBg};border:1px solid ${alertBorder}">
+    <div class="title" style="color:${alertColor}">Mayor fuga: ${worst.step}</div>
+    <div class="desc" style="color:${alertColor}">${leakMessages[worst.type]}<br><strong>${fmt(worst.lost)} personas perdidas (${worst.rate.toFixed(1)}% de abandono)</strong></div>
+  </div>`;
+
+  // Rate boxes
+  document.getElementById('rateBoxes').innerHTML = `
+    <div class="box ${dropCart > 60 ? 'box-red' : dropCart > 40 ? 'box-amber' : 'box-green'}">
+      <div class="label">Abandono carrito</div>
+      <div class="amount">${dropCart.toFixed(1)}%</div>
+      <div class="sub">${fmt(lostCart)} perdidos</div>
+    </div>
+    <div class="box ${dropCheckout > 50 ? 'box-red' : dropCheckout > 30 ? 'box-amber' : 'box-green'}">
+      <div class="label">Abandono checkout</div>
+      <div class="amount">${dropCheckout.toFixed(1)}%</div>
+      <div class="sub">${fmt(lostCheckout)} perdidos</div>
+    </div>`;
+
+  // Breakdown
+  document.getElementById('breakdown').innerHTML = `
+    <div class="break-row"><span class="lbl">Tasa add-to-cart</span><span class="val ${atcRate >= 8 ? 'green' : atcRate >= 4 ? 'amber' : 'red'}">${atcRate.toFixed(2)}%</span></div>
+    <div class="break-row"><span class="lbl">Tasa carrito a checkout</span><span class="val ${checkoutRate >= 50 ? 'green' : checkoutRate >= 30 ? 'amber' : 'red'}">${checkoutRate.toFixed(1)}%</span></div>
+    <div class="break-row"><span class="lbl">Tasa checkout a compra</span><span class="val ${purchaseRate >= 60 ? 'green' : purchaseRate >= 40 ? 'amber' : 'red'}">${purchaseRate.toFixed(1)}%</span></div>
+    <div class="break-row"><span class="lbl">Conversion global</span><span class="val ${overallCR >= 3 ? 'green' : overallCR >= 1.5 ? 'amber' : 'red'}">${overallCR.toFixed(2)}%</span></div>
+    <div class="break-row"><span class="lbl">Ingresos perdidos en carrito/mes</span><span class="val red">${fmt(revLostCart)}€</span></div>
+    <div class="break-row"><span class="lbl">Ingresos perdidos en checkout/mes</span><span class="val red">${fmt(revLostCheckout)}€</span></div>`;
+
+  // Benchmarks
+  const benchCR = overallCR;
+  document.getElementById('benchmarks').innerHTML = `
+    <div class="bench ${benchCR < 1.5 ? 'current' : ''}"><div class="val" style="${benchCR < 1.5 ? 'color:#F44336' : ''}">&lt;1.5%</div><div class="lbl">Bajo</div></div>
+    <div class="bench ${benchCR >= 1.5 && benchCR < 3 ? 'current' : ''}"><div class="val">1.5-3%</div><div class="lbl">Media</div></div>
+    <div class="bench ${benchCR >= 3 ? 'current' : ''}"><div class="val">3%+</div><div class="lbl">Excelente</div></div>`;
+
+  // Revenue recovery
+  const recover10Cart = lostCart * 0.10 * aov;
+  const recover10Checkout = lostCheckout * 0.10 * aov;
+  const totalRecover = recover10Cart + recover10Checkout;
+  document.getElementById('revenueBox').innerHTML = `
+    <div class="big">+${fmt(totalRecover)}€/mes</div>
+    <div class="desc">Ingresos recuperables si reduces el abandono un <strong>10%</strong> en cada paso.<br>Eso son <strong>+${fmt(totalRecover * 12)}€/ano</strong> sin gastar mas en trafico.</div>`;
+
+  // Solutions based on worst leak
+  let solHTML = '';
+  if (worst.type === 'checkout' || dropCheckout > 40) {
+    solHTML += `<div class="solution"><div class="sol-header"><h4>Simplifica el checkout</h4><span class="impact">Alto impacto</span></div><p>Reduce campos al minimo (nombre, email, direccion, pago). Cada campo extra reduce la conversion un 3-5%. Usa checkout de una pagina si tu plataforma lo permite.</p></div>`;
+    solHTML += `<div class="solution"><div class="sol-header"><h4>Anade mas metodos de pago</h4><span class="impact">Alto impacto</span></div><p>Bizum, PayPal, Apple Pay, Google Pay. El 7% de los abandonos son por falta de metodos de pago preferidos.</p></div>`;
+    solHTML += `<div class="solution"><div class="sol-header"><h4>Email de carrito abandonado</h4><span class="impact">Medio impacto</span></div><p>Secuencia de 3 emails: 1h, 24h y 72h post-abandono. Tasa de recuperacion media: 5-15% de los carritos abandonados.</p></div>`;
+  }
+  if (worst.type === 'cart' || dropCart > 50) {
+    solHTML += `<div class="solution"><div class="sol-header"><h4>Muestra costes totales antes</h4><span class="impact">Alto impacto</span></div><p>El 49% de abandonos son por costes inesperados (envio, impuestos). Muestra el coste total estimado desde la ficha de producto.</p></div>`;
+    solHTML += `<div class="solution"><div class="sol-header"><h4>Anade urgencia real</h4><span class="impact">Medio impacto</span></div><p>Stock limitado visible, contador de personas viendo el producto, ofertas con tiempo limitado. Solo si es real — la urgencia falsa destruye confianza.</p></div>`;
+  }
+  if (worst.type === 'browse' || atcRate < 5) {
+    solHTML += `<div class="solution"><div class="sol-header"><h4>Mejora fichas de producto</h4><span class="impact">Alto impacto</span></div><p>5+ imagenes de calidad, video, descripcion centrada en beneficios (no caracteristicas), reviews visibles. Usa el Auditor de Imagenes de Producto para diagnosticar.</p></div>`;
+    solHTML += `<div class="solution"><div class="sol-header"><h4>Revisa tu trafico</h4><span class="impact">Alto impacto</span></div><p>Una tasa de add-to-cart baja puede significar que el trafico no esta cualificado. Revisa de donde vienen las visitas y si coinciden con tu ICP.</p></div>`;
+  }
+  document.getElementById('solutions').innerHTML = solHTML;
+}
+
+calc();
+</script>
+</body>
+</html>

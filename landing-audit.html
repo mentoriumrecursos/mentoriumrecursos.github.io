@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditor de Landing Page — Mentorium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#08080a;color:#fff;min-height:100vh}
+  .container{max-width:460px;margin:0 auto;padding:24px 16px 60px}
+  .header{text-align:center;padding:30px 0 20px}
+  .logo{width:40px;height:40px;background:#C45830;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;margin-bottom:14px}
+  .header h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .header p{font-size:13px;color:#555;line-height:1.5}
+  .card{background:#111113;border:1px solid #1c1c20;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#C45830;margin-bottom:18px}
+  .check-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:#0c0c0e;border:1px solid #1a1a1a;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.2s;user-select:none}
+  .check-item:hover{border-color:#333}
+  .check-item.checked{border-color:#2D8C4E;background:rgba(45,140,78,0.05)}
+  .check-item .box{width:24px;height:24px;border:2px solid #333;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;margin-top:2px}
+  .check-item.checked .box{background:#2D8C4E;border-color:#2D8C4E}
+  .check-item.checked .box::after{content:'V';color:#fff;font-size:14px;font-weight:900}
+  .check-item .text .title{font-size:14px;font-weight:600;color:#ccc;line-height:1.4}
+  .check-item .text .why{font-size:12px;color:#555;line-height:1.4;margin-top:4px}
+  .check-item.checked .text .title{color:#666;text-decoration:line-through}
+  .progress-bar{background:#151515;border-radius:100px;height:8px;margin-bottom:20px;overflow:hidden}
+  .progress-fill{height:100%;background:#C45830;border-radius:100px;transition:width 0.3s}
+  .score-box{text-align:center;padding:30px;border-radius:16px;margin-top:16px;transition:all 0.3s}
+  .score-box.red{background:linear-gradient(135deg,#1a0a08,#0c0c0e);border:2px solid #3a1a15}
+  .score-box.yellow{background:linear-gradient(135deg,#1a1800,#0c0c0e);border:2px solid #3a3415}
+  .score-box.green{background:linear-gradient(135deg,#0a1a0f,#0c0c0e);border:2px solid #1a3a25}
+  .score-num{font-size:56px;font-weight:900;line-height:1}
+  .score-label{font-size:14px;color:#666;margin-top:8px}
+  .verdict{font-size:16px;font-weight:800;margin-top:16px;padding:10px 24px;border-radius:8px;display:inline-block}
+  .tips{margin-top:20px;text-align:left}
+  .tip{font-size:13px;color:#888;line-height:1.6;padding:10px 0;border-bottom:1px solid #1a1a1a}
+  .tip strong{color:#C45830}
+  .footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #1a1a1a}
+  .footer .brand{font-size:12px;font-weight:800;color:#C45830;letter-spacing:3px}
+  .footer .handle{font-size:13px;color:#444;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">M</div>
+    <h1>Auditor de Landing Page</h1>
+    <p>25 elementos que tu página de producto necesita para convertir. Marca los que tienes.</p>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+
+  <div class="card">
+    <div class="card-title">Above the fold (lo primero que se ve)</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Headline que ataca el problema principal</div><div class="why">No el nombre del producto. El problema que resuelve.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Imagen/video del producto en uso</div><div class="why">No sobre fondo blanco. En contexto real, siendo usado.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Precio visible sin hacer scroll</div><div class="why">Si el cliente tiene que buscar el precio, se va.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Boton Add to Cart visible y con color de contraste</div><div class="why">Verde, naranja o azul. Nunca gris o del mismo color que el fondo.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Envio gratis o coste visible</div><div class="why">57% de abandonos son por costes de envio inesperados.</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Prueba social</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Reviews con estrellas visibles</div><div class="why">Minimo 10 reviews. Con fotos de clientes reales mejor.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Numero de reviews visible (ej: 4.8 de 247 reviews)</div><div class="why">El número especifico da más confianza que "muchos clientes satisfechos".</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Fotos de clientes reales (UGC)</div><div class="why">Las fotos reales convierten 3x más que las del proveedor.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Badge de confianza (pago seguro, envio rápido, etc.)</div><div class="why">Iconos de Visa/Mastercard/PayPal debajo del boton de compra.</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Copy y persuasion</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Beneficios en vez de caracteristicas</div><div class="why">"Duerme 8 horas" en vez de "Espuma viscoelastica de 10cm".</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Maximo 3 beneficios principales (no 10)</div><div class="why">Mas de 3 diluye el mensaje. Elige los 3 que más duelen.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Seccion de objeciones ("Por que es diferente")</div><div class="why">Responde las 3 dudas más comunes ANTES de que las piensen.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Urgencia real (stock limitado, oferta con fecha)</div><div class="why">Real, no falsa. Si el contador se reinicia, la gente lo detecta.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Garantia o devolución visible</div><div class="why">Reduce el riesgo percibido. "30 dias o te devolvemos el dinero".</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tecnico</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Carga en menos de 3 segundos en movil</div><div class="why">Cada segundo extra = -7% de conversion. Testea en PageSpeed.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Mobile-first (se ve bien en movil)</div><div class="why">El 75% del trafico de ecommerce es movil.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Sin popups intrusivos en los primeros 10 segundos</div><div class="why">El popup de suscripcion al entrar espanta. Ponlo al 60% de scroll o al salir.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Checkout en menos de 3 pasos</div><div class="why">Shopify Checkout nativo con Shop Pay = 15% más conversion.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Metodos de pago: tarjeta + PayPal + pago local (Bizum/Klarna)</div><div class="why">Cada metodo que falta = clientes que se van.</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recuperacion</div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Email de carrito abandonado (1h, 24h, 48h)</div><div class="why">Recupera el 15-30% de carritos. Si no lo tienes, estas regalando dinero.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Exit intent popup con descuento</div><div class="why">Cuando el raton va al boton de cerrar = ultima oportunidad.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Retargeting pixel instalado (Meta + TikTok)</div><div class="why">Sin pixel no puedes hacer retargeting. Sin retargeting pierdes el 97% del trafico.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Upsell o cross-sell en el checkout</div><div class="why">Sube el ticket medio un 15-25% sin coste adicional de adquisición.</div></div></div>
+    <div class="check-item" onclick="toggle(this)"><div class="box"></div><div class="text"><div class="title">Email post-compra (review + recompra)</div><div class="why">El cliente que acaba de comprar es 5x más probable que vuelva a comprar.</div></div></div>
+  </div>
+
+  <div class="score-box red" id="scoreBox">
+    <div class="score-num" id="scoreNum" style="color:#C45830">0/25</div>
+    <div class="score-label" id="scoreLabel">Marca los que cumples</div>
+    <div class="verdict" id="verdict" style="background:rgba(196,88,48,0.15);color:#C45830">EMPIEZA</div>
+    <div class="tips" id="tips"></div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">MENTORIUM</div>
+    <div class="handle">@javier.sanchezecom</div>
+  </div>
+</div>
+<script>
+function toggle(el){el.classList.toggle('checked');update()}
+function update(){
+  var total=document.querySelectorAll('.check-item').length;
+  var ok=document.querySelectorAll('.check-item.checked').length;
+  var pct=ok/total*100;
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('scoreNum').textContent=ok+'/'+total;
+  var box=document.getElementById('scoreBox'),v=document.getElementById('verdict'),n=document.getElementById('scoreNum'),t=document.getElementById('tips'),l=document.getElementById('scoreLabel');
+  if(ok<=8){
+    box.className='score-box red';n.style.color='#C45830';v.style.background='rgba(196,88,48,0.15)';v.style.color='#C45830';v.textContent='CRITICO';
+    l.textContent='Tu landing tiene agujeros graves';
+    t.innerHTML='<div class="tip"><strong>Prioridad 1:</strong> Arregla el above the fold. Si el cliente no ve precio, beneficio y boton en 3 segundos, se va.</div><div class="tip"><strong>Prioridad 2:</strong> Anade reviews reales. Sin prueba social no hay confianza.</div><div class="tip"><strong>Prioridad 3:</strong> Activa el email de carrito abandonado HOY. Estas regalando ventas.</div>';
+  }else if(ok<=15){
+    box.className='score-box yellow';n.style.color='#C8AA28';v.style.background='rgba(200,170,40,0.12)';v.style.color='#C8AA28';v.textContent='MEJORABLE';
+    l.textContent='Base correcta pero dejas dinero en la mesa';
+    t.innerHTML='<div class="tip"><strong>Foco:</strong> Los puntos que faltan son probablemente los que marcan la diferencia entre 1% y 2.5% de conversion.</div><div class="tip"><strong>Rapido:</strong> Revisa la seccion de recuperacion. Cada punto que actives ahi = ventas que ahora pierdes.</div>';
+  }else if(ok<=20){
+    box.className='score-box green';n.style.color='#2D8C4E';v.style.background='rgba(45,140,78,0.15)';v.style.color='#2D8C4E';v.textContent='BIEN';
+    l.textContent='Tu landing esta casi optimizada';
+    t.innerHTML='<div class="tip"><strong>Siguiente paso:</strong> Los ultimos puntos son los que separan 2% de conversión de 3%+. Cada decima cuenta cuando escalas.</div>';
+  }else{
+    box.className='score-box green';n.style.color='#2D8C4E';v.style.background='rgba(45,140,78,0.15)';v.style.color='#2D8C4E';v.textContent='LISTA PARA ESCALAR';
+    l.textContent='Tu landing convierte. Los datos lo van a confirmar.';
+    t.innerHTML='<div class="tip"><strong>Ahora:</strong> Empieza a meter trafico de forma controlada. Mide CPA vs margen. Si los números cuadran, escala.</div>';
+  }
+}
+</script>
+</body>
+</html>
