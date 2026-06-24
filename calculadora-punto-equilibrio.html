@@ -7,42 +7,45 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#faf9f7,#f0ede8);color:#1a1a1a;min-height:100vh}
+  body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a2a2f,#071e22);color:#f4f1ea;min-height:100vh}
   .container{max-width:460px;margin:0 auto;padding:24px 16px 60px}
   .header{text-align:center;padding:30px 0 20px}
-  .badge{display:inline-block;background:#1a1a1a;color:#fff;font-size:10px;font-weight:800;padding:6px 16px;border-radius:100px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .badge{display:inline-block;background:#f4f1ea;color:#fff;font-size:10px;font-weight:800;padding:6px 16px;border-radius:100px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
   .header h1{font-size:22px;font-weight:900;margin-bottom:8px}
-  .header p{font-size:13px;color:#888;line-height:1.5}
-  .card{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
-  .card-title{font-size:11px;font-weight:800;color:#C45830;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
+  .header p{font-size:13px;color:#9aa6a3;line-height:1.5}
+  .card{background:#0d3338;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.35)}
+  .card-title{font-size:11px;font-weight:800;color:#D3AF39;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
   .field{margin-bottom:14px}
-  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#888;margin-bottom:6px}
-  .field label .val{color:#C45830;font-weight:800}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#9aa6a3;margin-bottom:6px}
+  .field label .val{color:#D3AF39;font-weight:800}
   .row{display:flex;align-items:center;gap:10px}
-  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#e8e4de;border-radius:100px;outline:none}
-  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#C45830;border-radius:50%;cursor:pointer;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.15)}
-  .row .num{width:80px;background:#faf9f7;border:1px solid #e8e4de;border-radius:8px;color:#1a1a1a;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
-  .row .num:focus{border-color:#C45830}
-  .row .u{color:#aaa;font-size:13px;font-weight:600;width:16px}
-  .result{background:#fff;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.06);text-align:center;margin-top:20px}
-  .result .big{font-size:48px;font-weight:900;color:#C45830}
-  .result .label{font-size:13px;color:#888;margin-top:6px;margin-bottom:20px}
-  .result .breakdown{text-align:left;background:#faf9f7;padding:16px;border-radius:10px}
-  .result .line{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;border-bottom:1px solid #f0ede8}
+  .row input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#0a3036;border-radius:100px;outline:none}
+  .row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:#D3AF39;border-radius:50%;cursor:pointer;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.15)}
+  .row .num{width:80px;background:#0a2a2f;border:1px solid #0a3036;border-radius:8px;color:#f4f1ea;font-size:15px;font-weight:700;padding:10px;text-align:right;font-family:inherit;outline:none}
+  .row .num:focus{border-color:#D3AF39}
+  .row .u{color:#7e8b88;font-size:13px;font-weight:600;width:16px}
+  .result{background:#0d3338;border-radius:16px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center;margin-top:20px}
+  .result .big{font-size:48px;font-weight:900;color:#D3AF39}
+  .result .label{font-size:13px;color:#9aa6a3;margin-top:6px;margin-bottom:20px}
+  .result .breakdown{text-align:left;background:#0a2a2f;padding:16px;border-radius:10px}
+  .result .line{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;border-bottom:1px solid #071e22}
   .result .line:last-child{border-bottom:none}
-  .result .line .l{color:#888}
+  .result .line .l{color:#9aa6a3}
   .result .line .v{font-weight:800}
-  .result .line .v.neg{color:#C45830}
-  .result .line .v.pos{color:#2D8C4E}
-  .gauge{margin:20px 0;height:16px;background:#e8e4de;border-radius:8px;overflow:hidden;position:relative}
+  .result .line .v.neg{color:#D3AF39}
+  .result .line .v.pos{color:#34d17f}
+  .gauge{margin:20px 0;height:16px;background:#0a3036;border-radius:8px;overflow:hidden;position:relative}
   .gauge-fill{height:100%;border-radius:8px;transition:width 0.5s}
-  .gauge-mark{position:absolute;top:-20px;font-size:10px;font-weight:800;color:#1a1a1a;transform:translateX(-50%)}
-  .gauge-labels{display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-top:4px}
-  .insight{background:#fff;border-radius:12px;padding:16px;margin-top:16px;box-shadow:0 2px 8px rgba(0,0,0,0.04);font-size:13px;color:#666;line-height:1.6}
-  .insight strong{color:#1a1a1a}
-  .insight .accent{color:#C45830;font-weight:700}
-  .footer{text-align:center;margin-top:30px;font-size:12px;color:#ccc}
-  .footer span{color:#C45830;font-weight:800}
+  .gauge-mark{position:absolute;top:-20px;font-size:10px;font-weight:800;color:#f4f1ea;transform:translateX(-50%)}
+  .gauge-labels{display:flex;justify-content:space-between;font-size:10px;color:#7e8b88;margin-top:4px}
+  .insight{background:#0d3338;border-radius:12px;padding:16px;margin-top:16px;box-shadow:0 2px 8px rgba(0,0,0,0.35);font-size:13px;color:#8a9794;line-height:1.6}
+  .insight strong{color:#f4f1ea}
+  .insight .accent{color:#D3AF39;font-weight:700}
+  .footer{text-align:center;margin-top:30px;font-size:12px;color:#5e6b68}
+  .footer span{color:#D3AF39;font-weight:800}
+
+.check,.result,.stat-item{border-top:2px solid rgba(211,175,57,.55)}
+.badge{color:#071e22 !important}
 </style>
 </head>
 <body>
@@ -96,11 +99,11 @@
 <!-- ss-cta-claridad :: CTA sesion de claridad (recurso + agenda llamada, modelo Mario Pelaez) -->
 <a href="https://calendly.com/mentoriumecom/sesion-de-claridad" target="_blank" rel="noopener" class="ss-cta-claridad"
    style="display:block;max-width:460px;margin:22px auto 0;text-decoration:none;font-family:'Inter',system-ui,-apple-system,sans-serif">
-  <div style="background:linear-gradient(135deg,#15110c,#0c0c0e);border:1px solid #C45830;border-radius:16px;padding:24px 20px;text-align:center;box-shadow:0 10px 30px rgba(196,88,48,.12)">
-    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#C45830;margin-bottom:9px">&iquest;Lo vemos juntos en directo?</div>
-    <div style="font-size:18px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:16px">Reserva tu sesi&oacute;n de claridad <span style="color:#C45830">GRATIS</span></div>
-    <span style="background:#C45830;color:#fff;font-size:15px;font-weight:800;padding:14px 26px;border-radius:10px;display:inline-block">Agendar llamada de 30 min &rarr;</span>
-    <div style="font-size:12.5px;color:#666;margin-top:14px;line-height:1.55">Miramos tu tienda juntos y te digo exactamente<br>qu&eacute; arreglar antes de escalar.</div>
+  <div style="background:linear-gradient(135deg,#0a2a2f,#071e22);border:1px solid #D3AF39;border-radius:16px;padding:24px 20px;text-align:center;box-shadow:0 10px 30px rgba(196,88,48,.12)">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D3AF39;margin-bottom:9px">&iquest;Lo vemos juntos en directo?</div>
+    <div style="font-size:18px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:16px">Reserva tu sesi&oacute;n de claridad <span style="color:#D3AF39">GRATIS</span></div>
+    <span style="background:#D3AF39;color:#fff;font-size:15px;font-weight:800;padding:14px 26px;border-radius:10px;display:inline-block">Agendar llamada de 30 min &rarr;</span>
+    <div style="font-size:12.5px;color:#8a9794;margin-top:14px;line-height:1.55">Miramos tu tienda juntos y te digo exactamente<br>qu&eacute; arreglar antes de escalar.</div>
   </div>
 </a>
 
@@ -140,7 +143,7 @@ function calc(){
 
   // Gauge
   var gauge_pct=Math.min(be_revenue/30000*100,100);
-  html+='<div class="gauge"><div class="gauge-fill" style="width:'+gauge_pct+'%;background:'+(be_revenue>20000?'#C45830':be_revenue>10000?'#C8AA28':'#2D8C4E')+'"></div></div>';
+  html+='<div class="gauge"><div class="gauge-fill" style="width:'+gauge_pct+'%;background:'+(be_revenue>20000?'#D3AF39':be_revenue>10000?'#C8AA28':'#34d17f')+'"></div></div>';
   html+='<div class="gauge-labels"><span>0€</span><span>10K€</span><span>20K€</span><span>30K€</span></div>';
 
   html+='<div class="breakdown">';
@@ -157,12 +160,12 @@ function calc(){
 
   var ins='';
   if(be_daily<=2){
-    ins='<strong style="color:#2D8C4E">Break-even alcanzable.</strong> Con '+be_daily+' pedidos al día cubres todos tus costes. Con una conversión del 2% necesitas '+Math.ceil(be_daily/0.02)+' visitantes diarios.';
+    ins='<strong style="color:#34d17f">Break-even alcanzable.</strong> Con '+be_daily+' pedidos al día cubres todos tus costes. Con una conversión del 2% necesitas '+Math.ceil(be_daily/0.02)+' visitantes diarios.';
   }else if(be_daily<=5){
     ins='<strong>Break-even moderado.</strong> '+be_daily+' pedidos/día es factible pero requiere tráfico consistente. ';
     if(ads>fijos) ins+='<span class="accent">Tu gasto en ads ('+fmt(ads)+') es mayor que tus fijos ('+fmt(fijos)+'). Si bajas ads y mejoras conversión orgánica, el break-even baja.</span>';
   }else{
-    ins='<strong style="color:#C45830">Break-even alto.</strong> Necesitas '+be_daily+' pedidos diarios. ';
+    ins='<strong style="color:#D3AF39">Break-even alto.</strong> Necesitas '+be_daily+' pedidos diarios. ';
     ins+='<span class="accent">Revisa: ¿puedes subir precio para aumentar margen? ¿Puedes bajar fijos eliminando apps innecesarias? ¿Tus ads están siendo rentables?</span>';
   }
   document.getElementById('insight').innerHTML=ins;

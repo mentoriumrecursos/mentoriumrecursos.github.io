@@ -11,51 +11,54 @@
   .container { max-width: 480px; margin: 0 auto; padding: 30px 20px; }
 
   .header { text-align: center; margin-bottom: 40px; }
-  .header .brand { font-size: 12px; font-weight: 700; letter-spacing: 4px; color: #C45830; text-transform: uppercase; margin-bottom: 12px; }
+  .header .brand { font-size: 12px; font-weight: 700; letter-spacing: 4px; color: #D3AF39; text-transform: uppercase; margin-bottom: 12px; }
   .header h1 { font-size: 26px; font-weight: 900; line-height: 1.2; margin-bottom: 8px; }
-  .header p { font-size: 14px; color: #666; line-height: 1.5; }
+  .header p { font-size: 14px; color: #8a9794; line-height: 1.5; }
 
   .criteria { margin-bottom: 30px; }
-  .criteria-title { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830; margin-bottom: 16px; }
+  .criteria-title { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #D3AF39; margin-bottom: 16px; }
 
   .criteria-item {
-    background: #111; border: 1px solid #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 10px;
+    background: #111; border: 1px solid #f4f1ea; border-radius: 12px; padding: 20px; margin-bottom: 10px;
   }
   .criteria-q { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 12px; line-height: 1.4; }
   .criteria-hint { font-size: 12px; color: #555; margin-bottom: 12px; line-height: 1.4; }
   .options { display: flex; gap: 8px; }
   .opt-btn {
     flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #222; background: transparent;
-    color: #888; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s;
+    color: #9aa6a3; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s;
     text-align: center;
   }
-  .opt-btn:hover { border-color: #444; color: #ccc; }
-  .opt-btn.selected-good { background: rgba(45,140,78,0.15); border-color: #2D8C4E; color: #2D8C4E; }
+  .opt-btn:hover { border-color: #444; color: #5e6b68; }
+  .opt-btn.selected-good { background: rgba(45,140,78,0.15); border-color: #34d17f; color: #34d17f; }
   .opt-btn.selected-ok { background: rgba(200,170,40,0.1); border-color: #C8AA28; color: #C8AA28; }
-  .opt-btn.selected-bad { background: rgba(196,88,48,0.15); border-color: #C45830; color: #C45830; }
+  .opt-btn.selected-bad { background: rgba(196,88,48,0.15); border-color: #D3AF39; color: #D3AF39; }
 
   .result-panel {
-    background: #111; border: 1px solid #1a1a1a; border-radius: 16px; padding: 30px; text-align: center;
+    background: #111; border: 1px solid #f4f1ea; border-radius: 16px; padding: 30px; text-align: center;
     margin-top: 30px; display: none;
   }
-  .result-panel h2 { font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #C45830; margin-bottom: 20px; }
+  .result-panel h2 { font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #D3AF39; margin-bottom: 20px; }
   .score-circle {
     width: 140px; height: 140px; border-radius: 50%; display: flex; flex-direction: column;
     align-items: center; justify-content: center; margin: 0 auto 20px;
   }
   .score-circle .num { font-size: 48px; font-weight: 900; }
-  .score-circle .of { font-size: 14px; color: #888; }
-  .circle-red { border: 4px solid #C45830; }
+  .score-circle .of { font-size: 14px; color: #9aa6a3; }
+  .circle-red { border: 4px solid #D3AF39; }
   .circle-yellow { border: 4px solid #C8AA28; }
-  .circle-green { border: 4px solid #2D8C4E; }
+  .circle-green { border: 4px solid #34d17f; }
 
   .verdict { font-size: 20px; font-weight: 900; margin-bottom: 16px; }
-  .verdict-text { font-size: 14px; color: #888; line-height: 1.6; text-align: left; margin-top: 16px; }
+  .verdict-text { font-size: 14px; color: #9aa6a3; line-height: 1.6; text-align: left; margin-top: 16px; }
   .verdict-text strong { color: #fff; }
 
-  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #1a1a1a; }
+  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #f4f1ea; }
   .footer p { font-size: 12px; color: #444; margin-bottom: 4px; }
-  .footer .handle { font-size: 14px; font-weight: 700; color: #C45830; }
+  .footer .handle { font-size: 14px; font-weight: 700; color: #D3AF39; }
+
+.check,.result,.stat-item{border-top:2px solid rgba(211,175,57,.55)}
+.badge{color:#071e22 !important}
 </style>
 </head>
 <body>
@@ -181,11 +184,11 @@
 <!-- ss-cta-claridad :: CTA sesion de claridad (recurso + agenda llamada, modelo Mario Pelaez) -->
 <a href="https://calendly.com/mentoriumecom/sesion-de-claridad" target="_blank" rel="noopener" class="ss-cta-claridad"
    style="display:block;max-width:460px;margin:22px auto 0;text-decoration:none;font-family:'Inter',system-ui,-apple-system,sans-serif">
-  <div style="background:linear-gradient(135deg,#15110c,#0c0c0e);border:1px solid #C45830;border-radius:16px;padding:24px 20px;text-align:center;box-shadow:0 10px 30px rgba(196,88,48,.12)">
-    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#C45830;margin-bottom:9px">&iquest;Lo vemos juntos en directo?</div>
-    <div style="font-size:18px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:16px">Reserva tu sesi&oacute;n de claridad <span style="color:#C45830">GRATIS</span></div>
-    <span style="background:#C45830;color:#fff;font-size:15px;font-weight:800;padding:14px 26px;border-radius:10px;display:inline-block">Agendar llamada de 30 min &rarr;</span>
-    <div style="font-size:12.5px;color:#666;margin-top:14px;line-height:1.55">Miramos tu tienda juntos y te digo exactamente<br>qu&eacute; arreglar antes de escalar.</div>
+  <div style="background:linear-gradient(135deg,#0a2a2f,#071e22);border:1px solid #D3AF39;border-radius:16px;padding:24px 20px;text-align:center;box-shadow:0 10px 30px rgba(196,88,48,.12)">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#D3AF39;margin-bottom:9px">&iquest;Lo vemos juntos en directo?</div>
+    <div style="font-size:18px;font-weight:900;color:#fff;line-height:1.3;margin-bottom:16px">Reserva tu sesi&oacute;n de claridad <span style="color:#D3AF39">GRATIS</span></div>
+    <span style="background:#D3AF39;color:#fff;font-size:15px;font-weight:800;padding:14px 26px;border-radius:10px;display:inline-block">Agendar llamada de 30 min &rarr;</span>
+    <div style="font-size:12.5px;color:#8a9794;margin-top:14px;line-height:1.55">Miramos tu tienda juntos y te digo exactamente<br>qu&eacute; arreglar antes de escalar.</div>
   </div>
 </a>
 
@@ -219,7 +222,7 @@ function pick(btn, score, level) {
 
     if (total <= 10) {
       circle.className = 'score-circle circle-red';
-      v.style.color = '#C45830';
+      v.style.color = '#D3AF39';
       v.textContent = 'NO LANZAR';
       vt.innerHTML = '<strong>Este producto tiene demasiados riesgos.</strong> Los márgenes, la demanda o la logística no están a favor. Busca otro producto antes de gastar dinero en ads. Es más barato cambiar de producto ahora que perder 2.000€ descubriéndolo después.';
     } else if (total <= 18) {
@@ -229,7 +232,7 @@ function pick(btn, score, level) {
       vt.innerHTML = '<strong>Tiene potencial pero hay puntos débiles.</strong> Antes de escalar, resuelve los criterios en rojo. Puedes testear con 100-200€ para validar la demanda, pero no subas presupuesto hasta arreglar los fundamentales.';
     } else {
       circle.className = 'score-circle circle-green';
-      v.style.color = '#2D8C4E';
+      v.style.color = '#34d17f';
       v.textContent = 'LANZAR';
       vt.innerHTML = '<strong>Este producto tiene los fundamentales cubiertos.</strong> Márgenes sanos, demanda validada, logística viable. Puedes lanzar con confianza. Empieza con 30-50€/día, mide los primeros 100 clics, y escala si el CPA está por debajo del 30% de tu ticket medio.';
     }
