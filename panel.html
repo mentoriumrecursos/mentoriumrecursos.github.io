@@ -1,63 +1,114 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mentorium - Panel</title>
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mentorium · Panel de Recursos</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Poppins',sans-serif;background:#0E1117;color:#fff;min-height:100vh}
-#login{text-align:center;padding:80px 20px}
-#login .logo{color:#C5A55A;font-size:32px;font-weight:800;margin-bottom:8px}
-#login small{color:#9aa6a3;display:block;margin-bottom:30px}
-#login input{background:#1a1f2e;border:1px solid #333;color:#fff;padding:14px 20px;border-radius:8px;font-size:15px;width:260px;margin:8px 0;font-family:'Poppins',sans-serif;text-align:center}
-#login input:focus{border-color:#C5A55A;outline:none}
-#login button{background:#C5A55A;color:#0E1117;border:none;padding:14px 40px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'Poppins',sans-serif}
-#login .error{color:#ff4444;font-size:13px;margin-top:10px;display:none}
-#panel{display:none;padding:20px;max-width:700px;margin:0 auto}
-#panel .top{text-align:center;margin:20px 0}
-#panel .top span{color:#C5A55A;font-size:28px;font-weight:800}
-#panel .top small{display:block;color:#9aa6a3;font-size:12px;margin-top:4px}
-h2{color:#C5A55A;font-size:17px;margin:25px 0 10px;padding-bottom:6px;border-bottom:1px solid #252b3b}
-.t{display:block;background:#1a1f2e;padding:14px 18px;margin:6px 0;border-radius:10px;text-decoration:none;border-left:4px solid #C5A55A}
-.t .n{color:#fff;font-size:14px;font-weight:700}
-.t .d{color:#9aa6a3;font-size:11px;margin-top:3px}
-.tg{display:inline-block;background:#C5A55A;color:#0E1117;font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;margin-left:6px}
-
-.check,.result,.stat-item{border-top:2px solid rgba(211,175,57,.55)}
-.badge{color:#071e22 !important}
-</style>
-</head>
-<body>
+body{font-family:'Inter',sans-serif;background:#071E22;color:#fff;min-height:100vh;background-image:radial-gradient(900px 420px at 82% -8%,rgba(211,175,57,.13),transparent 60%),radial-gradient(700px 380px at 8% 108%,rgba(29,120,116,.12),transparent 60%)}
+.wrap{max-width:760px;margin:0 auto;padding:24px 18px 70px}
+#login{text-align:center;padding:90px 20px}
+#login .logo{color:#fff;font-size:30px;font-weight:900;letter-spacing:-.5px}
+#login .logo b{color:#D3AF39}
+#login small{color:#8a9794;display:block;margin:8px 0 28px;letter-spacing:.5px}
+#login input{background:#0D3338;border:1px solid #1f3b3f;color:#fff;padding:14px 20px;border-radius:12px;font-size:15px;width:280px;margin:8px 0;font-family:inherit;text-align:center}
+#login input:focus{border-color:#D3AF39;outline:none}
+#login button{background:linear-gradient(135deg,#D3AF39,#E8C84A);color:#071E22;border:none;padding:14px 44px;border-radius:999px;font-size:14px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;margin-top:14px;box-shadow:0 8px 26px rgba(211,175,57,.3)}
+#login .error{color:#EE2E31;font-size:13px;margin-top:12px;display:none}
+#panel{display:none}
+.top{text-align:center;margin:14px 0 26px}
+.top .eb{color:#D3AF39;font-size:10px;font-weight:900;letter-spacing:3px;text-transform:uppercase}
+.top .ti{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-top:6px}
+.top .ti b{color:#D3AF39}
+.top small{display:block;color:#8a9794;font-size:12.5px;margin-top:6px}
+.cat{margin-top:30px}
+.cat h2{color:#D3AF39;font-size:13px;font-weight:900;letter-spacing:2px;text-transform:uppercase;display:inline-block}
+.cat .csub{color:#8a9794;font-size:12px;margin:2px 0 12px}
+.t{display:block;background:#0D3338;padding:15px 18px;margin:8px 0;border-radius:14px;text-decoration:none;border-left:3px solid #D3AF39;border-top:1px solid rgba(255,255,255,.04);transition:transform .15s,box-shadow .15s}
+.t:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+.t .n{color:#fff;font-size:14.5px;font-weight:700}
+.t .d{color:#9aa6a3;font-size:11.5px;margin-top:3px;line-height:1.4}
+.tg{display:inline-block;background:#D3AF39;color:#071E22;font-size:9px;font-weight:900;padding:2px 7px;border-radius:99px;margin-left:6px;letter-spacing:1px;vertical-align:middle}
+.cnt{text-align:center;color:#8a9794;font-size:12px;margin-top:8px}
+.cnt b{color:#D3AF39}
+</style></head><body><div class="wrap">
 <div id="login">
-<div class="logo">MENTORIUM</div>
-<small>Panel Recursos - Acceso Equipo</small>
-<input type="password" id="pass" placeholder="Contrasena" onkeypress="if(event.key==='Enter')ck()">
-<br><button onclick="ck()">Entrar</button>
-<div class="error" id="err">Incorrecta</div>
+  <div class="logo">MENTO<b>RIUM</b></div>
+  <small>Panel de recursos · acceso equipo</small>
+  <input type="password" id="pass" placeholder="Contraseña" onkeypress="if(event.key==='Enter')ck()"><br>
+  <button onclick="ck()">Entrar</button>
+  <div class="error" id="err">Contraseña incorrecta</div>
 </div>
 <div id="panel">
-<div class="top"><span>MENTORIUM</span><small>Recursos para enviar a leads</small></div>
-<h2>CALCULADORAS</h2>
-<a class="t" href="calculadora-margenes.html" target="_blank"><div class="n">Calculadora Margenes Reales <span class="tg">TOP</span></div><div class="d">Cuanto le queda DE VERDAD despues de costes</div></a>
-<a class="t" href="calculadora-roas-real.html" target="_blank"><div class="n">Calculadora ROAS Real</div><div class="d">Si los ads son rentables o no</div></a>
-<a class="t" href="calculadora-profit-first.html" target="_blank"><div class="n">Profit First</div><div class="d">Beneficio antes de gastar</div></a>
-<a class="t" href="calculadora-break-even-diario.html" target="_blank"><div class="n">Break Even Diario</div><div class="d">Cuanto vender al dia para cubrir costes</div></a>
-<h2>AUDITORES</h2>
-<a class="t" href="checklist-conversion-tienda.html" target="_blank"><div class="n">Checklist de Conversion <span class="tg">NUEVO</span></div><div class="d">16 puntos que te estan costando ventas</div></a>
-<a class="t" href="auditor-checkout.html" target="_blank"><div class="n">Auditor Checkout <span class="tg">TOP</span></div><div class="d">15 puntos que revisar del checkout</div></a>
-<a class="t" href="auditoria-express.html" target="_blank"><div class="n">Auditoria Express</div><div class="d">Nota del 1 al 10 de la tienda</div></a>
-<a class="t" href="auditor-meta-ads.html" target="_blank"><div class="n">Auditor Meta Ads</div><div class="d">Checklist campanas ads</div></a>
-<a class="t" href="landing-audit.html" target="_blank"><div class="n">Auditor Landing</div><div class="d">Landing de alta conversion</div></a>
-<h2>GENERADORES</h2>
-<a class="t" href="validador-producto.html" target="_blank"><div class="n">Validador Producto <span class="tg">TOP</span></div><div class="d">Si un producto tiene potencial</div></a>
-<a class="t" href="comparador-proveedores.html" target="_blank"><div class="n">Comparador Proveedores</div><div class="d">Precio, envio, calidad</div></a>
-<a class="t" href="generador-copy-anuncio.html" target="_blank"><div class="n">Generador Copy Anuncios</div><div class="d">Textos para Meta Ads</div></a>
-<h2>SIMULADORES</h2>
-<a class="t" href="simulador-escalado.html" target="_blank"><div class="n">Simulador Escalado</div><div class="d">Si meto mas en ads cuanto vendo</div></a>
-<a class="t" href="simulador-funnel-organico.html" target="_blank"><div class="n">Funnel Organico</div><div class="d">De seguidores a ventas</div></a>
+  <div class="top"><div class="eb">Mentorium · Recursos</div><div class="ti">61 herramientas para tus <b>leads</b></div><small>Auditores, calculadoras, generadores y simuladores. Cada uno con tu sesión 1-a-1.</small></div>
+  <div class="cat"><h2>CALCULADORAS</h2><p class="csub">Saca el número real de tu negocio</p><a class="t" href="calculadora-margenes.html" target="_blank"><div class="n">Calculadora de Márgenes Reales <span class="tg">TOP</span></div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-roas-real.html" target="_blank"><div class="n">Calculadora ROAS Real <span class="tg">TOP</span></div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-breakeven-ads.html" target="_blank"><div class="n">Calculadora Break-Even de Ads </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-break-even-diario.html" target="_blank"><div class="n">Calculadora Break-Even Diario </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-cac-canal.html" target="_blank"><div class="n">Calculadora CAC por Canal </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-coste-devolucion.html" target="_blank"><div class="n">Calculadora de Coste Real de Devoluciones </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-descuento-real.html" target="_blank"><div class="n">Calculadora de Descuento Real </div><div class="d">¿Cuánto margen pierdes realmente?</div></a>
+<a class="t" href="calculadora-margen-envio-gratis.html" target="_blank"><div class="n">Calculadora de Margen con Envio Gratis </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-precio-psicologico.html" target="_blank"><div class="n">Calculadora de Precio Psicológico </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-punto-equilibrio.html" target="_blank"><div class="n">Calculadora de Punto de Equilibrio </div><div class="d">¿Cuánto necesitas facturar para no perder?</div></a>
+<a class="t" href="calculadora-rentabilidad-sku.html" target="_blank"><div class="n">Calculadora de Rentabilidad por SKU </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-influencer-roi.html" target="_blank"><div class="n">Calculadora de ROI de Influencers </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-tasa-abandono.html" target="_blank"><div class="n">Calculadora de Tasa de Abandono del Carrito </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-envio-gratis.html" target="_blank"><div class="n">Calculadora Envío Gratis </div><div class="d">¿Desde qué ticket medio puedes ofrecerlo?</div></a>
+<a class="t" href="calculadora-ltv-cliente.html" target="_blank"><div class="n">Calculadora LTV de Cliente </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-profit-first.html" target="_blank"><div class="n">Calculadora Profit First </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-roi-landing.html" target="_blank"><div class="n">Calculadora ROI de Landing Page </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="calculadora-retorno-email.html" target="_blank"><div class="n">Calculadora ROI Email Marketing </div><div class="d">Herramienta gratuita Mentorium</div></a>
+</div>
+<div class="cat"><h2>AUDITORES</h2><p class="csub">Detecta qué falla y qué arreglar</p><a class="t" href="auditor-checkout.html" target="_blank"><div class="n">Auditor de Checkout <span class="tg">TOP</span></div><div class="d">¿Tu checkout pierde clientes?</div></a>
+<a class="t" href="auditor-confianza-tienda.html" target="_blank"><div class="n">Auditor de Confianza de Tienda </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="auditor-email-deliverability.html" target="_blank"><div class="n">Auditor de Email Deliverability </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="auditor-fichas-producto.html" target="_blank"><div class="n">Auditor de Ficha de Producto </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="auditor-imagenes-producto.html" target="_blank"><div class="n">Auditor de Imagenes de Producto </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="landing-audit.html" target="_blank"><div class="n">Auditor de Landing Page </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="auditor-meta-ads.html" target="_blank"><div class="n">Auditor de Meta Ads </div><div class="d">12 señales de que tus campañas están mal</div></a>
+<a class="t" href="auditor-pagina-inicio.html" target="_blank"><div class="n">Auditor de Pagina de Inicio </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="auditor-seo-producto.html" target="_blank"><div class="n">Auditor SEO de Producto </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="auditor-velocidad-tienda.html" target="_blank"><div class="n">Auditoría de Velocidad de Tienda </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="auditoria-express.html" target="_blank"><div class="n">Auditoría Express de Tu Tienda </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="scorecard-madurez-ecommerce.html" target="_blank"><div class="n">Scorecard de Madurez Ecommerce </div><div class="d">¿En qué nivel está tu tienda?</div></a>
+</div>
+<div class="cat"><h2>GENERADORES</h2><p class="csub">Crea copy, emails y assets en segundos</p><a class="t" href="generador-asuntos-email.html" target="_blank"><div class="n">Generador de Asuntos de Email </div><div class="d">20 subject lines que abren</div></a>
+<a class="t" href="generador-buyer-persona.html" target="_blank"><div class="n">Generador de Buyer Persona </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-calendario-contenido.html" target="_blank"><div class="n">Generador de Calendario de Contenido </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-copy-anuncio.html" target="_blank"><div class="n">Generador de Copy para Anuncios </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-descripcion-producto.html" target="_blank"><div class="n">Generador de Descripción de Producto </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="email-flows-generator.html" target="_blank"><div class="n">Generador de Email Flows </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-faqs-tienda.html" target="_blank"><div class="n">Generador de FAQs para Tienda Online </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-hooks.html" target="_blank"><div class="n">Generador de Hooks Virales </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-nombre-tienda.html" target="_blank"><div class="n">Generador de Nombre de Tienda </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-ofertas-flash.html" target="_blank"><div class="n">Generador de Ofertas Flash </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-politica-devoluciones.html" target="_blank"><div class="n">Generador de Pol&iacute;tica de Devoluciones </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-prompts-nano-banana.html" target="_blank"><div class="n">Generador de Prompts para Fotos de Producto </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-secuencia-email.html" target="_blank"><div class="n">Generador de Secuencia de Email </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-garantia.html" target="_blank"><div class="n">Generador de Texto de Garantia </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="generador-titulos-producto.html" target="_blank"><div class="n">Generador de Titulos de Producto SEO </div><div class="d">Herramienta gratuita Mentorium</div></a>
+</div>
+<div class="cat"><h2>SIMULADORES</h2><p class="csub">Prueba decisiones antes de tomarlas</p><a class="t" href="simulador-descuento-bundle.html" target="_blank"><div class="n">Simulador de Descuento por Bundle </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="simulador-escalado.html" target="_blank"><div class="n">Simulador de Escalado </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="simulador-funnel-organico.html" target="_blank"><div class="n">Simulador de Funnel Orgánico </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="simulador-precio-competencia.html" target="_blank"><div class="n">Simulador de Precio vs Competencia </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="simulador-email-revenue.html" target="_blank"><div class="n">Simulador de Revenue por Email </div><div class="d">¿Cuánto dinero pierdes sin email flows?</div></a>
+<a class="t" href="simulador-stock-reorder.html" target="_blank"><div class="n">Simulador de Stock y Reposición </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="simulador-temporada-alta.html" target="_blank"><div class="n">Simulador de Temporada Alta </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="simulador-ab-test.html" target="_blank"><div class="n">Simulador de Test A/B </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="simulador-upsell-crosssell.html" target="_blank"><div class="n">Simulador de Upsell y Cross-Sell </div><div class="d">Herramienta gratuita Mentorium</div></a>
+</div>
+<div class="cat"><h2>VALIDADORES Y COMPARADORES</h2><p class="csub">Decide con criterio, no a ojo</p><a class="t" href="validador-producto.html" target="_blank"><div class="n">Validador de Producto <span class="tg">TOP</span></div><div class="d">¿Tu producto es rentable?</div></a>
+<a class="t" href="comparador-proveedores.html" target="_blank"><div class="n">Comparador de Proveedores </div><div class="d">¿Cuál te da mejor margen?</div></a>
+<a class="t" href="pricing-optimizer.html" target="_blank"><div class="n">Optimizador de Precio y Oferta </div><div class="d">Herramienta gratuita Mentorium</div></a>
+</div>
+<div class="cat"><h2>CHECKLISTS Y GUÍAS</h2><p class="csub">Lo que no puede faltar, paso a paso</p><a class="t" href="checklist-conversion-tienda.html" target="_blank"><div class="n">Checklist de Conversión de tu Tienda <span class="tg">TOP</span></div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="guia-email-sms-marketing.html" target="_blank"><div class="n">Guia de Email Marketing y SMS para Ecommerce </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="planificador-contenido-semanal.html" target="_blank"><div class="n">Planificador de Contenido Semanal </div><div class="d">Herramienta gratuita Mentorium</div></a>
+<a class="t" href="stack-ecommerce-2026.html" target="_blank"><div class="n">Stack Ecommerce 2026 </div><div class="d">Las Herramientas que Usamos</div></a>
+</div>
+
+  <div class="cnt"><b>61</b> herramientas gratuitas · todas con CTA de sesión de claridad</div>
+</div>
 </div>
 <script>function ck(){if(document.getElementById('pass').value==='mentorium2026'){document.getElementById('login').style.display='none';document.getElementById('panel').style.display='block'}else{document.getElementById('err').style.display='block'}}</script>
-</body>
-</html>
+</body></html>
